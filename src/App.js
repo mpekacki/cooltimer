@@ -15,6 +15,7 @@ class App extends React.Component {
         totalWorkedSeconds: 0,
         isWork: null,
         availableBreakSeconds: 0,
+        hiddenAvailableBreakSeconds: 0,
         cycle: 0,
         notificationsGranted: false,
         timerRunning: null,
@@ -91,10 +92,11 @@ class App extends React.Component {
     if (this.state.isWork) {
       let newTotalWorkedSeconds = this.state.totalWorkedSeconds + 1;
       newState.totalWorkedSeconds = newTotalWorkedSeconds;
+      let availableBreakSecondsIncrement = this.settings.shortBreakMinutes * 1.0 / this.settings.workMinutes;
       if (this.state.availableBreakSeconds >= this.settings.shortBreakMinutes * 60) {
-        let availableBreakSecondsIncrement = this.settings.shortBreakMinutes * 1.0 / this.settings.workMinutes;
-        let newAvailableBreakSeconds = this.state.availableBreakSeconds + availableBreakSecondsIncrement;
-        newState.availableBreakSeconds = newAvailableBreakSeconds;
+        newState.availableBreakSeconds = this.state.availableBreakSeconds + availableBreakSecondsIncrement;
+      } else {
+        newState.hiddenAvailableBreakSeconds = this.state.hiddenAvailableBreakSeconds + availableBreakSecondsIncrement;
       }
     } else {
       let newAvailableBreakSeconds = this.state.availableBreakSeconds - 1;
@@ -116,15 +118,9 @@ class App extends React.Component {
       let newAvailableBreakSeconds = this.state.availableBreakSeconds;
       if (newCycle === this.settings.longBreakFreq) {
         newCycle = 0;
-        newAvailableBreakSeconds += this.settings.longBreakMinutes * 60;
-      } else {
-        newAvailableBreakSeconds += this.settings.shortBreakMinutes * 60;
+        newAvailableBreakSeconds += this.settings.longBreakMinutes * 60 - this.settings.shortBreakMinutes * 60;
       }
-
-      if (this.state.availableBreakSeconds >= this.settings.shortBreakMinutes * 60) {
-        newAvailableBreakSeconds -= this.settings.shortBreakMinutes * 60;
-      }
-
+      newAvailableBreakSeconds += this.state.hiddenAvailableBreakSeconds;
       newAvailableBreakSeconds = Math.round(newAvailableBreakSeconds);
 
       let newTimerSeconds;
@@ -141,6 +137,7 @@ class App extends React.Component {
       this.setState({
         timerSeconds: newTimerSeconds,
         availableBreakSeconds: newAvailableBreakSeconds,
+        hiddenAvailableBreakSeconds: 0,
         isWork: newIsWork,
         cycle: newCycle
       });

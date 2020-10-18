@@ -257,7 +257,7 @@ test('displays "Return to work" button only if on a break', () => {
   expect(queryByText(/Return to work/i)).toBeNull();
 });
 
-test('Displays "Go on a break" button only during work and when there is break time available', () => {
+test('displays "Go on a break" button only during work and when there is break time available', () => {
   const { getByText, queryByText } = render(<App settings={ new TestSettings(25, 5, 10, 4, 480) }/>);
   expect(queryByText(/Go on a break/i)).toBeNull();
   fireEvent.click(getByText(/Start working/i));
@@ -408,6 +408,7 @@ test('saves app state to provided storage', () => {
     totalWorkedSeconds: 1,
     isWork: true,
     availableBreakSeconds: 0,
+    hiddenAvailableBreakSeconds: 0.2,
     cycle: 0,
     notificationsGranted: false,
     timerRunning: true,
@@ -422,6 +423,7 @@ test('restores app state from provided storage', () => {
     totalWorkedSeconds: 8,
     isWork: true,
     availableBreakSeconds: 3,
+    hiddenAvailableBreakSeconds: 0,
     cycle: 0,
     notificationsGranted: false,
     timerRunning: true,
