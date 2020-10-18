@@ -397,7 +397,43 @@ test('if there is less than short break time during work and break is started, t
 });
 
 test('saves app state to provided storage', () => {
-  
+  let mockStorage = new MockStorage();
+  mockStorage.state = null;
+  const { getByText } = render(<App settings={ new TestSettings(25, 5, 10, 4, 480) } storage={ mockStorage }/>);
+  fireEvent.click(getByText(/Start working/i));
+  jest.advanceTimersByTime(1000);
+  expect(mockStorage.state).toBeTruthy();
+  expect(mockStorage.state).toStrictEqual({
+    timerSeconds: 24 * 60 + 59,
+    totalWorkedSeconds: 1,
+    isWork: true,
+    availableBreakSeconds: 0,
+    cycle: 0,
+    notificationsGranted: false,
+    timerRunning: true,
+    continousWork: false
+  });
+});
+
+test('restores app state from provided storage', () => {
+  let mockStorage = new MockStorage();
+  let savedState = {
+    timerSeconds: 21 * 60 + 37,
+    totalWorkedSeconds: 8,
+    isWork: true,
+    availableBreakSeconds: 3,
+    cycle: 0,
+    notificationsGranted: false,
+    timerRunning: true,
+    continousWork: true
+  };
+  mockStorage.state = savedState;
+  const { getByText, queryByText } = render(<App settings={ new TestSettings(25, 5, 10, 4, 480) } storage={ mockStorage }/>);
+  expect(getByText(/21:37/i)).toBeInTheDocument();
+  expect(getByText(/0 hours 0 minutes 8 seconds/i)).toBeInTheDocument();
+  expect(getByText(/0 hours 0 minutes 3 seconds/i)).toBeInTheDocument();
+  jest.advanceTimersByTime(1000);
+  expect(getByText(/21:36/i)).toBeInTheDocument();
 });
 
 class TestSettings extends Settings {
@@ -431,7 +467,17 @@ class MockNotifications {
 }
 
 class MockStorage {
-  
+  constructor() {
+    this._state = {};
+  }
+
+  get state() {
+      return this._state;
+  }
+
+  set state(state) {
+      this._state = state;
+  }
 }
 
 function clickGoOnABreak(getByText) {

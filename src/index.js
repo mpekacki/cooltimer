@@ -5,8 +5,9 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import DefaultSettings from './DefaultSettings';
 import BrowserNotifications from './BrowserNotifications';
+import LocalStorage from './LocalStorage';
 
-ReactDOM.render(<App settings={ new DefaultSettings() } notifications={ new BrowserNotifications() }/>, document.getElementById('root'));
+ReactDOM.render(<App settings={ new DefaultSettings() } notifications={ new BrowserNotifications() } storage={ new LocalStorage() }/>, document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

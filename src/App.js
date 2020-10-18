@@ -6,16 +6,22 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.settings = props.settings;
-    this.state = {
-      timerSeconds: props.settings.workMinutes * 60,
-      totalWorkedSeconds: 0,
-      isWork: null,
-      availableBreakSeconds: 0,
-      cycle: 0,
-      notificationsGranted: false,
-      timerRunning: null,
-      continousWork: false
-    };
+    this.storage = props.storage;
+    if (this.storage && this.storage.state) {
+      this.state = this.storage.state;
+    } else {
+      this.state = {
+        timerSeconds: props.settings.workMinutes * 60,
+        totalWorkedSeconds: 0,
+        isWork: null,
+        availableBreakSeconds: 0,
+        cycle: 0,
+        notificationsGranted: false,
+        timerRunning: null,
+        continousWork: false
+      };
+    }
+    setInterval(this.tick, 1000);
     if (props.notifications) {
       this.notifications = props.notifications;
       this.notifications.requestPermission().then((result) => {
@@ -56,7 +62,6 @@ class App extends React.Component {
       isWork: true,
       timerRunning: true
     });
-    setInterval(this.tick, 1000);
   }
 
   onClickReturnToWork = () => {
@@ -98,6 +103,9 @@ class App extends React.Component {
     this.setState(newState);
     if (newTimerSeconds === 0) {
       this.onTimerFinish();
+    }
+    if (this.storage) {
+      this.storage.state = this.state;
     }
   }
 
