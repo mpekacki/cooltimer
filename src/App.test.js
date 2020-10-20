@@ -438,6 +438,27 @@ test('restores app state from provided storage', () => {
   expect(getByText(/21:36/i)).toBeInTheDocument();
 });
 
+test('saves app state with timer stopped if timer is stopped', () => {
+  let mockStorage = new MockStorage();
+  mockStorage.state = null;
+  const { getByText } = render(<App settings={ new TestSettings(25, 5, 10, 4, 480) } storage={ mockStorage }/>);
+  fireEvent.click(getByText(/Start working/i));
+  jest.advanceTimersByTime(1000);
+  fireEvent.click(getByText(/Hold work/i));
+  expect(mockStorage.state).toBeTruthy();
+  expect(mockStorage.state).toStrictEqual({
+    timerSeconds: 24 * 60 + 59,
+    totalWorkedSeconds: 1,
+    isWork: true,
+    availableBreakSeconds: 0,
+    hiddenAvailableBreakSeconds: 0.2,
+    cycle: 0,
+    notificationsGranted: false,
+    timerRunning: false,
+    continousWork: false
+  });
+});
+
 class TestSettings extends Settings {
   constructor(workMinutes, shortBreakMinutes, longBreakMinutes, longBreakFreq, workDayMinutes) {
     super(workMinutes, shortBreakMinutes, longBreakMinutes, longBreakFreq, workDayMinutes);

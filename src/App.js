@@ -59,14 +59,14 @@ class App extends React.Component {
   }
 
   onClickStartWorking = () => {
-    this.setState({
+    this.setStateAndStorage({
       isWork: true,
       timerRunning: true
     });
   }
 
   onClickReturnToWork = () => {
-    this.setState({
+    this.setStateAndStorage({
       isWork: true,
       timerSeconds: this.settings.workMinutes * 60
     });
@@ -74,7 +74,7 @@ class App extends React.Component {
 
   onClickGoOnABreak = () => {
     let availableBreakSeconds = Math.round(this.state.availableBreakSeconds);
-    this.setState({
+    this.setStateAndStorage({
       isWork: false,
       timerSeconds: availableBreakSeconds,
       availableBreakSeconds: availableBreakSeconds
@@ -102,12 +102,9 @@ class App extends React.Component {
       let newAvailableBreakSeconds = this.state.availableBreakSeconds - 1;
       newState.availableBreakSeconds = newAvailableBreakSeconds;
     }
-    this.setState(newState);
+    this.setStateAndStorage(newState);
     if (newTimerSeconds === 0) {
       this.onTimerFinish();
-    }
-    if (this.storage) {
-      this.storage.state = this.state;
     }
   }
 
@@ -134,7 +131,7 @@ class App extends React.Component {
         newIsWork = false;
       }
 
-      this.setState({
+      this.setStateAndStorage({
         timerSeconds: newTimerSeconds,
         availableBreakSeconds: newAvailableBreakSeconds,
         hiddenAvailableBreakSeconds: 0,
@@ -142,7 +139,7 @@ class App extends React.Component {
         cycle: newCycle
       });
     } else {
-      this.setState({
+      this.setStateAndStorage({
         timerSeconds: this.settings.workMinutes * 60,
         isWork: true
       });
@@ -155,21 +152,28 @@ class App extends React.Component {
   }
 
   onClickHoldWork = () => {
-    this.setState({
+    this.setStateAndStorage({
       timerRunning: false
     });
   }
 
   onClickResumeWork = () => {
-    this.setState({
+    this.setStateAndStorage({
       timerRunning: true
     });
   }
 
   onChangeContinousWork = (event) => {
-    this.setState({
+    this.setStateAndStorage({
       continousWork: event.target.checked
     });
+  }
+
+  setStateAndStorage = (state) => {
+    this.setState(state);
+    if (this.storage) {
+      this.storage.state = Object.assign(this.state, state);
+    }
   }
 
   render() {
