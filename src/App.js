@@ -10,8 +10,9 @@ class App extends React.Component {
     if (this.storage && this.storage.state) {
       this.state = this.storage.state;
     } else {
+      let timerSecondsInitial = props.settings.workMinutes * 60
       this.state = {
-        timerSeconds: props.settings.workMinutes * 60,
+        timerSeconds: timerSecondsInitial,
         totalWorkedSeconds: 0,
         isWork: null,
         availableBreakSeconds: 0,
@@ -19,10 +20,13 @@ class App extends React.Component {
         cycle: 0,
         notificationsGranted: false,
         timerRunning: null,
-        continousWork: false
+        continousWork: false,
+        timerLastUpdatedAt: Date.now()
       };
     }
+    this.tempState = this.state;
     setInterval(this.tick, 1000);
+    this.tick();
     if (props.notifications) {
       this.notifications = props.notifications;
       this.notifications.requestPermission().then((result) => {
@@ -83,47 +87,61 @@ class App extends React.Component {
 
   tick = () => {
     if (!this.state.timerRunning) {
+      this.setStateAndStorage({
+        timerLastUpdatedAt: Date.now()
+      });
       return;
     }
 
-    let newState = {};
-    let newTimerSeconds = this.state.timerSeconds - 1;
-    newState.timerSeconds = newTimerSeconds;
-    if (this.state.isWork) {
-      let newTotalWorkedSeconds = this.state.totalWorkedSeconds + 1;
-      newState.totalWorkedSeconds = newTotalWorkedSeconds;
-      let availableBreakSecondsIncrement = this.settings.shortBreakMinutes * 1.0 / this.settings.workMinutes;
-      if (this.state.availableBreakSeconds >= this.settings.shortBreakMinutes * 60) {
-        newState.availableBreakSeconds = this.state.availableBreakSeconds + availableBreakSecondsIncrement;
+    let now = Date.now();
+
+    let secondsDiff = Math.round((now - this.state.timerLastUpdatedAt) / 1000);
+
+    this.tempState = this.state;
+
+    for (let secondsPassed = secondsDiff; secondsPassed > 0; secondsPassed--) {
+      let newState = {};
+      let newTimerSeconds = this.tempState.timerSeconds - 1;
+      newState.timerSeconds = newTimerSeconds;
+      if (this.tempState.isWork) {
+        let newTotalWorkedSeconds = this.tempState.totalWorkedSeconds + 1;
+        newState.totalWorkedSeconds = newTotalWorkedSeconds;
+        let availableBreakSecondsIncrement = this.settings.shortBreakMinutes * 1.0 / this.settings.workMinutes;
+        if (this.tempState.availableBreakSeconds >= this.settings.shortBreakMinutes * 60) {
+          newState.availableBreakSeconds = this.tempState.availableBreakSeconds + availableBreakSecondsIncrement;
+        } else {
+          newState.hiddenAvailableBreakSeconds = this.tempState.hiddenAvailableBreakSeconds + availableBreakSecondsIncrement;
+        }
       } else {
-        newState.hiddenAvailableBreakSeconds = this.state.hiddenAvailableBreakSeconds + availableBreakSecondsIncrement;
+        let newAvailableBreakSeconds = this.tempState.availableBreakSeconds - 1;
+        newState.availableBreakSeconds = newAvailableBreakSeconds;
       }
-    } else {
-      let newAvailableBreakSeconds = this.state.availableBreakSeconds - 1;
-      newState.availableBreakSeconds = newAvailableBreakSeconds;
+      newState.timerLastUpdatedAt = now;
+      this.tempState = Object.assign(this.tempState, newState);
+      if (newTimerSeconds === 0) {
+        this.onTimerFinish();
+      }
     }
-    this.setStateAndStorage(newState);
-    if (newTimerSeconds === 0) {
-      this.onTimerFinish();
-    }
+    this.setStateAndStorage(this.tempState);
   }
 
   onTimerFinish = () => {
-    let isWork = this.state.isWork;
+    let isWork = this.tempState.isWork;
+    let stateChange = {};
     if (isWork) {
-      let newCycle = this.state.cycle + 1;
-      let newAvailableBreakSeconds = this.state.availableBreakSeconds;
+      let newCycle = this.tempState.cycle + 1;
+      let newAvailableBreakSeconds = this.tempState.availableBreakSeconds;
       if (newCycle === this.settings.longBreakFreq) {
         newCycle = 0;
         newAvailableBreakSeconds += this.settings.longBreakMinutes * 60 - this.settings.shortBreakMinutes * 60;
       }
-      newAvailableBreakSeconds += this.state.hiddenAvailableBreakSeconds;
+      newAvailableBreakSeconds += this.tempState.hiddenAvailableBreakSeconds;
       newAvailableBreakSeconds = Math.round(newAvailableBreakSeconds);
 
       let newTimerSeconds;
       let newIsWork;
 
-      if (this.state.continousWork) {
+      if (this.tempState.continousWork) {
         newTimerSeconds = this.settings.workMinutes * 60;
         newIsWork = true;
       } else {
@@ -131,19 +149,21 @@ class App extends React.Component {
         newIsWork = false;
       }
 
-      this.setStateAndStorage({
+      stateChange = {
         timerSeconds: newTimerSeconds,
         availableBreakSeconds: newAvailableBreakSeconds,
         hiddenAvailableBreakSeconds: 0,
         isWork: newIsWork,
         cycle: newCycle
-      });
+      };
     } else {
-      this.setStateAndStorage({
+      stateChange = {
         timerSeconds: this.settings.workMinutes * 60,
         isWork: true
-      });
+      };
     }
+
+    this.tempState = Object.assign(this.tempState, stateChange);
 
     if (this.notifications && this.notificationsGranted) {
       let notificationTitle = isWork ? 'Work finished' : 'Break finished';

@@ -5,17 +5,39 @@ import Settings from './Settings';
 import { Simulate } from 'react-dom/test-utils';
 
 let container;
+let mockedTime = {
+  val: 1603829345000
+};
 
 beforeEach(() => {
   container = document.createElement('div');
   document.body.appendChild(container);
+  mockedTime.val = 1603829345000;
+  mockDate();
 });
+
+function mockDate() {
+  // const DATE_TO_USE = new Date(mockedTime.val);
+  // const _Date = Date;
+  // global.Date = jest.fn(() => DATE_TO_USE);
+  // global.Date.UTC = _Date.UTC;
+  // global.Date.parse = _Date.parse;
+  // global.Date.now = _Date.now;
+  jest.spyOn(Date, 'now').mockImplementation(() => mockedTime.val);
+}
 
 afterEach(() => {
   cleanup();
   document.body.removeChild(container);
   container = null;
 });
+
+function advanceTimersByTime(time) {
+  mockedTime.val += time;
+  mockDate();
+  // global.Date.now = jest.fn(() => mockedTime);
+  jest.advanceTimersByTime(time);
+}
 
 jest.useFakeTimers();
 
@@ -31,15 +53,15 @@ test('renders timer based on passed settings', () => {
 test('starts timer after clicking the button', () => {
   const { getByText } = render(<App settings={ new TestSettings(25, 5, 10, 4, 480) }/>);
   fireEvent.click(getByText(/Start working/i));
-  jest.advanceTimersByTime(1000);
+  advanceTimersByTime(1000);
   expect(getByText(/24:59/i)).toBeInTheDocument();
   expect(getByText(/0 hours 0 minutes 1 second/i)).toBeInTheDocument();
   // expect(document.title).toBe("24:59");
-  jest.advanceTimersByTime((12 * 60 + 12) * 1000);
+  advanceTimersByTime((12 * 60 + 12) * 1000);
   expect(getByText(/12:47/i)).toBeInTheDocument();
   expect(getByText(/0 hours 12 minutes 13 seconds/i)).toBeInTheDocument();
   // expect(document.title).toBe("12:47");
-  jest.advanceTimersByTime((12 * 60 + 46) * 1000);
+  advanceTimersByTime((12 * 60 + 46) * 1000);
   expect(getByText(/00:01/i)).toBeInTheDocument();
   expect(getByText(/0 hours 24 minutes 59 seconds/i)).toBeInTheDocument();
   // expect(document.title).toBe("00:01");
@@ -48,23 +70,23 @@ test('starts timer after clicking the button', () => {
 test('switches to break after work time elapses', () => {
   const { getByText } = render(<App settings={ new TestSettings(25, 5, 10, 4, 480) }/>);
   fireEvent.click(getByText(/Start working/i));
-  jest.advanceTimersByTime((25 * 60) * 1000);
+  advanceTimersByTime((25 * 60) * 1000);
   expect(getByText(/05:00/i)).toBeInTheDocument();
   expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 5 minutes 0 seconds/i)).toBeInTheDocument();
-  jest.advanceTimersByTime(1000);
+  advanceTimersByTime(1000);
   expect(getByText(/04:59/i)).toBeInTheDocument();
   expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 4 minutes 59 seconds/i)).toBeInTheDocument();
-  jest.advanceTimersByTime(15 * 1000);
+  advanceTimersByTime(15 * 1000);
   expect(getByText(/04:44/i)).toBeInTheDocument();
   expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 4 minutes 44 seconds/i)).toBeInTheDocument();
-  jest.advanceTimersByTime((4 * 60 + 44) * 1000);
+  advanceTimersByTime((4 * 60 + 44) * 1000);
   expect(getByText(/25:00/i)).toBeInTheDocument();
   expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 0 minutes 0 seconds/i)).toBeInTheDocument();
-  jest.advanceTimersByTime(1000);
+  advanceTimersByTime(1000);
   expect(getByText(/24:59/i)).toBeInTheDocument();
   expect(getByText(/0 hours 25 minutes 1 second/i)).toBeInTheDocument();
   expect(getByText(/0 hours 0 minutes 0 seconds/i)).toBeInTheDocument();
@@ -74,24 +96,24 @@ test('renders total work time correctly', () => {
   const { getByText } = render(<App settings={ new TestSettings(25, 5, 10, 4, 480) }/>);
   fireEvent.click(getByText(/Start working/i));
   expect(getByText(/0 hours 0 minutes 0 seconds/i)).toBeInTheDocument();
-  jest.advanceTimersByTime((25 * 60) * 1000);
+  advanceTimersByTime((25 * 60) * 1000);
   expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
-  jest.advanceTimersByTime(((5 + 25 + 5 + 9) * 60) * 1000);
+  advanceTimersByTime(((5 + 25 + 5 + 9) * 60) * 1000);
   expect(getByText(/0 hours 59 minutes 0 seconds/i)).toBeInTheDocument();
-  jest.advanceTimersByTime(60 * 1000);
+  advanceTimersByTime(60 * 1000);
   expect(getByText(/1 hour 0 minutes 0 seconds/i)).toBeInTheDocument();
-  jest.advanceTimersByTime(60 * 1000);
+  advanceTimersByTime(60 * 1000);
   expect(getByText(/1 hour 1 minute 0 seconds/i)).toBeInTheDocument();
 });
 
 test('after n periods, uses long break instead of short break', () => {
   const { getByText } = render(<App settings={ new TestSettings(25, 5, 10, 4, 480) }/>);
   fireEvent.click(getByText(/Start working/i));
-  jest.advanceTimersByTime(((25 + 5 + 25 + 5 + 25 + 5 + 25) * 60) * 1000);
+  advanceTimersByTime(((25 + 5 + 25 + 5 + 25 + 5 + 25) * 60) * 1000);
   expect(getByText(/10:00/i)).toBeInTheDocument();
   expect(getByText(/1 hour 40 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 10 minutes 0 seconds/i)).toBeInTheDocument();
-  jest.advanceTimersByTime(((10 + 25) * 60) * 1000);
+  advanceTimersByTime(((10 + 25) * 60) * 1000);
   expect(getByText(/05:00/i)).toBeInTheDocument();
   expect(getByText(/2 hours 5 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 5 minutes 0 seconds/i)).toBeInTheDocument();
@@ -100,10 +122,10 @@ test('after n periods, uses long break instead of short break', () => {
 test('after clicking on "Return to work" during break, resumes work', () => {
   const { getByText } = render(<App settings={ new TestSettings(25, 5, 10, 4, 480) }/>);
   fireEvent.click(getByText(/Start working/i));
-  jest.advanceTimersByTime((25 * 60) * 1000);
+  advanceTimersByTime((25 * 60) * 1000);
   expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 5 minutes 0 seconds/i)).toBeInTheDocument();
-  jest.advanceTimersByTime(10 * 1000);
+  advanceTimersByTime(10 * 1000);
   expect(getByText(/04:50/i)).toBeInTheDocument();
   expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 4 minutes 50 seconds/i)).toBeInTheDocument();
@@ -111,15 +133,15 @@ test('after clicking on "Return to work" during break, resumes work', () => {
   expect(getByText(/25:00/i)).toBeInTheDocument();
   expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 4 minutes 50 seconds/i)).toBeInTheDocument();
-  jest.advanceTimersByTime((10 * 60) * 1000);
+  advanceTimersByTime((10 * 60) * 1000);
   expect(getByText(/15:00/i)).toBeInTheDocument();
   expect(getByText(/0 hours 35 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 4 minutes 50 seconds/i)).toBeInTheDocument();
-  jest.advanceTimersByTime((15 * 60) * 1000);
+  advanceTimersByTime((15 * 60) * 1000);
   expect(getByText(/09:50/i)).toBeInTheDocument();
   expect(getByText(/0 hours 50 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 9 minutes 50 seconds/i)).toBeInTheDocument();
-  jest.advanceTimersByTime((9 * 60 + 50) * 1000);
+  advanceTimersByTime((9 * 60 + 50) * 1000);
   expect(getByText(/25:00/i)).toBeInTheDocument();
   expect(getByText(/0 hours 50 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 0 minutes 0 seconds/i)).toBeInTheDocument();
@@ -128,10 +150,10 @@ test('after clicking on "Return to work" during break, resumes work', () => {
 test('if during work there is break time available, clicking on "Go on a break" starts break', () => {
   const { getByText } = render(<App settings={ new TestSettings(25, 5, 10, 4, 480) }/>);
   fireEvent.click(getByText(/Start working/i));
-  jest.advanceTimersByTime((25 * 60) * 1000);
+  advanceTimersByTime((25 * 60) * 1000);
   expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 5 minutes 0 seconds/i)).toBeInTheDocument();
-  jest.advanceTimersByTime(10 * 1000);
+  advanceTimersByTime(10 * 1000);
   expect(getByText(/04:50/i)).toBeInTheDocument();
   expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 4 minutes 50 seconds/i)).toBeInTheDocument();
@@ -139,7 +161,7 @@ test('if during work there is break time available, clicking on "Go on a break" 
   expect(getByText(/25:00/i)).toBeInTheDocument();
   expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 4 minutes 50 seconds/i)).toBeInTheDocument();
-  jest.advanceTimersByTime((10 * 60) * 1000);
+  advanceTimersByTime((10 * 60) * 1000);
   expect(getByText(/15:00/i)).toBeInTheDocument();
   expect(getByText(/0 hours 35 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 4 minutes 50 seconds/i)).toBeInTheDocument();
@@ -147,7 +169,7 @@ test('if during work there is break time available, clicking on "Go on a break" 
   expect(getByText(/04:50/i)).toBeInTheDocument();
   expect(getByText(/0 hours 35 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 4 minutes 50 seconds/i)).toBeInTheDocument();
-  jest.advanceTimersByTime(50 * 1000);
+  advanceTimersByTime(50 * 1000);
   expect(getByText(/04:00/i)).toBeInTheDocument();
   expect(getByText(/0 hours 35 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 4 minutes 0 seconds/i)).toBeInTheDocument();
@@ -155,7 +177,7 @@ test('if during work there is break time available, clicking on "Go on a break" 
   expect(getByText(/25:00/i)).toBeInTheDocument();
   expect(getByText(/0 hours 35 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 4 minutes 0 seconds/i)).toBeInTheDocument();
-  jest.advanceTimersByTime((5 * 60) * 1000);
+  advanceTimersByTime((5 * 60) * 1000);
   expect(getByText(/20:00/i)).toBeInTheDocument();
   expect(getByText(/0 hours 40 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 4 minutes 0 seconds/i)).toBeInTheDocument();
@@ -163,7 +185,7 @@ test('if during work there is break time available, clicking on "Go on a break" 
   expect(getByText(/04:00/i)).toBeInTheDocument();
   expect(getByText(/0 hours 40 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 4 minutes 0 seconds/i)).toBeInTheDocument();
-  jest.advanceTimersByTime((4 * 60) * 1000);
+  advanceTimersByTime((4 * 60) * 1000);
   expect(getByText(/25:00/i)).toBeInTheDocument();
   expect(getByText(/0 hours 40 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 0 minutes 0 seconds/i)).toBeInTheDocument();
@@ -176,7 +198,7 @@ test('after clicking on "Hold work" button, holds all timers, and after clicking
   fireEvent.click(getByText(/Start working/i));
   expect(queryByText(/Hold work/i)).toBeInTheDocument();
   expect(queryByText(/Resume work/i)).toBeNull();
-  jest.advanceTimersByTime((15 * 60) * 1000);
+  advanceTimersByTime((15 * 60) * 1000);
   expect(getByText(/10:00/i)).toBeInTheDocument();
   expect(getByText(/0 hours 15 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 0 minutes 0 seconds/i)).toBeInTheDocument();
@@ -186,7 +208,7 @@ test('after clicking on "Hold work" button, holds all timers, and after clicking
   expect(getByText(/10:00/i)).toBeInTheDocument();
   expect(getByText(/0 hours 15 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 0 minutes 0 seconds/i)).toBeInTheDocument();
-  jest.advanceTimersByTime((5 * 60) * 1000);
+  advanceTimersByTime((5 * 60) * 1000);
   expect(queryByText(/Hold work/i)).toBeNull();
   expect(queryByText(/Resume work/i)).toBeInTheDocument();
   expect(getByText(/10:00/i)).toBeInTheDocument();
@@ -198,19 +220,19 @@ test('after clicking on "Hold work" button, holds all timers, and after clicking
   expect(getByText(/10:00/i)).toBeInTheDocument();
   expect(getByText(/0 hours 15 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 0 minutes 0 seconds/i)).toBeInTheDocument();
-  jest.advanceTimersByTime((5 * 60) * 1000);
+  advanceTimersByTime((5 * 60) * 1000);
   expect(queryByText(/Hold work/i)).toBeInTheDocument();
   expect(queryByText(/Resume work/i)).toBeNull();
   expect(getByText(/05:00/i)).toBeInTheDocument();
   expect(getByText(/0 hours 20 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 0 minutes 0 seconds/i)).toBeInTheDocument();
-  jest.advanceTimersByTime((5 * 60) * 1000);
+  advanceTimersByTime((5 * 60) * 1000);
   expect(queryByText(/Hold work/i)).toBeInTheDocument();
   expect(queryByText(/Resume work/i)).toBeNull();
   expect(getByText(/05:00/i)).toBeInTheDocument();
   expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 5 minutes 0 seconds/i)).toBeInTheDocument();
-  jest.advanceTimersByTime((1 * 60) * 1000);
+  advanceTimersByTime((1 * 60) * 1000);
   expect(getByText(/04:00/i)).toBeInTheDocument();
   expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 4 minutes 0 seconds/i)).toBeInTheDocument();
@@ -220,7 +242,7 @@ test('after clicking on "Hold work" button, holds all timers, and after clicking
   expect(getByText(/04:00/i)).toBeInTheDocument();
   expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 4 minutes 0 seconds/i)).toBeInTheDocument();
-  jest.advanceTimersByTime(1000);
+  advanceTimersByTime(1000);
   expect(queryByText(/Hold work/i)).toBeNull();
   expect(queryByText(/Resume work/i)).toBeInTheDocument();
   expect(getByText(/04:00/i)).toBeInTheDocument();
@@ -232,7 +254,7 @@ test('after clicking on "Hold work" button, holds all timers, and after clicking
   expect(getByText(/04:00/i)).toBeInTheDocument();
   expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 4 minutes 0 seconds/i)).toBeInTheDocument();
-  jest.advanceTimersByTime(1000);
+  advanceTimersByTime(1000);
   expect(queryByText(/Hold work/i)).toBeInTheDocument();
   expect(queryByText(/Resume work/i)).toBeNull();
   expect(getByText(/03:59/i)).toBeInTheDocument();
@@ -251,9 +273,9 @@ test('displays "Return to work" button only if on a break', () => {
   expect(queryByText(/Return to work/i)).toBeNull();
   fireEvent.click(getByText(/Start working/i));
   expect(queryByText(/Return to work/i)).toBeNull();
-  jest.advanceTimersByTime((25 * 60) * 1000);
+  advanceTimersByTime((25 * 60) * 1000);
   expect(getByText(/Return to work/i)).toBeInTheDocument();
-  jest.advanceTimersByTime((5 * 60) * 1000);
+  advanceTimersByTime((5 * 60) * 1000);
   expect(queryByText(/Return to work/i)).toBeNull();
 });
 
@@ -262,13 +284,13 @@ test('displays "Go on a break" button only during work and when there is break t
   expect(queryByText(/Go on a break/i)).toBeNull();
   fireEvent.click(getByText(/Start working/i));
   expect(queryByText(/Go on a break/i)).toBeNull();
-  jest.advanceTimersByTime((25 * 60) * 1000);
+  advanceTimersByTime((25 * 60) * 1000);
   expect(queryByText(/Go on a break/i)).toBeNull();
-  jest.advanceTimersByTime((5 * 60) * 1000);
+  advanceTimersByTime((5 * 60) * 1000);
   expect(queryByText(/Go on a break/i)).toBeNull();
-  jest.advanceTimersByTime((25 * 60) * 1000);
+  advanceTimersByTime((25 * 60) * 1000);
   expect(queryByText(/Go on a break/i)).toBeNull();
-  jest.advanceTimersByTime((1 * 60) * 1000);
+  advanceTimersByTime((1 * 60) * 1000);
   fireEvent.click(getByText(/Return to work/i));
   expect(getByText(/Go on a break/i)).toBeInTheDocument();
   fireEvent.click(getByText(/Go on a break/i));
@@ -286,13 +308,13 @@ test('if permission for notifications is granted, displays notification after ti
   const { getByText } = render(<App settings={ new TestSettings(25, 5, 10, 4, 480) } notifications={ mockNotifications }/>);
   fireEvent.click(getByText(/Start working/i));
   expect(mockNotifications.createdNotifications.length).toBe(0);
-  jest.advanceTimersByTime((10 * 60) * 1000);
+  advanceTimersByTime((10 * 60) * 1000);
   expect(mockNotifications.createdNotifications.length).toBe(0);
-  jest.advanceTimersByTime((15 * 60) * 1000);
+  advanceTimersByTime((15 * 60) * 1000);
   expect(mockNotifications.createdNotifications.length).toBe(1);
   let notification = mockNotifications.createdNotifications[0];
   expect(notification.title).toBe('Work finished');
-  jest.advanceTimersByTime((5 * 60) * 1000);
+  advanceTimersByTime((5 * 60) * 1000);
   expect(mockNotifications.createdNotifications.length).toBe(2);
   let breakNotification = mockNotifications.createdNotifications[1];
   expect(breakNotification.title).toBe('Break finished');
@@ -303,9 +325,9 @@ test('if permission for notifications is not granted, does not attempt to create
   const { getByText } = render(<App settings={ new TestSettings(25, 5, 10, 4, 480) } notifications={ mockNotifications }/>);
   fireEvent.click(getByText(/Start working/i));
   expect(mockNotifications.createdNotifications.length).toBe(0);
-  jest.advanceTimersByTime((10 * 60) * 1000);
+  advanceTimersByTime((10 * 60) * 1000);
   expect(mockNotifications.createdNotifications.length).toBe(0);
-  jest.advanceTimersByTime((15 * 60) * 1000);
+  advanceTimersByTime((15 * 60) * 1000);
   expect(mockNotifications.createdNotifications.length).toBe(0);
 });
 
@@ -315,16 +337,16 @@ test('if "Continous work" is checked, should switch to next work period instead 
   fireEvent.click(getByText(/Start working/i));
   expect(getByTestId("cont-work")).toBeInTheDocument();
   Simulate.change(getByTestId("cont-work"), {target: {checked: true}});
-  jest.advanceTimersByTime((25 * 60) * 1000);
+  advanceTimersByTime((25 * 60) * 1000);
   expect(getByText(/25:00/i)).toBeInTheDocument();
   expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 5 minutes 0 seconds/i)).toBeInTheDocument();
-  jest.advanceTimersByTime(1000);
+  advanceTimersByTime(1000);
   expect(getByText(/24:59/i)).toBeInTheDocument();
   expect(getByText(/0 hours 25 minutes 1 second/i)).toBeInTheDocument();
   expect(getByText(/0 hours 5 minutes 0 seconds/i)).toBeInTheDocument();
   Simulate.change(getByTestId("cont-work"), {target: {checked: false}});
-  jest.advanceTimersByTime((24 * 60 + 59) * 1000);
+  advanceTimersByTime((24 * 60 + 59) * 1000);
   expect(getByText(/10:00/i)).toBeInTheDocument();
   expect(getByText(/0 hours 50 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 10 minutes 0 seconds/i)).toBeInTheDocument();
@@ -334,38 +356,38 @@ test('if work is continued even though there is full break available, then add i
   const { getByText, getByTestId } = render(<App settings={ new TestSettings(25, 5, 10, 4, 480) }/>);
   fireEvent.click(getByText(/Start working/i));
   Simulate.change(getByTestId("cont-work"), {target: {checked: true}});
-  jest.advanceTimersByTime((25 * 60) * 1000);
+  advanceTimersByTime((25 * 60) * 1000);
   expect(getByText(/25:00/i)).toBeInTheDocument();
   expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 5 minutes 0 seconds/i)).toBeInTheDocument();
-  jest.advanceTimersByTime((5 * 60) * 1000);
+  advanceTimersByTime((5 * 60) * 1000);
   expect(getByText(/20:00/i)).toBeInTheDocument();
   expect(getByText(/0 hours 30 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 6 minutes 0 seconds/i)).toBeInTheDocument();
-  jest.advanceTimersByTime((5 * 60) * 1000);
+  advanceTimersByTime((5 * 60) * 1000);
   expect(getByText(/15:00/i)).toBeInTheDocument();
   expect(getByText(/0 hours 35 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 7 minutes 0 seconds/i)).toBeInTheDocument();
-  jest.advanceTimersByTime((5 * 60) * 1000);
+  advanceTimersByTime((5 * 60) * 1000);
   expect(getByText(/10:00/i)).toBeInTheDocument();
   expect(getByText(/0 hours 40 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 8 minutes 0 seconds/i)).toBeInTheDocument();
-  jest.advanceTimersByTime((5 * 60) * 1000);
+  advanceTimersByTime((5 * 60) * 1000);
   expect(getByText(/05:00/i)).toBeInTheDocument();
   expect(getByText(/0 hours 45 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 9 minutes 0 seconds/i)).toBeInTheDocument();
-  jest.advanceTimersByTime((5 * 60) * 1000);
+  advanceTimersByTime((5 * 60) * 1000);
   expect(getByText(/25:00/i)).toBeInTheDocument();
   expect(getByText(/0 hours 50 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 10 minutes 0 seconds/i)).toBeInTheDocument();
-  jest.advanceTimersByTime((5 * 60) * 1000);
+  advanceTimersByTime((5 * 60) * 1000);
   expect(getByText(/20:00/i)).toBeInTheDocument();
   expect(getByText(/0 hours 55 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 11 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/Go on a break/i)).toBeInTheDocument();
   fireEvent.click(getByText(/Go on a break/i));
   expect(getByText(/11:00/i)).toBeInTheDocument();
-  jest.advanceTimersByTime((11 * 60) * 1000);
+  advanceTimersByTime((11 * 60) * 1000);
   expect(getByText(/25:00/i)).toBeInTheDocument();
   expect(getByText(/0 hours 55 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 0 minutes 0 seconds/i)).toBeInTheDocument();
@@ -375,21 +397,21 @@ test('if there is less than short break time during work and break is started, t
   const { getByText, getByTestId } = render(<App settings={ new TestSettings(25, 5, 10, 4, 480) }/>);
   fireEvent.click(getByText(/Start working/i));
   Simulate.change(getByTestId("cont-work"), {target: {checked: true}});
-  jest.advanceTimersByTime((25 * 60) * 1000);
+  advanceTimersByTime((25 * 60) * 1000);
   expect(getByText(/25:00/i)).toBeInTheDocument();
   expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 5 minutes 0 seconds/i)).toBeInTheDocument();
   clickGoOnABreak(getByText);
-  jest.advanceTimersByTime((1 * 60) * 1000);
+  advanceTimersByTime((1 * 60) * 1000);
   expect(getByText(/04:00/i)).toBeInTheDocument();
   clickReturnToWork(getByText);
   expect(getByText(/25:00/i)).toBeInTheDocument();
-  jest.advanceTimersByTime((20 * 60) * 1000);
+  advanceTimersByTime((20 * 60) * 1000);
   expect(getByText(/0 hours 45 minutes 0 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 4 minutes 0 seconds/i)).toBeInTheDocument();
   clickGoOnABreak(getByText);
-  jest.advanceTimersByTime((4 * 60) * 1000);
-  jest.advanceTimersByTime((25 * 60) * 1000);
+  advanceTimersByTime((4 * 60) * 1000);
+  advanceTimersByTime((25 * 60) * 1000);
   clickGoOnABreak(getByText);
   expect(getByText(/09:00/i)).toBeInTheDocument();
   expect(getByText(/1 hour 10 minutes 0 seconds/i)).toBeInTheDocument();
@@ -401,7 +423,7 @@ test('saves app state to provided storage', () => {
   mockStorage.state = null;
   const { getByText } = render(<App settings={ new TestSettings(25, 5, 10, 4, 480) } storage={ mockStorage }/>);
   fireEvent.click(getByText(/Start working/i));
-  jest.advanceTimersByTime(1000);
+  advanceTimersByTime(1000);
   expect(mockStorage.state).toBeTruthy();
   expect(mockStorage.state).toStrictEqual({
     timerSeconds: 24 * 60 + 59,
@@ -411,6 +433,7 @@ test('saves app state to provided storage', () => {
     hiddenAvailableBreakSeconds: 0.2,
     cycle: 0,
     notificationsGranted: false,
+    timerLastUpdatedAt: mockedTime.val,
     timerRunning: true,
     continousWork: false
   });
@@ -426,16 +449,17 @@ test('restores app state from provided storage', () => {
     hiddenAvailableBreakSeconds: 0,
     cycle: 0,
     notificationsGranted: false,
+    timerLastUpdatedAt: mockedTime.val - 2000,
     timerRunning: true,
     continousWork: true
   };
   mockStorage.state = savedState;
   const { getByText, queryByText } = render(<App settings={ new TestSettings(25, 5, 10, 4, 480) } storage={ mockStorage }/>);
-  expect(getByText(/21:37/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 0 minutes 8 seconds/i)).toBeInTheDocument();
+  expect(getByText(/21:35/i)).toBeInTheDocument();
+  expect(getByText(/0 hours 0 minutes 10 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 0 minutes 3 seconds/i)).toBeInTheDocument();
-  jest.advanceTimersByTime(1000);
-  expect(getByText(/21:36/i)).toBeInTheDocument();
+  advanceTimersByTime(1000);
+  expect(getByText(/21:34/i)).toBeInTheDocument();
 });
 
 test('saves app state with timer stopped if timer is stopped', () => {
@@ -443,7 +467,7 @@ test('saves app state with timer stopped if timer is stopped', () => {
   mockStorage.state = null;
   const { getByText } = render(<App settings={ new TestSettings(25, 5, 10, 4, 480) } storage={ mockStorage }/>);
   fireEvent.click(getByText(/Start working/i));
-  jest.advanceTimersByTime(1000);
+  advanceTimersByTime(1000);
   fireEvent.click(getByText(/Hold work/i));
   expect(mockStorage.state).toBeTruthy();
   expect(mockStorage.state).toStrictEqual({
@@ -454,9 +478,19 @@ test('saves app state with timer stopped if timer is stopped', () => {
     hiddenAvailableBreakSeconds: 0.2,
     cycle: 0,
     notificationsGranted: false,
+    timerLastUpdatedAt: Date.now(),
     timerRunning: false,
     continousWork: false
   });
+});
+
+test('correctly calculates after long time elapsed', () => {
+  const { getByText } = render(<App settings={ new TestSettings(25, 5, 10, 4, 480) }/>);
+  fireEvent.click(getByText(/Start working/i));
+  advanceTimersByTime(65 * 60 * 1000);
+  expect(getByText(/20:00/i)).toBeInTheDocument();
+  expect(getByText(/0 hours 55 minutes 0 seconds/i)).toBeInTheDocument();
+  expect(getByText(/0 hours 0 minutes 0 seconds/i)).toBeInTheDocument();
 });
 
 class TestSettings extends Settings {
