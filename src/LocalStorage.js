@@ -1,7 +1,4 @@
 class LocalStorage {
-    constructor() {
-    }
-    
     get state() {
         return JSON.parse(localStorage.getItem('timer_state'));
     }

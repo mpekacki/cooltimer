@@ -10,21 +10,8 @@ class App extends React.Component {
     if (this.storage && this.storage.state) {
       this.state = this.storage.state;
     } else {
-      let timerSecondsInitial = props.settings.workMinutes * 60
-      this.state = {
-        timerSeconds: timerSecondsInitial,
-        totalWorkedSeconds: 0,
-        isWork: null,
-        availableBreakSeconds: 0,
-        hiddenAvailableBreakSeconds: 0,
-        cycle: 0,
-        notificationsGranted: false,
-        timerRunning: null,
-        continousWork: false,
-        timerLastUpdatedAt: Date.now()
-      };
+      this.state = this.getDefaultState();
     }
-    this.tempState = this.state;
     setInterval(this.tick, 1000);
     this.tick();
     if (props.notifications) {
@@ -59,7 +46,7 @@ class App extends React.Component {
     seconds = seconds % 60;
     let secondsPart = (seconds % 60) + '';
     let secondsLabel = secondsPart === '1' ? 'second' : 'seconds';
-    return hoursPart + ' ' + hoursLabel + ' ' + minutesPart + ' ' + minutesLabel + ' ' + secondsPart + ' ' + secondsLabel + ' ';
+    return hoursPart + ' ' + hoursLabel + ' ' + minutesPart + ' ' + minutesLabel + ' ' + secondsPart + ' ' + secondsLabel;
   }
 
   onClickStartWorking = () => {
@@ -94,34 +81,28 @@ class App extends React.Component {
     }
 
     let now = Date.now();
-
     let secondsDiff = Math.round((now - this.state.timerLastUpdatedAt) / 1000);
-
     this.tempState = this.state;
 
     for (let secondsPassed = secondsDiff; secondsPassed > 0; secondsPassed--) {
-      let newState = {};
-      let newTimerSeconds = this.tempState.timerSeconds - 1;
-      newState.timerSeconds = newTimerSeconds;
+      this.tempState.timerSeconds--;
       if (this.tempState.isWork) {
-        let newTotalWorkedSeconds = this.tempState.totalWorkedSeconds + 1;
-        newState.totalWorkedSeconds = newTotalWorkedSeconds;
+        this.tempState.totalWorkedSeconds++;
         let availableBreakSecondsIncrement = this.settings.shortBreakMinutes * 1.0 / this.settings.workMinutes;
         if (this.tempState.availableBreakSeconds >= this.settings.shortBreakMinutes * 60) {
-          newState.availableBreakSeconds = this.tempState.availableBreakSeconds + availableBreakSecondsIncrement;
+          this.tempState.availableBreakSeconds += availableBreakSecondsIncrement;
         } else {
-          newState.hiddenAvailableBreakSeconds = this.tempState.hiddenAvailableBreakSeconds + availableBreakSecondsIncrement;
+          this.tempState.hiddenAvailableBreakSeconds += availableBreakSecondsIncrement;
         }
       } else {
-        let newAvailableBreakSeconds = this.tempState.availableBreakSeconds - 1;
-        newState.availableBreakSeconds = newAvailableBreakSeconds;
+        this.tempState.availableBreakSeconds--;
       }
-      newState.timerLastUpdatedAt = now;
-      this.tempState = Object.assign(this.tempState, newState);
-      if (newTimerSeconds === 0) {
+      this.tempState.timerLastUpdatedAt = now;
+      if (this.tempState.timerSeconds === 0) {
         this.onTimerFinish();
       }
     }
+
     this.setStateAndStorage(this.tempState);
   }
 
@@ -183,6 +164,12 @@ class App extends React.Component {
     });
   }
 
+  onClickReset = () => {
+    if (window.confirm("Are you sure you want to reset everything to inital state?")) {
+      this.setStateAndStorage(this.getDefaultState());
+    }
+  }
+
   onChangeContinousWork = (event) => {
     this.setStateAndStorage({
       continousWork: event.target.checked
@@ -196,6 +183,21 @@ class App extends React.Component {
     }
   }
 
+  getDefaultState = () => {
+    return {
+      timerSeconds: this.settings.workMinutes * 60,
+      totalWorkedSeconds: 0,
+      isWork: null,
+      availableBreakSeconds: 0,
+      hiddenAvailableBreakSeconds: 0,
+      cycle: 0,
+      notificationsGranted: false,
+      timerRunning: null,
+      continousWork: false,
+      timerLastUpdatedAt: Date.now()
+    };
+  }
+
   render() {
     return (
       <div className="App">
@@ -203,38 +205,69 @@ class App extends React.Component {
           <title>{this.formatSecondsAsTimer(this.state.timerSeconds)}</title>
         </Helmet>
 
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"></link>
-        {this.state.timerRunning === true &&
-          <button className="btn btn-warning" onClick={ this.onClickHoldWork }>Hold work</button>
-        }
-        {this.state.timerRunning === false &&
-          <button className="btn btn-secondary" onClick={ this.onClickResumeWork }>Resume work</button>
-        }
-        {this.state.isWork === null &&
-          <button className="btn btn-success" onClick={ this.onClickStartWorking }>Start working</button>
-        }
-        <br/>
-        <h1>{this.formatSecondsAsTimer(this.state.timerSeconds)}</h1>
-        {(this.state.isWork === true && this.state.availableBreakSeconds) ? 
-          <>
-            <button className="btn btn-success" onClick={ this.onClickGoOnABreak }>Go on a break</button>
-            <br/>
-          </> : null
-        }
-        {this.state.isWork === false ?
-          <>
-            <button className="btn btn-secondary" onClick={ this.onClickReturnToWork }>Return to work</button>
-            <br/>
-          </> : null
-        }
-        {this.formatSecondsAsText(this.state.totalWorkedSeconds)}<br/>
-        {this.formatSecondsAsText(this.state.availableBreakSeconds)}<br/>
-        <input 
-          type="checkbox" 
-          value="Continuous work" 
-          data-testid="cont-work" 
-          onChange={ this.onChangeContinousWork } 
-          checked={ this.state.continousWork }/> Continuous work
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" 
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"></link>
+
+        <div class="container">
+          <div class="row">
+            <div class="col-sm offset-sm-11">
+              <button className="btn" onClick={this.onClickReset} data-testid="reset-btn">Reset</button>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm">
+              {this.state.timerRunning === true &&
+                <button className="btn btn-warning" onClick={this.onClickHoldWork}>Hold work</button>
+              }
+              {this.state.timerRunning === false &&
+                <button className="btn btn-secondary" onClick={this.onClickResumeWork}>Resume work</button>
+              }
+              {this.state.isWork === null &&
+                <button className="btn btn-success" onClick={this.onClickStartWorking} data-testid="start-working-btn">Start working</button>
+              }
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm">
+              <h1 data-testid="timer">{this.formatSecondsAsTimer(this.state.timerSeconds)}</h1>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm">
+              {(this.state.isWork === true && this.state.availableBreakSeconds) ?
+                <>
+                  <button className="btn btn-success" onClick={this.onClickGoOnABreak}>Go on a break</button>
+                </> : null
+              }
+              {this.state.isWork === false ?
+                <>
+                  <button className="btn btn-secondary" onClick={this.onClickReturnToWork}>Return to work</button>
+                </> : null
+              }
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm" data-testid="totalWorkedTime">
+              {this.formatSecondsAsText(this.state.totalWorkedSeconds)}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm" data-testid="availableBreakTime">
+              {this.formatSecondsAsText(this.state.availableBreakSeconds)}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" onChange={this.onChangeContinousWork}
+                  checked={this.state.continousWork} data-testid="cont-work" id="cont-work-check" />
+                <label class="form-check-label" for="cont-work-check">
+                  Continuous work
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }

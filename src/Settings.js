@@ -1,10 +1,9 @@
 class Settings {
-    constructor(workMinutes, shortBreakMinutes, longBreakMinutes, longBreakFreq, workDayMinutes) {
+    constructor(workMinutes, shortBreakMinutes, longBreakMinutes, longBreakFreq) {
         this._workMinutes = workMinutes;
         this._shortBreakMinutes = shortBreakMinutes;
         this._longBreakMinutes = longBreakMinutes;
         this._longBreakFreq = longBreakFreq;
-        this._workDayMinutes = workDayMinutes;
     }
 
     get workMinutes() {
@@ -21,10 +20,6 @@ class Settings {
 
     get longBreakFreq() {
         return this._longBreakFreq;
-    }
-
-    get workDayMinutes() {
-        return this._workDayMinutes;
     }
 }
 

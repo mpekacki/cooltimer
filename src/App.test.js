@@ -17,12 +17,6 @@ beforeEach(() => {
 });
 
 function mockDate() {
-  // const DATE_TO_USE = new Date(mockedTime.val);
-  // const _Date = Date;
-  // global.Date = jest.fn(() => DATE_TO_USE);
-  // global.Date.UTC = _Date.UTC;
-  // global.Date.parse = _Date.parse;
-  // global.Date.now = _Date.now;
   jest.spyOn(Date, 'now').mockImplementation(() => mockedTime.val);
 }
 
@@ -35,14 +29,13 @@ afterEach(() => {
 function advanceTimersByTime(time) {
   mockedTime.val += time;
   mockDate();
-  // global.Date.now = jest.fn(() => mockedTime);
   jest.advanceTimersByTime(time);
 }
 
 jest.useFakeTimers();
 
 test('renders timer based on passed settings', () => {
-  const testSettings = new TestSettings(25, 5, 10, 4, 480);
+  const testSettings = new TestSettings(25, 5, 10, 4);
   const { getByText } = render(<App settings={ testSettings }/>);
   const mainTimer = getByText(/25:00/i);
   expect(mainTimer).toBeInTheDocument();
@@ -51,7 +44,7 @@ test('renders timer based on passed settings', () => {
 });
 
 test('starts timer after clicking the button', () => {
-  const { getByText } = render(<App settings={ new TestSettings(25, 5, 10, 4, 480) }/>);
+  const { getByText } = render(<App settings={ new TestSettings(25, 5, 10, 4) }/>);
   fireEvent.click(getByText(/Start working/i));
   advanceTimersByTime(1000);
   expect(getByText(/24:59/i)).toBeInTheDocument();
@@ -68,7 +61,7 @@ test('starts timer after clicking the button', () => {
 });
 
 test('switches to break after work time elapses', () => {
-  const { getByText } = render(<App settings={ new TestSettings(25, 5, 10, 4, 480) }/>);
+  const { getByText } = render(<App settings={ new TestSettings(25, 5, 10, 4) }/>);
   fireEvent.click(getByText(/Start working/i));
   advanceTimersByTime((25 * 60) * 1000);
   expect(getByText(/05:00/i)).toBeInTheDocument();
@@ -93,21 +86,21 @@ test('switches to break after work time elapses', () => {
 });
 
 test('renders total work time correctly', () => {
-  const { getByText } = render(<App settings={ new TestSettings(25, 5, 10, 4, 480) }/>);
-  fireEvent.click(getByText(/Start working/i));
-  expect(getByText(/0 hours 0 minutes 0 seconds/i)).toBeInTheDocument();
+  const c = render(<App settings={ new TestSettings(25, 5, 10, 4) }/>);
+  fireEvent.click(startWorkingButton(c));
+  verifyTotalWorkedTime(c, "0 hours 0 minutes 0 seconds");
   advanceTimersByTime((25 * 60) * 1000);
-  expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
+  verifyTotalWorkedTime(c, "0 hours 25 minutes 0 seconds");
   advanceTimersByTime(((5 + 25 + 5 + 9) * 60) * 1000);
-  expect(getByText(/0 hours 59 minutes 0 seconds/i)).toBeInTheDocument();
+  verifyTotalWorkedTime(c, "0 hours 59 minutes 0 seconds");
   advanceTimersByTime(60 * 1000);
-  expect(getByText(/1 hour 0 minutes 0 seconds/i)).toBeInTheDocument();
+  verifyTotalWorkedTime(c, "1 hour 0 minutes 0 seconds");
   advanceTimersByTime(60 * 1000);
-  expect(getByText(/1 hour 1 minute 0 seconds/i)).toBeInTheDocument();
+  verifyTotalWorkedTime(c, "1 hour 1 minute 0 seconds");
 });
 
 test('after n periods, uses long break instead of short break', () => {
-  const { getByText } = render(<App settings={ new TestSettings(25, 5, 10, 4, 480) }/>);
+  const { getByText } = render(<App settings={ new TestSettings(25, 5, 10, 4) }/>);
   fireEvent.click(getByText(/Start working/i));
   advanceTimersByTime(((25 + 5 + 25 + 5 + 25 + 5 + 25) * 60) * 1000);
   expect(getByText(/10:00/i)).toBeInTheDocument();
@@ -120,7 +113,7 @@ test('after n periods, uses long break instead of short break', () => {
 });
 
 test('after clicking on "Return to work" during break, resumes work', () => {
-  const { getByText } = render(<App settings={ new TestSettings(25, 5, 10, 4, 480) }/>);
+  const { getByText } = render(<App settings={ new TestSettings(25, 5, 10, 4) }/>);
   fireEvent.click(getByText(/Start working/i));
   advanceTimersByTime((25 * 60) * 1000);
   expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
@@ -148,7 +141,7 @@ test('after clicking on "Return to work" during break, resumes work', () => {
 });
 
 test('if during work there is break time available, clicking on "Go on a break" starts break', () => {
-  const { getByText } = render(<App settings={ new TestSettings(25, 5, 10, 4, 480) }/>);
+  const { getByText } = render(<App settings={ new TestSettings(25, 5, 10, 4) }/>);
   fireEvent.click(getByText(/Start working/i));
   advanceTimersByTime((25 * 60) * 1000);
   expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
@@ -192,7 +185,7 @@ test('if during work there is break time available, clicking on "Go on a break" 
 });
 
 test('after clicking on "Hold work" button, holds all timers, and after clicking on "Resume work" starts them again', () => {
-  const { getByText, queryByText } = render(<App settings={ new TestSettings(25, 5, 10, 4, 480) }/>);
+  const { getByText, queryByText } = render(<App settings={ new TestSettings(25, 5, 10, 4) }/>);
   expect(queryByText(/Hold work/i)).toBeNull();
   expect(queryByText(/Resume work/i)).toBeNull();
   fireEvent.click(getByText(/Start working/i));
@@ -263,13 +256,13 @@ test('after clicking on "Hold work" button, holds all timers, and after clicking
 });
 
 test('hides "Start working" button after it\'s clicked', () => {
-  const { getByText, queryByText } = render(<App settings={ new TestSettings(25, 5, 10, 4, 480) }/>);
+  const { getByText, queryByText } = render(<App settings={ new TestSettings(25, 5, 10, 4) }/>);
   fireEvent.click(getByText(/Start working/i));
   expect(queryByText(/Start working/i)).toBeNull();
 });
 
 test('displays "Return to work" button only if on a break', () => {
-  const { getByText, queryByText } = render(<App settings={ new TestSettings(25, 5, 10, 4, 480) }/>);
+  const { getByText, queryByText } = render(<App settings={ new TestSettings(25, 5, 10, 4) }/>);
   expect(queryByText(/Return to work/i)).toBeNull();
   fireEvent.click(getByText(/Start working/i));
   expect(queryByText(/Return to work/i)).toBeNull();
@@ -280,7 +273,7 @@ test('displays "Return to work" button only if on a break', () => {
 });
 
 test('displays "Go on a break" button only during work and when there is break time available', () => {
-  const { getByText, queryByText } = render(<App settings={ new TestSettings(25, 5, 10, 4, 480) }/>);
+  const { getByText, queryByText } = render(<App settings={ new TestSettings(25, 5, 10, 4) }/>);
   expect(queryByText(/Go on a break/i)).toBeNull();
   fireEvent.click(getByText(/Start working/i));
   expect(queryByText(/Go on a break/i)).toBeNull();
@@ -299,13 +292,13 @@ test('displays "Go on a break" button only during work and when there is break t
 
 test('asks for notification permission on startup', () => {
   let mockNotifications = new MockNotifications();
-  render(<App settings={ new TestSettings(25, 5, 10, 4, 480) } notifications={ mockNotifications }/>);
+  render(<App settings={ new TestSettings(25, 5, 10, 4) } notifications={ mockNotifications }/>);
   expect(mockNotifications.permissionRequested).toBeTruthy();
 });
 
 test('if permission for notifications is granted, displays notification after time elapses', () => {
   let mockNotifications = new MockNotifications('granted');
-  const { getByText } = render(<App settings={ new TestSettings(25, 5, 10, 4, 480) } notifications={ mockNotifications }/>);
+  const { getByText } = render(<App settings={ new TestSettings(25, 5, 10, 4) } notifications={ mockNotifications }/>);
   fireEvent.click(getByText(/Start working/i));
   expect(mockNotifications.createdNotifications.length).toBe(0);
   advanceTimersByTime((10 * 60) * 1000);
@@ -322,7 +315,7 @@ test('if permission for notifications is granted, displays notification after ti
 
 test('if permission for notifications is not granted, does not attempt to create a notfication', () => {
   let mockNotifications = new MockNotifications('denied');
-  const { getByText } = render(<App settings={ new TestSettings(25, 5, 10, 4, 480) } notifications={ mockNotifications }/>);
+  const { getByText } = render(<App settings={ new TestSettings(25, 5, 10, 4) } notifications={ mockNotifications }/>);
   fireEvent.click(getByText(/Start working/i));
   expect(mockNotifications.createdNotifications.length).toBe(0);
   advanceTimersByTime((10 * 60) * 1000);
@@ -332,7 +325,7 @@ test('if permission for notifications is not granted, does not attempt to create
 });
 
 test('if "Continous work" is checked, should switch to next work period instead of break period', () => {
-  const { getByText, getByTestId } = render(<App settings={ new TestSettings(25, 5, 10, 4, 480) }/>);
+  const { getByText, getByTestId } = render(<App settings={ new TestSettings(25, 5, 10, 4) }/>);
   expect(getByTestId("cont-work")).toBeInTheDocument();
   fireEvent.click(getByText(/Start working/i));
   expect(getByTestId("cont-work")).toBeInTheDocument();
@@ -353,7 +346,7 @@ test('if "Continous work" is checked, should switch to next work period instead 
 });
 
 test('if work is continued even though there is full break available, then add incrementally to break time during work', () => {
-  const { getByText, getByTestId } = render(<App settings={ new TestSettings(25, 5, 10, 4, 480) }/>);
+  const { getByText, getByTestId } = render(<App settings={ new TestSettings(25, 5, 10, 4) }/>);
   fireEvent.click(getByText(/Start working/i));
   Simulate.change(getByTestId("cont-work"), {target: {checked: true}});
   advanceTimersByTime((25 * 60) * 1000);
@@ -394,7 +387,7 @@ test('if work is continued even though there is full break available, then add i
 });
 
 test('if there is less than short break time during work and break is started, then the awarded break is not lost and is added to next break time', () => {
-  const { getByText, getByTestId } = render(<App settings={ new TestSettings(25, 5, 10, 4, 480) }/>);
+  const { getByText, getByTestId } = render(<App settings={ new TestSettings(25, 5, 10, 4) }/>);
   fireEvent.click(getByText(/Start working/i));
   Simulate.change(getByTestId("cont-work"), {target: {checked: true}});
   advanceTimersByTime((25 * 60) * 1000);
@@ -421,7 +414,7 @@ test('if there is less than short break time during work and break is started, t
 test('saves app state to provided storage', () => {
   let mockStorage = new MockStorage();
   mockStorage.state = null;
-  const { getByText } = render(<App settings={ new TestSettings(25, 5, 10, 4, 480) } storage={ mockStorage }/>);
+  const { getByText } = render(<App settings={ new TestSettings(25, 5, 10, 4) } storage={ mockStorage }/>);
   fireEvent.click(getByText(/Start working/i));
   advanceTimersByTime(1000);
   expect(mockStorage.state).toBeTruthy();
@@ -454,7 +447,7 @@ test('restores app state from provided storage', () => {
     continousWork: true
   };
   mockStorage.state = savedState;
-  const { getByText, queryByText } = render(<App settings={ new TestSettings(25, 5, 10, 4, 480) } storage={ mockStorage }/>);
+  const { getByText, queryByText } = render(<App settings={ new TestSettings(25, 5, 10, 4) } storage={ mockStorage }/>);
   expect(getByText(/21:35/i)).toBeInTheDocument();
   expect(getByText(/0 hours 0 minutes 10 seconds/i)).toBeInTheDocument();
   expect(getByText(/0 hours 0 minutes 3 seconds/i)).toBeInTheDocument();
@@ -465,7 +458,7 @@ test('restores app state from provided storage', () => {
 test('saves app state with timer stopped if timer is stopped', () => {
   let mockStorage = new MockStorage();
   mockStorage.state = null;
-  const { getByText } = render(<App settings={ new TestSettings(25, 5, 10, 4, 480) } storage={ mockStorage }/>);
+  const { getByText } = render(<App settings={ new TestSettings(25, 5, 10, 4) } storage={ mockStorage }/>);
   fireEvent.click(getByText(/Start working/i));
   advanceTimersByTime(1000);
   fireEvent.click(getByText(/Hold work/i));
@@ -485,17 +478,62 @@ test('saves app state with timer stopped if timer is stopped', () => {
 });
 
 test('correctly calculates after long time elapsed', () => {
-  const { getByText } = render(<App settings={ new TestSettings(25, 5, 10, 4, 480) }/>);
-  fireEvent.click(getByText(/Start working/i));
+  const c = render(<App settings={ new TestSettings(25, 5, 10, 4) }/>);
+  fireEvent.click(startWorkingButton(c));
   advanceTimersByTime(65 * 60 * 1000);
-  expect(getByText(/20:00/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 55 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 0 minutes 0 seconds/i)).toBeInTheDocument();
+  verifyTimer(c, "20:00");
+  verifyTotalWorkedTime(c, "0 hours 55 minutes 0 seconds");
+  verifyAvailableBreakTime(c, "0 hours 0 minutes 0 seconds");
 });
 
+test('resets state after clicking Reset', () => {
+  let confirmCalled = false;
+  global.confirm = () => {
+    confirmCalled = true;
+    return true;
+  };
+  const c = render(<App settings={ new TestSettings(25, 5, 10, 4) }/>);
+  fireEvent.click(startWorkingButton(c));
+  advanceTimersByTime((25 * 60) * 1000);
+  verifyTimer(c, "05:00");
+  verifyTotalWorkedTime(c, "0 hours 25 minutes 0 seconds");
+  verifyAvailableBreakTime(c, "0 hours 5 minutes 0 seconds");
+  fireEvent.click(resetButton(c));
+  expect(confirmCalled).toBe(true);
+  verifyTimer(c, "25:00");
+  verifyTotalWorkedTime(c, "0 hours 0 minutes 0 seconds");
+  verifyAvailableBreakTime(c, "0 hours 0 minutes 0 seconds");
+  expect(startWorkingButton(c)).toBeInTheDocument();
+  advanceTimersByTime(2 * 1000);
+  verifyTimer(c, "25:00");
+  verifyTotalWorkedTime(c, "0 hours 0 minutes 0 seconds");
+  verifyAvailableBreakTime(c, "0 hours 0 minutes 0 seconds");
+  expect(startWorkingButton(c)).toBeInTheDocument();
+});
+
+function startWorkingButton(container) {
+  return container.getByTestId("start-working-btn");
+}
+
+function resetButton(container) {
+  return container.getByTestId("reset-btn");
+}
+
+function verifyTimer(container, expected) {
+  return expect(container.getByTestId("timer").textContent).toBe(expected);
+}
+
+function verifyTotalWorkedTime(container, expected) {
+  return expect(container.getByTestId("totalWorkedTime").textContent).toBe(expected);
+}
+
+function verifyAvailableBreakTime(container, expected) {
+  return expect(container.getByTestId("availableBreakTime").textContent).toBe(expected);
+}
+
 class TestSettings extends Settings {
-  constructor(workMinutes, shortBreakMinutes, longBreakMinutes, longBreakFreq, workDayMinutes) {
-    super(workMinutes, shortBreakMinutes, longBreakMinutes, longBreakFreq, workDayMinutes);
+  constructor(workMinutes, shortBreakMinutes, longBreakMinutes, longBreakFreq) {
+    super(workMinutes, shortBreakMinutes, longBreakMinutes, longBreakFreq);
   }
 }
 

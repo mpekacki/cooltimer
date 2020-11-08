@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/cooltimer/precache-manifest.aec2c268aa8305ace683df48becd4f06.js"
+  "/cooltimer/precache-manifest.c5266e598834fc89ce31c97c9c774403.js"
 );
 
 self.addEventListener('message', (event) => {
