@@ -419,6 +419,7 @@ test('saves app state to provided storage', () => {
   advanceTimersByTime(1000);
   expect(mockStorage.state).toBeTruthy();
   expect(mockStorage.state).toStrictEqual({
+    autoStartTimers: true,
     timerSeconds: 24 * 60 + 59,
     totalWorkedSeconds: 1,
     isWork: true,
@@ -435,6 +436,7 @@ test('saves app state to provided storage', () => {
 test('restores app state from provided storage', () => {
   let mockStorage = new MockStorage();
   let savedState = {
+    autoStartTimers: true,
     timerSeconds: 21 * 60 + 37,
     totalWorkedSeconds: 8,
     isWork: true,
@@ -464,6 +466,7 @@ test('saves app state with timer stopped if timer is stopped', () => {
   fireEvent.click(getByText(/Hold work/i));
   expect(mockStorage.state).toBeTruthy();
   expect(mockStorage.state).toStrictEqual({
+    autoStartTimers: true,
     timerSeconds: 24 * 60 + 59,
     totalWorkedSeconds: 1,
     isWork: true,
@@ -511,12 +514,51 @@ test('resets state after clicking Reset', () => {
   expect(startWorkingButton(c)).toBeInTheDocument();
 });
 
+test('timers start automatically based on checkbox', () => {
+  const c = render(<App settings={ new TestSettings(25, 5, 10, 4) }/>);
+  expect(startTimersAutomaticallyCheckbox(c)).toBeInTheDocument();
+  fireEvent.click(startWorkingButton(c));
+  Simulate.change(startTimersAutomaticallyCheckbox(c), {target: {checked: false}});
+  advanceTimersByTime(25 * 60 * 1000);
+  verifyTimer(c, "05:00");
+  advanceTimersByTime(3 * 60 * 1000);
+  verifyTimer(c, "05:00");
+  Simulate.change(startTimersAutomaticallyCheckbox(c), {target: {checked: true}});
+  fireEvent.click(resumeWorkButton(c));
+  advanceTimersByTime(5 * 60 * 1000);
+  verifyTimer(c, "25:00");
+  advanceTimersByTime(5 * 60 * 1000);
+  verifyTimer(c, "20:00");
+});
+
+test('shows info how many cycles until long break', () => {
+  const c = render(<App settings={ new TestSettings(25, 5, 10, 4) }/>);
+  fireEvent.click(startWorkingButton(c));
+  expect(c.getByTestId('longBreakInfo').textContent).toBe('4');
+  advanceTimersByTime(25 * 60 * 1000);
+  expect(c.getByTestId('longBreakInfo').textContent).toBe('3');
+  advanceTimersByTime(30 * 60 * 1000);
+  expect(c.getByTestId('longBreakInfo').textContent).toBe('2');
+  advanceTimersByTime(30 * 60 * 1000);
+  expect(c.getByTestId('longBreakInfo').textContent).toBe('1');
+  advanceTimersByTime(30 * 60 * 1000);
+  expect(c.getByTestId('longBreakInfo').textContent).toBe('4');
+});
+
 function startWorkingButton(container) {
   return container.getByTestId("start-working-btn");
 }
 
 function resetButton(container) {
   return container.getByTestId("reset-btn");
+}
+
+function resumeWorkButton(container) {
+  return container.getByTestId("resume-work-btn");
+}
+
+function startTimersAutomaticallyCheckbox(container) {
+  return container.getByTestId("auto-start-timers");
 }
 
 function verifyTimer(container, expected) {

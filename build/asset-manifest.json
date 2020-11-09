@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/cooltimer/static/css/main.8ab6f918.chunk.css",
-    "main.js": "/cooltimer/static/js/main.519cc44a.chunk.js",
-    "main.js.map": "/cooltimer/static/js/main.519cc44a.chunk.js.map",
+    "main.js": "/cooltimer/static/js/main.843d89b5.chunk.js",
+    "main.js.map": "/cooltimer/static/js/main.843d89b5.chunk.js.map",
     "runtime-main.js": "/cooltimer/static/js/runtime-main.169ee471.js",
     "runtime-main.js.map": "/cooltimer/static/js/runtime-main.169ee471.js.map",
     "static/js/2.571952ab.chunk.js": "/cooltimer/static/js/2.571952ab.chunk.js",
     "static/js/2.571952ab.chunk.js.map": "/cooltimer/static/js/2.571952ab.chunk.js.map",
     "index.html": "/cooltimer/index.html",
-    "precache-manifest.c5266e598834fc89ce31c97c9c774403.js": "/cooltimer/precache-manifest.c5266e598834fc89ce31c97c9c774403.js",
+    "precache-manifest.79d368df281b7d371e79232b26bd29af.js": "/cooltimer/precache-manifest.79d368df281b7d371e79232b26bd29af.js",
     "service-worker.js": "/cooltimer/service-worker.js",
     "static/css/main.8ab6f918.chunk.css.map": "/cooltimer/static/css/main.8ab6f918.chunk.css.map",
     "static/js/2.571952ab.chunk.js.LICENSE": "/cooltimer/static/js/2.571952ab.chunk.js.LICENSE"
@@ -17,6 +17,6 @@
     "static/js/runtime-main.169ee471.js",
     "static/js/2.571952ab.chunk.js",
     "static/css/main.8ab6f918.chunk.css",
-    "static/js/main.519cc44a.chunk.js"
+    "static/js/main.843d89b5.chunk.js"
   ]
 }

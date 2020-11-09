@@ -25,14 +25,8 @@ class App extends React.Component {
   }
 
   formatSecondsAsTimer(seconds) {
-    let minutesPart = Math.floor(seconds / 60) + '';
-    if (minutesPart.length === 1) {
-      minutesPart = '0' + minutesPart;
-    }
-    let secondsPart = (seconds % 60) + '';
-    if (secondsPart.length === 1) {
-      secondsPart = '0' + secondsPart;
-    }
+    let minutesPart = String(Math.floor(seconds / 60)).padStart(2, '0');
+    let secondsPart = String(seconds % 60).padStart(2, '0');
     return minutesPart + ':' + secondsPart;
   }
 
@@ -144,6 +138,8 @@ class App extends React.Component {
       };
     }
 
+    stateChange.timerRunning = this.state.autoStartTimers;
+
     this.tempState = Object.assign(this.tempState, stateChange);
 
     if (this.notifications && this.notificationsGranted) {
@@ -176,11 +172,21 @@ class App extends React.Component {
     });
   }
 
+  onChangeAutoStartTimers = (event) => {
+    this.setStateAndStorage({
+      autoStartTimers: event.target.checked
+    });
+  }
+
   setStateAndStorage = (state) => {
     this.setState(state);
     if (this.storage) {
       this.storage.state = Object.assign(this.state, state);
     }
+  }
+
+  get cyclesUntilLongBreak() {
+    return this.settings.longBreakFreq - this.state.cycle;
   }
 
   getDefaultState = () => {
@@ -194,7 +200,8 @@ class App extends React.Component {
       notificationsGranted: false,
       timerRunning: null,
       continousWork: false,
-      timerLastUpdatedAt: Date.now()
+      timerLastUpdatedAt: Date.now(),
+      autoStartTimers: true
     };
   }
 
@@ -220,7 +227,7 @@ class App extends React.Component {
                 <button className="btn btn-warning" onClick={this.onClickHoldWork}>Hold work</button>
               }
               {this.state.timerRunning === false &&
-                <button className="btn btn-secondary" onClick={this.onClickResumeWork}>Resume work</button>
+                <button className="btn btn-secondary" onClick={this.onClickResumeWork} data-testid="resume-work-btn">Resume work</button>
               }
               {this.state.isWork === null &&
                 <button className="btn btn-success" onClick={this.onClickStartWorking} data-testid="start-working-btn">Start working</button>
@@ -258,11 +265,27 @@ class App extends React.Component {
           </div>
           <div class="row">
             <div class="col-sm">
+              Cycles until long break ({this.settings.longBreakMinutes} minutes): <span data-testid="longBreakInfo">{this.cyclesUntilLongBreak}</span>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm">
               <div class="form-check">
                 <input class="form-check-input" type="checkbox" value="" onChange={this.onChangeContinousWork}
                   checked={this.state.continousWork} data-testid="cont-work" id="cont-work-check" />
                 <label class="form-check-label" for="cont-work-check">
                   Continuous work
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" onChange={this.onChangeAutoStartTimers}
+                  checked={this.state.autoStartTimers} data-testid="auto-start-timers" id="auto-start-timers-check" />
+                <label class="form-check-label" for="auto-start-timers-check">
+                  Start timers automatically
                 </label>
               </div>
             </div>
