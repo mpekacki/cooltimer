@@ -162,7 +162,10 @@ class App extends React.Component {
 
   onClickReset = () => {
     if (window.confirm("Are you sure you want to reset everything to inital state?")) {
-      this.setStateAndStorage(this.getDefaultState());
+      let defaultState = this.getDefaultState();
+      defaultState.continousWork = this.state.continousWork;
+      defaultState.autoStartTimers = this.state.autoStartTimers;
+      this.setStateAndStorage(defaultState);
     }
   }
 
@@ -254,18 +257,27 @@ class App extends React.Component {
             </div>
           </div>
           <div class="row">
-            <div class="col-sm" data-testid="totalWorkedTime">
+            <div class="col-sm font-weight-light text-md-right">
+              Total time worked:
+            </div>
+            <div class="col-sm text-md-left" data-testid="totalWorkedTime">
               {this.formatSecondsAsText(this.state.totalWorkedSeconds)}
             </div>
           </div>
           <div class="row">
-            <div class="col-sm" data-testid="availableBreakTime">
+            <div class="col-sm font-weight-light text-md-right">
+              Available break time:
+            </div>
+            <div class="col-sm text-md-left" data-testid="availableBreakTime">
               {this.formatSecondsAsText(this.state.availableBreakSeconds)}
             </div>
           </div>
           <div class="row">
-            <div class="col-sm">
-              Cycles until long break ({this.settings.longBreakMinutes} minutes): <span data-testid="longBreakInfo">{this.cyclesUntilLongBreak}</span>
+            <div class="col-sm font-weight-light text-md-right">
+              Cycles until long break ({this.settings.longBreakMinutes} minutes):
+            </div>
+            <div class="col-sm text-md-left" data-testid="longBreakInfo">
+              {this.cyclesUntilLongBreak}
             </div>
           </div>
           <div class="row">
