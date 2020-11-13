@@ -1,16 +1,16 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
 import './App.css';
+import UserSettings from './UserSettings';
 
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.settings = props.settings;
+    this.defaultSettings = props.defaultSettings;
     this.storage = props.storage;
+    this.state = this.getDefaultState();
     if (this.storage && this.storage.state) {
-      this.state = this.storage.state;
-    } else {
-      this.state = this.getDefaultState();
+      this.state = Object.assign(this.state, this.storage.state);
     }
     setInterval(this.tick, 1000);
     this.tick();
@@ -53,7 +53,7 @@ class App extends React.Component {
   onClickReturnToWork = () => {
     this.setStateAndStorage({
       isWork: true,
-      timerSeconds: this.settings.workMinutes * 60
+      timerSeconds: this.state.workMinutes * 60
     });
   }
 
@@ -82,8 +82,8 @@ class App extends React.Component {
       this.tempState.timerSeconds--;
       if (this.tempState.isWork) {
         this.tempState.totalWorkedSeconds++;
-        let availableBreakSecondsIncrement = this.settings.shortBreakMinutes * 1.0 / this.settings.workMinutes;
-        if (this.tempState.availableBreakSeconds >= this.settings.shortBreakMinutes * 60) {
+        let availableBreakSecondsIncrement = this.state.shortBreakMinutes * 1.0 / this.state.workMinutes;
+        if (this.tempState.availableBreakSeconds >= this.state.shortBreakMinutes * 60) {
           this.tempState.availableBreakSeconds += availableBreakSecondsIncrement;
         } else {
           this.tempState.hiddenAvailableBreakSeconds += availableBreakSecondsIncrement;
@@ -106,9 +106,9 @@ class App extends React.Component {
     if (isWork) {
       let newCycle = this.tempState.cycle + 1;
       let newAvailableBreakSeconds = this.tempState.availableBreakSeconds;
-      if (newCycle === this.settings.longBreakFreq) {
+      if (newCycle === this.state.longBreakFreq) {
         newCycle = 0;
-        newAvailableBreakSeconds += this.settings.longBreakMinutes * 60 - this.settings.shortBreakMinutes * 60;
+        newAvailableBreakSeconds += this.state.longBreakMinutes * 60 - this.state.shortBreakMinutes * 60;
       }
       newAvailableBreakSeconds += this.tempState.hiddenAvailableBreakSeconds;
       newAvailableBreakSeconds = Math.round(newAvailableBreakSeconds);
@@ -117,7 +117,7 @@ class App extends React.Component {
       let newIsWork;
 
       if (this.tempState.continousWork) {
-        newTimerSeconds = this.settings.workMinutes * 60;
+        newTimerSeconds = this.state.workMinutes * 60;
         newIsWork = true;
       } else {
         newTimerSeconds = newAvailableBreakSeconds;
@@ -133,7 +133,7 @@ class App extends React.Component {
       };
     } else {
       stateChange = {
-        timerSeconds: this.settings.workMinutes * 60,
+        timerSeconds: this.state.workMinutes * 60,
         isWork: true
       };
     }
@@ -162,11 +162,14 @@ class App extends React.Component {
 
   onClickReset = () => {
     if (window.confirm("Are you sure you want to reset everything to inital state?")) {
-      let defaultState = this.getDefaultState();
-      defaultState.continousWork = this.state.continousWork;
-      defaultState.autoStartTimers = this.state.autoStartTimers;
-      this.setStateAndStorage(defaultState);
+      this.setStateAndStorage(this.getDefaultStateWithoutSettings());
     }
+  }
+
+  onClickSettings = () => {
+    this.setState({
+      settingsVisible: !this.state.settingsVisible
+    });
   }
 
   onChangeContinousWork = (event) => {
@@ -188,13 +191,17 @@ class App extends React.Component {
     }
   }
 
+  onChangeSettings = (settings) => {
+    this.setStateAndStorage(settings);
+  }
+
   get cyclesUntilLongBreak() {
-    return this.settings.longBreakFreq - this.state.cycle;
+    return this.state.longBreakFreq - this.state.cycle;
   }
 
   getDefaultState = () => {
     return {
-      timerSeconds: this.settings.workMinutes * 60,
+      timerSeconds: this.defaultSettings.workMinutes * 60,
       totalWorkedSeconds: 0,
       isWork: null,
       availableBreakSeconds: 0,
@@ -204,8 +211,25 @@ class App extends React.Component {
       timerRunning: null,
       continousWork: false,
       timerLastUpdatedAt: Date.now(),
-      autoStartTimers: true
+      autoStartTimers: true,
+      workMinutes: this.defaultSettings.workMinutes,
+      shortBreakMinutes: this.defaultSettings.shortBreakMinutes,
+      longBreakMinutes: this.defaultSettings.longBreakMinutes,
+      longBreakFreq: this.defaultSettings.longBreakFreq,
+      settingsVisible: false
     };
+  }
+
+  getDefaultStateWithoutSettings = () => {
+    const defaultState = this.getDefaultState();
+    defaultState.continousWork = this.state.continousWork;
+    defaultState.autoStartTimers = this.state.autoStartTimers;
+    defaultState.workMinutes = this.state.workMinutes;
+    defaultState.shortBreakMinutes = this.state.shortBreakMinutes;
+    defaultState.longBreakMinutes = this.state.longBreakMinutes;
+    defaultState.longBreakFreq = this.state.longBreakFreq;
+    defaultState.timerSeconds = this.state.workMinutes * 60;
+    return defaultState;
   }
 
   render() {
@@ -215,8 +239,12 @@ class App extends React.Component {
           <title>{this.formatSecondsAsTimer(this.state.timerSeconds)}</title>
         </Helmet>
 
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" 
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"></link>
+
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 
         <div class="container">
           <div class="row">
@@ -274,7 +302,7 @@ class App extends React.Component {
           </div>
           <div class="row">
             <div class="col-sm font-weight-light text-md-right">
-              Cycles until long break ({this.settings.longBreakMinutes} minutes):
+              Cycles until long break ({this.state.longBreakMinutes} minutes):
             </div>
             <div class="col-sm text-md-left" data-testid="longBreakInfo">
               {this.cyclesUntilLongBreak}
@@ -300,6 +328,17 @@ class App extends React.Component {
                   Start timers automatically
                 </label>
               </div>
+            </div>
+          </div>
+          <button class="btn m-2" type="button" onClick={this.onClickSettings}>
+            Settings
+          </button>
+          <div class={this.state.settingsVisible ? 'collapse show' : 'collapse'}>
+            <div class="card card-body">
+              <UserSettings
+                workMinutes={this.state.workMinutes} shortBreakMinutes={this.state.shortBreakMinutes}
+                longBreakMinutes={this.state.longBreakMinutes} longBreakFreq={this.state.longBreakFreq}
+                onchange={this.onChangeSettings} />
             </div>
           </div>
         </div>
