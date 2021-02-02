@@ -44,6 +44,7 @@ class Timer extends React.Component {
             isWork: true,
             timerSeconds: this.state.workMinutes * 60
         });
+        this.notifyCycleChange(false);
     }
 
     onClickGoOnABreak = () => {
@@ -53,7 +54,7 @@ class Timer extends React.Component {
             timerSeconds: availableBreakSeconds,
             availableBreakSeconds: availableBreakSeconds
         });
-        this.markTimerStart();
+        this.notifyCycleChange(true);
     }
 
     markTimerStart = () => {
@@ -137,8 +138,11 @@ class Timer extends React.Component {
         this.tempState = Object.assign(this.tempState, stateChange);
 
         this.props.showNotification(isWork ? 'Work finished' : 'Break finished');
-        this.props.onTimerFinish({wasWork: isWork, startedAt: this.timerStartedAt});
+        this.notifyCycleChange(isWork);
+    }
 
+    notifyCycleChange = (wasWork) => {
+        this.props.onTimerFinish({wasWork: wasWork, startedAt: this.timerStartedAt});
         this.markTimerStart();
     }
 
@@ -146,12 +150,14 @@ class Timer extends React.Component {
         this.setStateAndStorage({
             timerRunning: false
         });
+        this.notifyCycleChange(this.state.isWork);
     }
 
     onClickResumeWork = () => {
         this.setStateAndStorage({
             timerRunning: true
         });
+        this.markTimerStart();
     }
 
     onChangeContinousWork = (event) => {

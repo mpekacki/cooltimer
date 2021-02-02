@@ -46,8 +46,25 @@ jest.mock('@fullcalendar/react', () => {
     },
   };
 });
-
 jest.mock('@fullcalendar/timegrid', () => {
+  return {
+    __esModule: true,
+    A: true,
+    default: () => {
+      return <div></div>;
+    },
+  };
+});
+jest.mock('@fullcalendar/daygrid', () => {
+  return {
+    __esModule: true,
+    A: true,
+    default: () => {
+      return <div></div>;
+    },
+  };
+});
+jest.mock('@fullcalendar/list', () => {
   return {
     __esModule: true,
     A: true,
@@ -675,6 +692,27 @@ test('displays event in calendar', () => {
   expect(getAllByText(`Work ${MOCK_START_TIME} ${MOCK_START_TIME + 25 * 60 * 1000}`).length).toBe(1);
   advanceTimersByTime((5 * 60) * 1000);
   expect(getAllByText(`Break ${MOCK_START_TIME + 25 * 60 * 1000} ${MOCK_START_TIME + 30 * 60 * 1000}`).length).toBe(1);
+});
+
+test('displays events in calendar correctly when manually switching timer', () => {
+  const { getByText, getAllByText } = render(<App defaultSettings={ new Settings(25, 5, 10, 4) }/>);
+  fireEvent.click(getByText(/Start working/i));
+  advanceTimersByTime((25 * 60) * 1000);
+  expect(getAllByText(`Work ${MOCK_START_TIME} ${MOCK_START_TIME + 25 * 60 * 1000}`).length).toBe(1);
+  advanceTimersByTime((1 * 60) * 1000);
+  clickReturnToWork(getByText);
+  expect(getAllByText(`Break ${MOCK_START_TIME + 25 * 60 * 1000} ${MOCK_START_TIME + 26 * 60 * 1000}`).length).toBe(1);
+  advanceTimersByTime((4 * 60) * 1000);
+  clickGoOnABreak(getByText);
+  expect(getAllByText(`Work ${MOCK_START_TIME + 26 * 60 * 1000} ${MOCK_START_TIME + 30 * 60 * 1000}`).length).toBe(1);
+  advanceTimersByTime((1 * 60) * 1000);
+  fireEvent.click(getByText(/Hold work/i));
+  expect(getAllByText(`Break ${MOCK_START_TIME + 30 * 60 * 1000} ${MOCK_START_TIME + 31 * 60 * 1000}`).length).toBe(1);
+  advanceTimersByTime((1 * 60) * 1000);
+  fireEvent.click(getByText(/Resume work/i));
+  advanceTimersByTime((1 * 60) * 1000);
+  clickReturnToWork(getByText);
+  expect(getAllByText(`Break ${MOCK_START_TIME + 32 * 60 * 1000} ${MOCK_START_TIME + 33 * 60 * 1000}`).length).toBe(1);
 });
 
 function startWorkingButton(container) {
