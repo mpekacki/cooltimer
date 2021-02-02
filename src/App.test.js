@@ -4,15 +4,18 @@ import App from './App';
 import Settings from './Settings';
 import { Simulate } from 'react-dom/test-utils';
 
+const MOCK_START_TIME = 1603829345000;
+
 let container;
 let mockedTime = {
-  val: 1603829345000
+  val: MOCK_START_TIME
 };
+
 
 beforeEach(() => {
   container = document.createElement('div');
   document.body.appendChild(container);
-  mockedTime.val = 1603829345000;
+  mockedTime.val = MOCK_START_TIME;
   mockDate();
 });
 
@@ -34,9 +37,29 @@ function advanceTimersByTime(time) {
 
 jest.useFakeTimers();
 
+jest.mock('@fullcalendar/react', () => {
+  return {
+    __esModule: true,
+    A: true,
+    default: (props) => {
+      return <ul>{props && props.events && props.events.map((event) => <li>{event.title + ' ' + event.start.getTime() + ' ' + event.end.getTime()}</li>)}</ul>;
+    },
+  };
+});
+
+jest.mock('@fullcalendar/timegrid', () => {
+  return {
+    __esModule: true,
+    A: true,
+    default: () => {
+      return <div></div>;
+    },
+  };
+});
+
 test('renders timer based on passed settings', () => {
   const testSettings = new Settings(25, 5, 10, 4);
-  const { getByText } = render(<App defaultSettings={ testSettings }/>);
+  const { getByText } = render(<App defaultSettings={testSettings} />);
   const mainTimer = getByText(/25:00/i);
   expect(mainTimer).toBeInTheDocument();
   const startWorkingBtn = getByText(/Start working/i);
@@ -645,6 +668,15 @@ test('resets using updated settings', () => {
   verifyTimer(c, "19:00");
 });
 
+test('displays event in calendar', () => {
+  const { getByText, getAllByText } = render(<App defaultSettings={ new Settings(25, 5, 10, 4) }/>);
+  fireEvent.click(getByText(/Start working/i));
+  advanceTimersByTime((25 * 60) * 1000);
+  expect(getAllByText(`Work ${MOCK_START_TIME} ${MOCK_START_TIME + 25 * 60 * 1000}`).length).toBe(1);
+  advanceTimersByTime((5 * 60) * 1000);
+  expect(getAllByText(`Break ${MOCK_START_TIME + 25 * 60 * 1000} ${MOCK_START_TIME + 30 * 60 * 1000}`).length).toBe(1);
+});
+
 function startWorkingButton(container) {
   return container.getByTestId("start-working-btn");
 }
@@ -709,11 +741,11 @@ class MockStorage {
   }
 
   get state() {
-      return this._state;
+    return this._state;
   }
 
   set state(state) {
-      this._state = state;
+    this._state = state;
   }
 }
 
