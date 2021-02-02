@@ -5,6 +5,8 @@ import UserSettings from './UserSettings';
 import Timer from './Timer';
 import FullCalendar from '@fullcalendar/react';
 import timeGridPlugin from '@fullcalendar/timegrid';
+import dayGridMonth from '@fullcalendar/daygrid';
+import listPlugin from '@fullcalendar/list';
 
 class App extends React.Component {
   constructor(props) {
@@ -152,7 +154,9 @@ class App extends React.Component {
             </div>
           </div>
           <div class="card card-body">
-            <FullCalendar events={this.state.events} plugins={[timeGridPlugin]} initialView="timeGridWeek" />
+            <FullCalendar events={this.state.events} plugins={[timeGridPlugin, dayGridMonth, listPlugin]} initialView="timeGridWeek" headerToolbar={
+              {right: 'today prev,next dayGridMonth,timeGridWeek,timeGridDay listWeek'}
+            } />
           </div>
         </div>
       </div>
