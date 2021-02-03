@@ -685,6 +685,14 @@ test('resets using updated settings', () => {
   verifyTimer(c, "19:00");
 });
 
+test('resets without events', () => {
+  const c = render(<App defaultSettings={ new Settings(25, 5, 10, 4) }/>);
+  fireEvent.click(startWorkingButton(c));
+  advanceTimersByTime((25 * 60) * 1000);
+  fireEvent.click(resetButton(c));
+  expect(c.getAllByText(`Work ${MOCK_START_TIME} ${MOCK_START_TIME + 25 * 60 * 1000}`).length).toBe(1);
+});
+
 test('displays event in calendar', () => {
   const { getByText, getAllByText } = render(<App defaultSettings={ new Settings(25, 5, 10, 4) }/>);
   fireEvent.click(getByText(/Start working/i));
@@ -713,6 +721,21 @@ test('displays events in calendar correctly when manually switching timer', () =
   advanceTimersByTime((1 * 60) * 1000);
   clickReturnToWork(getByText);
   expect(getAllByText(`Break ${MOCK_START_TIME + 32 * 60 * 1000} ${MOCK_START_TIME + 33 * 60 * 1000}`).length).toBe(1);
+});
+
+test('saves and restores event state in storage', () => {
+  let mockStorage = new MockStorage();
+  mockStorage.state = {};
+  const { getByText, getAllByText } = render(<App defaultSettings={ new Settings(25, 5, 10, 4) } storage={ mockStorage }/>);
+  fireEvent.click(getByText(/Start working/i));
+  advanceTimersByTime((25 * 60) * 1000);
+  expect(getAllByText(`Work ${MOCK_START_TIME} ${MOCK_START_TIME + 25 * 60 * 1000}`).length).toBe(1);
+  advanceTimersByTime((2 * 60) * 1000);
+  cleanup();
+  const c = render(<App defaultSettings={ new Settings(25, 5, 10, 4) } storage={ mockStorage }/>);
+  expect(c.getAllByText(`Work ${MOCK_START_TIME} ${MOCK_START_TIME + 25 * 60 * 1000}`).length).toBe(1);
+  advanceTimersByTime((3 * 60) * 1000);
+  expect(c.getAllByText(`Break ${MOCK_START_TIME + 25 * 60 * 1000} ${MOCK_START_TIME + 30 * 60 * 1000}`).length).toBe(1);
 });
 
 function startWorkingButton(container) {

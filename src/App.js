@@ -30,7 +30,7 @@ class App extends React.Component {
 
   onClickReset = () => {
     if (window.confirm("Are you sure you want to reset everything to inital state?")) {
-      this.setStateAndStorage(this.getDefaultStateWithoutSettings());
+      this.setStateAndStorage(this.getStateForReset());
     }
   }
 
@@ -69,23 +69,28 @@ class App extends React.Component {
       longBreakMinutes: this.defaultSettings.longBreakMinutes,
       longBreakFreq: this.defaultSettings.longBreakFreq,
       settingsVisible: false,
-      events: []
+      events: [],
+      timerStartedAt: null
     };
   }
 
-  getDefaultStateWithoutSettings = () => {
-    const defaultState = this.getDefaultState();
-    defaultState.continousWork = this.state.continousWork;
-    defaultState.autoStartTimers = this.state.autoStartTimers;
-    defaultState.workMinutes = this.state.workMinutes;
-    defaultState.shortBreakMinutes = this.state.shortBreakMinutes;
-    defaultState.longBreakMinutes = this.state.longBreakMinutes;
-    defaultState.longBreakFreq = this.state.longBreakFreq;
-    defaultState.timerSeconds = this.state.workMinutes * 60;
-    return defaultState;
+  getStateForReset = () => {
+    const stateForReset = this.getDefaultState();
+    stateForReset.continousWork = this.state.continousWork;
+    stateForReset.autoStartTimers = this.state.autoStartTimers;
+    stateForReset.workMinutes = this.state.workMinutes;
+    stateForReset.shortBreakMinutes = this.state.shortBreakMinutes;
+    stateForReset.longBreakMinutes = this.state.longBreakMinutes;
+    stateForReset.longBreakFreq = this.state.longBreakFreq;
+    stateForReset.timerSeconds = this.state.workMinutes * 60;
+    stateForReset.events = this.state.events;
+    return stateForReset;
   }
 
   handleTimerStateChange = (timerState) => {
+    if (timerState.timerStartedAt < this.state.timerStartedAt) {
+      timerState.timerStartedAt = this.state.timerStartedAt;
+    }
     this.setStateAndStorage(timerState);
   }
 
@@ -99,8 +104,8 @@ class App extends React.Component {
     this.setStateAndStorage({
       events: [...this.state.events, {
         title: event.wasWork ? 'Work' : 'Break',
-        start: new Date(event.startedAt),
-        end: new Date(Date.now())
+        start: new Date(event.start),
+        end: new Date(event.end)
       }]
     });
   }
@@ -139,6 +144,7 @@ class App extends React.Component {
             shortBreakMinutes={this.state.shortBreakMinutes}
             longBreakMinutes={this.state.longBreakMinutes}
             longBreakFreq={this.state.longBreakFreq}
+            timerStartedAt={this.state.timerStartedAt}
             setStateAndStorage={this.handleTimerStateChange}
             showNotification={this.handleShowNotification}
             onTimerFinish={this.handleTimerFinish} />

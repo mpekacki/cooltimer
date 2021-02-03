@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "7074761b673b662f857b8f5872844f9e",
+    "revision": "b17cb3762a67c4f49eace73309f4b04c",
     "url": "/cooltimer/index.html"
   },
   {
@@ -8,7 +8,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/cooltimer/static/css/2.274e6aef.chunk.css"
   },
   {
-    "revision": "246adc2b212003cb1542",
+    "revision": "1f54f4235d8df37a6de4",
     "url": "/cooltimer/static/css/main.8ab6f918.chunk.css"
   },
   {
@@ -20,8 +20,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/cooltimer/static/js/2.115c36db.chunk.js.LICENSE"
   },
   {
-    "revision": "246adc2b212003cb1542",
-    "url": "/cooltimer/static/js/main.ff111bc0.chunk.js"
+    "revision": "1f54f4235d8df37a6de4",
+    "url": "/cooltimer/static/js/main.a31ac843.chunk.js"
   },
   {
     "revision": "a08a7f8581066259d44d",

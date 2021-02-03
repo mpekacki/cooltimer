@@ -58,7 +58,9 @@ class Timer extends React.Component {
     }
 
     markTimerStart = () => {
-        this.timerStartedAt = Date.now();
+        this.setStateAndStorage({
+            timerStartedAt: Date.now()
+        });
     }
 
     tick = () => {
@@ -142,7 +144,7 @@ class Timer extends React.Component {
     }
 
     notifyCycleChange = (wasWork) => {
-        this.props.onTimerFinish({wasWork: wasWork, startedAt: this.timerStartedAt});
+        this.props.onTimerFinish({wasWork: wasWork, start: this.state.timerStartedAt, end: Date.now()});
         this.markTimerStart();
     }
 
