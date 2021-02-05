@@ -752,6 +752,23 @@ test('correctly creates events when restoring app after delay', () => {
   expect(c.getAllByText(`Break ${MOCK_START_TIME + 25 * 60 * 1000} ${MOCK_START_TIME + 30 * 60 * 1000}`).length).toBe(1);
 });
 
+test('squashes neighbouring events of the same type', () => {
+  const c = render(<App defaultSettings={ new Settings(25, 5, 10, 4) }/>);
+  tickContinousWork(c, true);
+  fireEvent.click(startWorkingButton(c));
+  advanceTimersByTime((25 * 60) * 1000);
+  expect(c.getAllByText(`Work ${MOCK_START_TIME} ${MOCK_START_TIME + 25 * 60 * 1000}`).length).toBe(1);
+  advanceTimersByTime((25 * 60) * 1000);
+  expect(c.getAllByText(`Work ${MOCK_START_TIME} ${MOCK_START_TIME + 50 * 60 * 1000}`).length).toBe(1);
+  fireEvent.click(c.getByText(/Hold work/i));
+  advanceTimersByTime((10 * 60) * 1000);
+  fireEvent.click(c.getByText(/Resume work/i));
+  advanceTimersByTime((25 * 60) * 1000);
+  expect(c.getAllByText(`Work ${MOCK_START_TIME + 60 * 60 * 1000} ${MOCK_START_TIME + 85 * 60 * 1000}`).length).toBe(1);
+  advanceTimersByTime((25 * 60) * 1000);
+  expect(c.getAllByText(`Work ${MOCK_START_TIME + 60 * 60 * 1000} ${MOCK_START_TIME + 110 * 60 * 1000}`).length).toBe(1);
+});
+
 function startWorkingButton(container) {
   return container.getByTestId("start-working-btn");
 }
@@ -830,4 +847,8 @@ function clickGoOnABreak(getByText) {
 
 function clickReturnToWork(getByText) {
   fireEvent.click(getByText(/Return to work/i));
+}
+
+function tickContinousWork(container, checked) {
+  Simulate.change(container.getByTestId("cont-work"), {target: {checked: checked}});
 }

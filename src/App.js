@@ -102,12 +102,19 @@ class App extends React.Component {
   }
 
   handleTimerFinish = (event) => {
+    let newEvents = [...this.state.events, {
+      title: event.wasWork ? 'Work' : 'Break',
+      isWork: event.wasWork,
+      start: new Date(event.start),
+      end: new Date(event.end)
+    }];
+    if (newEvents.length > 1 && newEvents[newEvents.length - 1].isWork === newEvents[newEvents.length - 2].isWork
+      && newEvents[newEvents.length - 2].end.getTime() === newEvents[newEvents.length - 1].start.getTime()) {
+      newEvents = newEvents.slice(0, newEvents.length - 1);
+      newEvents[newEvents.length - 1].end = new Date(event.end);
+    }
     this.setStateAndStorage({
-      events: [...this.state.events, {
-        title: event.wasWork ? 'Work' : 'Break',
-        start: new Date(event.start),
-        end: new Date(event.end)
-      }]
+      events: newEvents
     });
   }
 
@@ -163,8 +170,8 @@ class App extends React.Component {
           </div>
           <div class="card card-body">
             <FullCalendar events={this.state.events} plugins={[timeGridPlugin, dayGridMonth, listPlugin]} initialView="timeGridWeek" headerToolbar={
-              {right: 'today prev,next dayGridMonth,timeGridWeek,timeGridDay listWeek'}
-            } slotDuration='00:15:00'/>
+              { right: 'today prev,next dayGridMonth,timeGridWeek,timeGridDay listWeek' }
+            } slotDuration='00:15:00' />
           </div>
         </div>
       </div>

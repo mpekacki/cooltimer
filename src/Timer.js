@@ -16,9 +16,9 @@ class Timer extends React.Component {
 
     componentWillReceiveProps(props) {
         if (!this.timerStartedAt)
-        this.timerStartedAt = props.timerStartedAt;
+            this.timerStartedAt = props.timerStartedAt;
         if (!this.timerStartedWithSeconds)
-        this.timerStartedWithSeconds = props.timerStartedWithSeconds;
+            this.timerStartedWithSeconds = props.timerStartedWithSeconds;
         let state = JSON.parse(JSON.stringify(props));
         delete state.timerStartedAt;
         delete state.timerStartedWithSeconds;
