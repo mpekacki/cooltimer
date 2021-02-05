@@ -106,7 +106,8 @@ class App extends React.Component {
       title: event.wasWork ? 'Work' : 'Break',
       isWork: event.wasWork,
       start: new Date(event.start),
-      end: new Date(event.end)
+      end: new Date(event.end),
+      color: event.wasWork ? '#3788d8' : 'orange'
     }];
     if (newEvents.length > 1 && newEvents[newEvents.length - 1].isWork === newEvents[newEvents.length - 2].isWork
       && newEvents[newEvents.length - 2].end.getTime() === newEvents[newEvents.length - 1].start.getTime()) {
