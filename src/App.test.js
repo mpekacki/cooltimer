@@ -738,6 +738,20 @@ test('saves and restores event state in storage', () => {
   expect(c.getAllByText(`Break ${MOCK_START_TIME + 25 * 60 * 1000} ${MOCK_START_TIME + 30 * 60 * 1000}`).length).toBe(1);
 });
 
+test('correctly creates events when restoring app after delay', () => {
+  let mockStorage = new MockStorage();
+  mockStorage.state = {};
+  const { getByText, getAllByText } = render(<App defaultSettings={ new Settings(25, 5, 10, 4) } storage={ mockStorage }/>);
+  fireEvent.click(getByText(/Start working/i));
+  advanceTimersByTime((25 * 60) * 1000);
+  expect(getAllByText(`Work ${MOCK_START_TIME} ${MOCK_START_TIME + 25 * 60 * 1000}`).length).toBe(1);
+  advanceTimersByTime((2 * 60) * 1000);
+  cleanup();
+  advanceTimersByTime((10 * 60) * 1000);
+  const c = render(<App defaultSettings={ new Settings(25, 5, 10, 4) } storage={ mockStorage }/>);
+  expect(c.getAllByText(`Break ${MOCK_START_TIME + 25 * 60 * 1000} ${MOCK_START_TIME + 30 * 60 * 1000}`).length).toBe(1);
+});
+
 function startWorkingButton(container) {
   return container.getByTestId("start-working-btn");
 }

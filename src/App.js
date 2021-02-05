@@ -70,7 +70,8 @@ class App extends React.Component {
       longBreakFreq: this.defaultSettings.longBreakFreq,
       settingsVisible: false,
       events: [],
-      timerStartedAt: null
+      timerStartedAt: null,
+      timerStartedWithSeconds: null
     };
   }
 
@@ -145,6 +146,7 @@ class App extends React.Component {
             longBreakMinutes={this.state.longBreakMinutes}
             longBreakFreq={this.state.longBreakFreq}
             timerStartedAt={this.state.timerStartedAt}
+            timerStartedWithSeconds={this.state.timerStartedWithSeconds}
             setStateAndStorage={this.handleTimerStateChange}
             showNotification={this.handleShowNotification}
             onTimerFinish={this.handleTimerFinish} />
@@ -162,7 +164,7 @@ class App extends React.Component {
           <div class="card card-body">
             <FullCalendar events={this.state.events} plugins={[timeGridPlugin, dayGridMonth, listPlugin]} initialView="timeGridWeek" headerToolbar={
               {right: 'today prev,next dayGridMonth,timeGridWeek,timeGridDay listWeek'}
-            } />
+            } slotDuration='00:10:00'/>
           </div>
         </div>
       </div>

@@ -3,13 +3,26 @@ import React from 'react';
 class Timer extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { ...props };
+        let state = JSON.parse(JSON.stringify(props));
+        this.timerStartedAt = state.timerStartedAt;
+        this.timerStartedWithSeconds = state.timerStartedWithSeconds;
+        delete state.timerStartedAt;
+        delete state.timerStartedWithSeconds;
+        this.state = { ...state };
+        // console.log(props);
         setInterval(this.tick, 1000);
         this.tick();
     }
 
     componentWillReceiveProps(props) {
-        this.setState(props);
+        if (!this.timerStartedAt)
+        this.timerStartedAt = props.timerStartedAt;
+        if (!this.timerStartedWithSeconds)
+        this.timerStartedWithSeconds = props.timerStartedWithSeconds;
+        let state = JSON.parse(JSON.stringify(props));
+        delete state.timerStartedAt;
+        delete state.timerStartedWithSeconds;
+        this.setState(state);
     }
 
     formatSecondsAsTimer(seconds) {
@@ -36,31 +49,28 @@ class Timer extends React.Component {
             isWork: true,
             timerRunning: true
         });
-        this.markTimerStart();
+        this.markTimerStart(this.state.timerSeconds, Date.now());
     }
 
     onClickReturnToWork = () => {
+        const lastTimerSeconds = this.state.timerSeconds;
+        const newTimerSeconds = this.state.workMinutes * 60;
         this.setStateAndStorage({
             isWork: true,
-            timerSeconds: this.state.workMinutes * 60
+            timerSeconds: newTimerSeconds
         });
-        this.notifyCycleChange(false);
+        this.notifyCycleChange(false, lastTimerSeconds, newTimerSeconds);
     }
 
     onClickGoOnABreak = () => {
         let availableBreakSeconds = Math.round(this.state.availableBreakSeconds);
+        const lastTimerSeconds = this.state.timerSeconds;
         this.setStateAndStorage({
             isWork: false,
             timerSeconds: availableBreakSeconds,
             availableBreakSeconds: availableBreakSeconds
         });
-        this.notifyCycleChange(true);
-    }
-
-    markTimerStart = () => {
-        this.setStateAndStorage({
-            timerStartedAt: Date.now()
-        });
+        this.notifyCycleChange(true, lastTimerSeconds, availableBreakSeconds);
     }
 
     tick = () => {
@@ -137,29 +147,53 @@ class Timer extends React.Component {
 
         stateChange.timerRunning = this.state.autoStartTimers;
 
+        const lastTimerSeconds = this.tempState.timerSeconds;
         this.tempState = Object.assign(this.tempState, stateChange);
 
         this.props.showNotification(isWork ? 'Work finished' : 'Break finished');
-        this.notifyCycleChange(isWork);
+        this.notifyCycleChange(isWork, lastTimerSeconds, this.tempState.timerSeconds);
     }
 
-    notifyCycleChange = (wasWork) => {
-        this.props.onTimerFinish({wasWork: wasWork, start: this.state.timerStartedAt, end: Date.now()});
-        this.markTimerStart();
+    notifyCycleChange = (wasWork, oldTimerSeconds, newTimerSeconds) => {
+        // console.log({
+        //     oldTimerSeconds: oldTimerSeconds,
+        //     newTimerSeconds: newTimerSeconds,
+        //     stateTimerStartedWithSeconds: this.timerStartedWithSeconds
+        // });
+        const timerEndAt = this.timerStartedAt + (this.timerStartedWithSeconds - oldTimerSeconds) * 1000;
+        const event = {
+            wasWork: wasWork,
+            start: this.timerStartedAt,
+            end: timerEndAt
+        };
+        this.props.onTimerFinish(event);
+        // console.log(event);
+        this.markTimerStart(newTimerSeconds, timerEndAt);
+    }
+
+    markTimerStart = (timerSeconds, timerStartedAt) => {
+        const newState = {
+            timerStartedAt: timerStartedAt,
+            timerStartedWithSeconds: timerSeconds
+        };
+        // console.log(newState);
+        this.timerStartedAt = timerStartedAt;
+        this.timerStartedWithSeconds = timerSeconds;
+        this.props.setStateAndStorage(newState);
     }
 
     onClickHoldWork = () => {
         this.setStateAndStorage({
             timerRunning: false
         });
-        this.notifyCycleChange(this.state.isWork);
+        this.notifyCycleChange(this.state.isWork, this.state.timerSeconds, this.state.timerSeconds);
     }
 
     onClickResumeWork = () => {
         this.setStateAndStorage({
             timerRunning: true
         });
-        this.markTimerStart();
+        this.markTimerStart(this.state.timerSeconds, Date.now());
     }
 
     onChangeContinousWork = (event) => {
