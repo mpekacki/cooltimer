@@ -747,8 +747,8 @@ test('correctly creates events when restoring app after delay', () => {
   expect(getAllByText(`Work ${MOCK_START_TIME} ${MOCK_START_TIME + 25 * 60 * 1000}`).length).toBe(1);
   advanceTimersByTime((2 * 60) * 1000);
   cleanup();
-  advanceTimersByTime((10 * 60) * 1000);
   const c = render(<App defaultSettings={ new Settings(25, 5, 10, 4) } storage={ mockStorage }/>);
+  advanceTimersByTime((10 * 60) * 1000);
   expect(c.getAllByText(`Break ${MOCK_START_TIME + 25 * 60 * 1000} ${MOCK_START_TIME + 30 * 60 * 1000}`).length).toBe(1);
 });
 
@@ -829,15 +829,15 @@ class MockNotifications {
 
 class MockStorage {
   constructor() {
-    this._state = {};
+    this._state = '{}';
   }
 
   get state() {
-    return this._state;
+    return JSON.parse(this._state);
   }
 
   set state(state) {
-    this._state = state;
+    this._state = JSON.stringify(state);
   }
 }
 

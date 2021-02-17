@@ -16,6 +16,10 @@ class App extends React.Component {
     this.state = this.getDefaultState();
     if (this.storage && this.storage.state) {
       this.state = Object.assign(this.state, this.storage.state);
+      this.state.events.forEach(e => {
+        e.start = new Date(Date.parse(e.start));
+        e.end = new Date(Date.parse(e.end));
+      });
     }
     if (props.notifications) {
       this.notifications = props.notifications;
