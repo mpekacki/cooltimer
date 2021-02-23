@@ -112,13 +112,17 @@ class App extends React.Component {
     if (this.state.selectedTask !== undefined) {
       eventTitle += ' (' + this.state.selectedTask + ')';
     }
-    let newEvents = [...this.state.events, {
+    const newEvent = {
       title: eventTitle,
       isWork: event.wasWork,
       start: new Date(event.start),
       end: new Date(event.end),
       color: event.wasWork ? '#3788d8' : 'orange'
-    }];
+    };
+    if (newEvent.start.getTime() === newEvent.end.getTime()) {
+      return;
+    }
+    let newEvents = [...this.state.events, newEvent];
     if (newEvents.length > 1 && newEvents[newEvents.length - 1].isWork === newEvents[newEvents.length - 2].isWork
       && newEvents[newEvents.length - 2].end.getTime() === newEvents[newEvents.length - 1].start.getTime()) {
       newEvents = newEvents.slice(0, newEvents.length - 1);

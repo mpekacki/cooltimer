@@ -795,6 +795,20 @@ test('when selected task changes, finish current event and start new one', () =>
   expect(c.getByText('Break 0 -1500000')).not.toBeInTheDocument();
 });
 
+test('does not create zero length events', () => {
+  const c = render(<App defaultSettings={ new Settings(25, 5, 10, 4) }/>);
+  tickContinousWork(c, true);
+  fireEvent.click(startWorkingButton(c));
+  advanceTimersByTime((25 * 60) * 1000);
+  expect(c.getAllByText(`Work ${MOCK_START_TIME} ${MOCK_START_TIME + 25 * 60 * 1000}`).length).toBe(1);
+  advanceTimersByTime((10 * 60) * 1000);
+  fireEvent.click(holdWorkButton(c));
+  expect(c.getAllByText(`Work ${MOCK_START_TIME} ${MOCK_START_TIME + 35 * 60 * 1000}`).length).toBe(1);
+  fireEvent.click(goOnABreakButton(c));
+  clickReturnToWork(c.getByText);
+  expect(c.queryByText(`Break ${MOCK_START_TIME + 35 * 60 * 1000} ${MOCK_START_TIME + 35 * 60 * 1000}`)).not.toBeInTheDocument();
+});
+
 function startWorkingButton(container) {
   return container.getByTestId("start-working-btn");
 }
@@ -805,6 +819,14 @@ function resetButton(container) {
 
 function resumeWorkButton(container) {
   return container.getByTestId("resume-work-btn");
+}
+
+function holdWorkButton(c) {
+  return c.getByText(/Hold work/i);
+}
+
+function goOnABreakButton(c) {
+  return c.getByText(/Go on a break/i);
 }
 
 function startTimersAutomaticallyCheckbox(container) {
