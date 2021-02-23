@@ -3,27 +3,27 @@ import React from 'react';
 class Timer extends React.Component {
     constructor(props) {
         super(props);
-        let state = JSON.parse(JSON.stringify(props));
-        this.timerStartedAt = state.timerStartedAt;
-        this.timerStartedWithSeconds = state.timerStartedWithSeconds;
-        delete state.timerStartedAt;
-        delete state.timerStartedWithSeconds;
-        this.state = { ...state };
+        // let state = JSON.parse(JSON.stringify(props));
+        // this.timerStartedAt = state.timerStartedAt;
+        // this.timerStartedWithSeconds = state.timerStartedWithSeconds;
+        // delete state.timerStartedAt;
+        // delete state.timerStartedWithSeconds;
+        // this.state = { ...state };
         // console.log(props);
         setInterval(this.tick, 1000);
         this.tick();
     }
 
-    componentWillReceiveProps(props) {
-        if (!this.timerStartedAt)
-            this.timerStartedAt = props.timerStartedAt;
-        if (!this.timerStartedWithSeconds)
-            this.timerStartedWithSeconds = props.timerStartedWithSeconds;
-        let state = JSON.parse(JSON.stringify(props));
-        delete state.timerStartedAt;
-        delete state.timerStartedWithSeconds;
-        this.setState(state);
-    }
+    // componentWillReceiveProps(props) {
+    //     // if (!this.timerStartedAt)
+    //     //     this.timerStartedAt = props.timerStartedAt;
+    //     // if (!this.timerStartedWithSeconds)
+    //     //     this.timerStartedWithSeconds = props.timerStartedWithSeconds;
+    //     let state = JSON.parse(JSON.stringify(props));
+    //     // delete state.timerStartedAt;
+    //     // delete state.timerStartedWithSeconds;
+    //     this.setState(state);
+    // }
 
     formatSecondsAsTimer(seconds) {
         let minutesPart = String(Math.floor(seconds / 60)).padStart(2, '0');
@@ -49,12 +49,12 @@ class Timer extends React.Component {
             isWork: true,
             timerRunning: true
         });
-        this.markTimerStart(this.state.timerSeconds, Date.now());
+        this.markTimerStart(this.props.timerSeconds, Date.now());
     }
 
     onClickReturnToWork = () => {
-        const lastTimerSeconds = this.state.timerSeconds;
-        const newTimerSeconds = this.state.workMinutes * 60;
+        const lastTimerSeconds = this.props.timerSeconds;
+        const newTimerSeconds = this.props.workMinutes * 60;
         this.setStateAndStorage({
             isWork: true,
             timerSeconds: newTimerSeconds
@@ -63,8 +63,8 @@ class Timer extends React.Component {
     }
 
     onClickGoOnABreak = () => {
-        let availableBreakSeconds = Math.round(this.state.availableBreakSeconds);
-        const lastTimerSeconds = this.state.timerSeconds;
+        let availableBreakSeconds = Math.round(this.props.availableBreakSeconds);
+        const lastTimerSeconds = this.props.timerSeconds;
         this.setStateAndStorage({
             isWork: false,
             timerSeconds: availableBreakSeconds,
@@ -74,7 +74,7 @@ class Timer extends React.Component {
     }
 
     tick = () => {
-        if (!this.state.timerRunning) {
+        if (!this.props.timerRunning) {
             this.setStateAndStorage({
                 timerLastUpdatedAt: Date.now()
             });
@@ -82,15 +82,15 @@ class Timer extends React.Component {
         }
 
         let now = Date.now();
-        let secondsDiff = Math.round((now - this.state.timerLastUpdatedAt) / 1000);
+        let secondsDiff = Math.round((now - this.props.timerLastUpdatedAt) / 1000);
         this.tempState = this.state;
 
         for (let secondsPassed = secondsDiff; secondsPassed > 0; secondsPassed--) {
             this.tempState.timerSeconds--;
             if (this.tempState.isWork) {
                 this.tempState.totalWorkedSeconds++;
-                let availableBreakSecondsIncrement = this.state.shortBreakMinutes * 1.0 / this.state.workMinutes;
-                if (this.tempState.availableBreakSeconds >= this.state.shortBreakMinutes * 60) {
+                let availableBreakSecondsIncrement = this.props.shortBreakMinutes * 1.0 / this.props.workMinutes;
+                if (this.tempState.availableBreakSeconds >= this.props.shortBreakMinutes * 60) {
                     this.tempState.availableBreakSeconds += availableBreakSecondsIncrement;
                 } else {
                     this.tempState.hiddenAvailableBreakSeconds += availableBreakSecondsIncrement;
@@ -113,9 +113,9 @@ class Timer extends React.Component {
         if (isWork) {
             let newCycle = this.tempState.cycle + 1;
             let newAvailableBreakSeconds = this.tempState.availableBreakSeconds;
-            if (newCycle === this.state.longBreakFreq) {
+            if (newCycle === this.props.longBreakFreq) {
                 newCycle = 0;
-                newAvailableBreakSeconds += this.state.longBreakMinutes * 60 - this.state.shortBreakMinutes * 60;
+                newAvailableBreakSeconds += this.props.longBreakMinutes * 60 - this.props.shortBreakMinutes * 60;
             }
             newAvailableBreakSeconds += this.tempState.hiddenAvailableBreakSeconds;
             newAvailableBreakSeconds = Math.round(newAvailableBreakSeconds);
@@ -124,7 +124,7 @@ class Timer extends React.Component {
             let newIsWork;
 
             if (this.tempState.continousWork) {
-                newTimerSeconds = this.state.workMinutes * 60;
+                newTimerSeconds = this.props.workMinutes * 60;
                 newIsWork = true;
             } else {
                 newTimerSeconds = newAvailableBreakSeconds;
@@ -140,12 +140,12 @@ class Timer extends React.Component {
             };
         } else {
             stateChange = {
-                timerSeconds: this.state.workMinutes * 60,
+                timerSeconds: this.props.workMinutes * 60,
                 isWork: true
             };
         }
 
-        stateChange.timerRunning = this.state.autoStartTimers;
+        stateChange.timerRunning = this.props.autoStartTimers;
 
         const lastTimerSeconds = this.tempState.timerSeconds;
         this.tempState = Object.assign(this.tempState, stateChange);
@@ -160,10 +160,10 @@ class Timer extends React.Component {
         //     newTimerSeconds: newTimerSeconds,
         //     stateTimerStartedWithSeconds: this.timerStartedWithSeconds
         // });
-        const timerEndAt = this.timerStartedAt + (this.timerStartedWithSeconds - oldTimerSeconds) * 1000;
+        const timerEndAt = this.props.timerStartedAt + (this.props.timerStartedWithSeconds - oldTimerSeconds) * 1000;
         const event = {
             wasWork: wasWork,
-            start: this.timerStartedAt,
+            start: this.props.timerStartedAt,
             end: timerEndAt
         };
         this.props.onTimerFinish(event);
@@ -177,8 +177,8 @@ class Timer extends React.Component {
             timerStartedWithSeconds: timerSeconds
         };
         // console.log(newState);
-        this.timerStartedAt = timerStartedAt;
-        this.timerStartedWithSeconds = timerSeconds;
+        // this.timerStartedAt = timerStartedAt;
+        // this.timerStartedWithSeconds = timerSeconds;
         this.props.setStateAndStorage(newState);
     }
 
@@ -186,14 +186,14 @@ class Timer extends React.Component {
         this.setStateAndStorage({
             timerRunning: false
         });
-        this.notifyCycleChange(this.state.isWork, this.state.timerSeconds, this.state.timerSeconds);
+        this.notifyCycleChange(this.props.isWork, this.props.timerSeconds, this.props.timerSeconds);
     }
 
     onClickResumeWork = () => {
         this.setStateAndStorage({
             timerRunning: true
         });
-        this.markTimerStart(this.state.timerSeconds, Date.now());
+        this.markTimerStart(this.props.timerSeconds, Date.now());
     }
 
     onChangeContinousWork = (event) => {
@@ -209,12 +209,12 @@ class Timer extends React.Component {
     }
 
     setStateAndStorage = (newState) => {
-        this.setState(newState);
+        // this.setState(newState);
         this.props.setStateAndStorage(newState);
     }
 
     get cyclesUntilLongBreak() {
-        return this.state.longBreakFreq - this.state.cycle;
+        return this.props.longBreakFreq - this.props.cycle;
     }
 
     render() {
@@ -222,30 +222,30 @@ class Timer extends React.Component {
             <div>
                 <div class="row">
                     <div class="col-sm">
-                        {this.state.timerRunning === true &&
+                        {this.props.timerRunning === true &&
                             <button className="btn btn-warning" onClick={this.onClickHoldWork}>Hold work</button>
                         }
-                        {this.state.timerRunning === false &&
+                        {this.props.timerRunning === false &&
                             <button className="btn btn-secondary" onClick={this.onClickResumeWork} data-testid="resume-work-btn">Resume work</button>
                         }
-                        {this.state.isWork === null &&
+                        {this.props.isWork === null &&
                             <button className="btn btn-success" onClick={this.onClickStartWorking} data-testid="start-working-btn">Start working</button>
                         }
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-sm">
-                        <h1 data-testid="timer">{this.formatSecondsAsTimer(this.state.timerSeconds)}</h1>
+                        <h1 data-testid="timer">{this.formatSecondsAsTimer(this.props.timerSeconds)}</h1>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-sm">
-                        {(this.state.isWork === true && this.state.availableBreakSeconds) ?
+                        {(this.props.isWork === true && this.props.availableBreakSeconds) ?
                             <>
                                 <button className="btn btn-success" onClick={this.onClickGoOnABreak}>Go on a break</button>
                             </> : null
                         }
-                        {this.state.isWork === false ?
+                        {this.props.isWork === false ?
                             <>
                                 <button className="btn btn-secondary" onClick={this.onClickReturnToWork}>Return to work</button>
                             </> : null
@@ -257,7 +257,7 @@ class Timer extends React.Component {
                         Total time worked:
             </div>
                     <div class="col-sm text-md-left" data-testid="totalWorkedTime">
-                        {this.formatSecondsAsText(this.state.totalWorkedSeconds)}
+                        {this.formatSecondsAsText(this.props.totalWorkedSeconds)}
                     </div>
                 </div>
                 <div class="row">
@@ -265,12 +265,12 @@ class Timer extends React.Component {
                         Available break time:
             </div>
                     <div class="col-sm text-md-left" data-testid="availableBreakTime">
-                        {this.formatSecondsAsText(this.state.availableBreakSeconds)}
+                        {this.formatSecondsAsText(this.props.availableBreakSeconds)}
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-sm font-weight-light text-md-right">
-                        Cycles until long break ({this.state.longBreakMinutes} minutes):
+                        Cycles until long break ({this.props.longBreakMinutes} minutes):
             </div>
                     <div class="col-sm text-md-left" data-testid="longBreakInfo">
                         {this.cyclesUntilLongBreak}
@@ -280,7 +280,7 @@ class Timer extends React.Component {
                     <div class="col-sm">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" value="" onChange={this.onChangeContinousWork}
-                                checked={this.state.continousWork} data-testid="cont-work" id="cont-work-check" />
+                                checked={this.props.continousWork} data-testid="cont-work" id="cont-work-check" />
                             <label class="form-check-label" htmlFor="cont-work-check">
                                 Continuous work
                 </label>
@@ -291,7 +291,7 @@ class Timer extends React.Component {
                     <div class="col-sm">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" value="" onChange={this.onChangeAutoStartTimers}
-                                checked={this.state.autoStartTimers} data-testid="auto-start-timers" id="auto-start-timers-check" />
+                                checked={this.props.autoStartTimers} data-testid="auto-start-timers" id="auto-start-timers-check" />
                             <label class="form-check-label" htmlFor="auto-start-timers-check">
                                 Start timers automatically
                 </label>

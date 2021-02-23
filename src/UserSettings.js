@@ -44,25 +44,25 @@ class UserSettings extends React.Component {
         return (
             <div>
                 <div class="d-flex flex-row form-group">
-                    <label for="work-minutes" class="p-2 col-form-label">Work cycle minutes</label>
+                    <label htmlFor="work-minutes" class="p-2 col-form-label">Work cycle minutes</label>
                     <div class="p-2">
                         <input class="form-control" type="number" value={this.state.workMinutes} onChange={this.onChangeWorkMinutes} id="work-minutes" />
                     </div>
                 </div>
                 <div class="d-flex flex-row form-group">
-                    <label for="short-break-minutes" class="p-2 col-form-label">Short break minutes</label>
+                    <label htmlFor="short-break-minutes" class="p-2 col-form-label">Short break minutes</label>
                     <div class="p-2">
                         <input class="form-control" type="number" value={this.state.shortBreakMinutes} onChange={this.onChangeShortBreakMinutes} id="short-break-minutes" />
                     </div>
                 </div>
                 <div class="d-flex flex-row form-group">
-                    <label for="long-break-minutes" class="p-2 col-form-label">Long break minutes</label>
+                    <label htmlFor="long-break-minutes" class="p-2 col-form-label">Long break minutes</label>
                     <div class="p-2">
                         <input class="form-control" type="number" value={this.state.longBreakMinutes} onChange={this.onChangeLongBreakMinutes} id="long-break-minutes" />
                     </div>
                 </div>
                 <div class="d-flex flex-row form-group">
-                    <label for="long-break-freq" class="p-2 col-form-label">Long break after n cycles</label>
+                    <label htmlFor="long-break-freq" class="p-2 col-form-label">Long break after n cycles</label>
                     <div class="p-2">
                         <input class="form-control" type="number" value={this.state.longBreakFreq} onChange={this.onChangeLongBreakFreq} id="long-break-freq" />
                     </div>

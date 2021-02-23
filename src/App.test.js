@@ -3,6 +3,7 @@ import { render, cleanup, fireEvent } from '@testing-library/react';
 import App from './App';
 import Settings from './Settings';
 import { Simulate } from 'react-dom/test-utils';
+import Constants from './Constants';
 
 const MOCK_START_TIME = 1603829345000;
 
@@ -769,6 +770,31 @@ test('squashes neighbouring events of the same type', () => {
   expect(c.getAllByText(`Work ${MOCK_START_TIME + 60 * 60 * 1000} ${MOCK_START_TIME + 110 * 60 * 1000}`).length).toBe(1);
 });
 
+const TEST_TASK_NAME = 'petting the dog';
+test('when task is selected, saves calendar work events with task name', () => {
+  const c = render(<App defaultSettings={ new Settings(25, 5, 10, 4) }/>);
+  createTask(c, TEST_TASK_NAME);
+  selectTask(c, TEST_TASK_NAME);
+  fireEvent.click(startWorkingButton(c));
+  advanceTimersByTime((25 * 60) * 1000);
+  verifyEventCreatedForWorkWithTask(c, TEST_TASK_NAME, MOCK_START_TIME, MOCK_START_TIME + 25 * 60 * 1000);
+});
+
+const TEST_TASK_NAME2 = 'eating cake';
+test('when selected task changes, finish current event and start new one', () => {
+  const c = render(<App defaultSettings={ new Settings(25, 5, 10, 4) }/>);
+  createTask(c, TEST_TASK_NAME);
+  createTask(c, TEST_TASK_NAME2);
+  selectTask(c, TEST_TASK_NAME);
+  fireEvent.click(startWorkingButton(c));
+  advanceTimersByTime((15 * 60) * 1000);
+  selectTask(c, TEST_TASK_NAME2);
+  verifyEventCreatedForWorkWithTask(c, TEST_TASK_NAME, MOCK_START_TIME, MOCK_START_TIME + 15 * 60 * 1000);
+  advanceTimersByTime((10 * 60) * 1000);
+  verifyEventCreatedForWorkWithTask(c, TEST_TASK_NAME2, MOCK_START_TIME + 15 * 60 * 1000, MOCK_START_TIME + 25 * 60 * 1000);
+  expect(c.getByText('Break 0 -1500000')).not.toBeInTheDocument();
+});
+
 function startWorkingButton(container) {
   return container.getByTestId("start-working-btn");
 }
@@ -795,6 +821,31 @@ function verifyTotalWorkedTime(container, expected) {
 
 function verifyAvailableBreakTime(container, expected) {
   return expect(container.getByTestId("availableBreakTime").textContent).toBe(expected);
+}
+
+function verifyEventCreatedForWorkWithTask(c, taskName, start, end) {
+  expect(c.getAllByText(`Work (${taskName}) ${start} ${end}`).length).toBe(1);
+}
+
+function createTask(c, taskName) {
+  Simulate.change(getNewTaskInput(c), {target: {value: taskName}});
+  fireEvent.click(getSaveNewTaskButton(c));
+}
+
+function selectTask(c, taskName) {
+  fireEvent.click(getTaskElement(c, taskName));
+}
+
+function getNewTaskInput(c) {
+  return c.getByPlaceholderText(Constants.CREATE_TASK_PLACEHOLDER_TEXT);
+}
+
+function getSaveNewTaskButton(c) {
+  return c.getByText(Constants.SAVE_NEW_TASK_BUTTON_TEXT);
+}
+
+function getTaskElement(c, taskName) {
+  return c.getByLabelText(taskName);
 }
 
 class TestSettings extends Settings {
