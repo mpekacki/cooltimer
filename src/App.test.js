@@ -18,6 +18,7 @@ beforeEach(() => {
   document.body.appendChild(container);
   mockedTime.val = MOCK_START_TIME;
   mockDate();
+  jest.useFakeTimers();
 });
 
 function mockDate() {
@@ -28,6 +29,7 @@ afterEach(() => {
   cleanup();
   document.body.removeChild(container);
   container = null;
+  jest.clearAllTimers();
 });
 
 function advanceTimersByTime(time) {
@@ -35,8 +37,6 @@ function advanceTimersByTime(time) {
   mockDate();
   jest.advanceTimersByTime(time);
 }
-
-jest.useFakeTimers();
 
 jest.mock('@fullcalendar/react', () => {
   return {
@@ -792,7 +792,7 @@ test('when selected task changes, finish current event and start new one', () =>
   verifyEventCreatedForWorkWithTask(c, TEST_TASK_NAME, MOCK_START_TIME, MOCK_START_TIME + 15 * 60 * 1000);
   advanceTimersByTime((10 * 60) * 1000);
   verifyEventCreatedForWorkWithTask(c, TEST_TASK_NAME2, MOCK_START_TIME + 15 * 60 * 1000, MOCK_START_TIME + 25 * 60 * 1000);
-  expect(c.getByText('Break 0 -1500000')).not.toBeInTheDocument();
+  expect(c.queryByText('Break 0 -1500000')).not.toBeInTheDocument();
 });
 
 test('does not create zero length events', () => {

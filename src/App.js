@@ -107,7 +107,7 @@ class App extends React.Component {
     }
   }
 
-  handleTimerFinish = (event) => {
+  handleEventCreated = (event) => {
     let eventTitle = event.wasWork ? 'Work' : 'Break';
     if (this.state.selectedTask !== undefined) {
       eventTitle += ' (' + this.state.selectedTask + ')';
@@ -117,14 +117,16 @@ class App extends React.Component {
       isWork: event.wasWork,
       start: new Date(event.start),
       end: new Date(event.end),
-      color: event.wasWork ? '#3788d8' : 'orange'
+      color: event.wasWork ? '#3788d8' : 'orange',
+      task: this.state.selectedTask
     };
     if (newEvent.start.getTime() === newEvent.end.getTime()) {
       return;
     }
     let newEvents = [...this.state.events, newEvent];
     if (newEvents.length > 1 && newEvents[newEvents.length - 1].isWork === newEvents[newEvents.length - 2].isWork
-      && newEvents[newEvents.length - 2].end.getTime() === newEvents[newEvents.length - 1].start.getTime()) {
+      && newEvents[newEvents.length - 2].end.getTime() === newEvents[newEvents.length - 1].start.getTime() 
+      && newEvents[newEvents.length - 1].task === newEvents[newEvents.length - 2].task) {
       newEvents = newEvents.slice(0, newEvents.length - 1);
       newEvents[newEvents.length - 1].end = new Date(event.end);
     }
@@ -142,16 +144,19 @@ class App extends React.Component {
   }
 
   handleTaskSelected = (task) => {
-    this.setState({ selectedTask: task });
+    const oldSelectedTask = this.state.selectedTask;
     const end = this.state.timerStartedAt + (this.state.timerStartedWithSeconds - this.state.timerSeconds) * 1000;
-    this.handleTimerFinish({
-      wasWork: this.state.isWork,
-      start: this.state.timerStartedAt,
-      end: end
-    });
+    if (oldSelectedTask !== undefined) {
+      this.handleEventCreated({
+        wasWork: this.state.isWork,
+        start: this.state.timerStartedAt,
+        end: end
+      });
+    }
     this.setStateAndStorage({
       timerStartedAt: end,
-      timerStartedWithSeconds: this.state.timerSeconds
+      timerStartedWithSeconds: this.state.timerSeconds,
+      selectedTask: task
     });
   }
 
@@ -193,7 +198,7 @@ class App extends React.Component {
             timerStartedWithSeconds={this.state.timerStartedWithSeconds}
             setStateAndStorage={this.handleTimerStateChange}
             showNotification={this.handleShowNotification}
-            onTimerFinish={this.handleTimerFinish} />
+            onTimerFinish={this.handleEventCreated} />
           <button className="btn m-2" type="button" onClick={this.onClickSettings}>
             Settings
           </button>

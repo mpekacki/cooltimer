@@ -83,7 +83,16 @@ class Timer extends React.Component {
 
         let now = Date.now();
         let secondsDiff = Math.round((now - this.props.timerLastUpdatedAt) / 1000);
-        this.tempState = this.state;
+        this.tempState = {
+            isWork: this.props.isWork,
+            totalWorkedSeconds: this.props.totalWorkedSeconds,
+            availableBreakSeconds: this.props.availableBreakSeconds,
+            hiddenAvailableBreakSeconds: this.props.hiddenAvailableBreakSeconds,
+            timerLastUpdatedAt: this.props.timerLastUpdatedAt,
+            cycle: this.props.cycle,
+            continousWork: this.props.continousWork,
+            timerSeconds: this.props.timerSeconds
+        };
 
         for (let secondsPassed = secondsDiff; secondsPassed > 0; secondsPassed--) {
             this.tempState.timerSeconds--;
