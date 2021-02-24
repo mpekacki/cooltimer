@@ -6,4 +6,8 @@ export default class Constants {
     static get SAVE_NEW_TASK_BUTTON_TEXT() {
         return 'Save new task';
     }
+
+    static get NO_TASK_TEXT() {
+        return 'No task';
+    }
 }

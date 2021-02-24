@@ -46,6 +46,29 @@ test('displays tasks', () => {
   expect(getTaskElement(c, TEST_TASK_NAME2)).toBeInTheDocument();
 });
 
+test('displays No Task option always', () => {
+  let selectedTask = undefined;
+  const taskSelectedCallback = (task) => {
+    selectedTask = task;
+  }
+  const tasks = [TEST_TASK_NAME, TEST_TASK_NAME2];
+  const c = render(<SimpleTaskManager onTaskSelected={taskSelectedCallback} tasks={tasks} />);
+  expect(getTaskElement(c, Constants.NO_TASK_TEXT)).toBeInTheDocument();
+  fireEvent.click(getTaskElement(c, TEST_TASK_NAME));
+  fireEvent.click(getTaskElement(c, Constants.NO_TASK_TEXT));
+  expect(selectedTask).toBe(null);
+});
+
+test('selects option passed in props', () => {
+  const tasks = [TEST_TASK_NAME, TEST_TASK_NAME2];
+  let c = render(<SimpleTaskManager tasks={tasks} selectedTask={TEST_TASK_NAME} />);
+  expect(getTaskElementChecked(c, TEST_TASK_NAME)).toBeTruthy();
+  c.rerender(<SimpleTaskManager tasks={tasks} selectedTask={TEST_TASK_NAME2} />);
+  expect(getTaskElementChecked(c, TEST_TASK_NAME2)).toBeTruthy();
+  c.rerender(<SimpleTaskManager tasks={tasks} selectedTask={null} />);
+  expect(getTaskElementChecked(c, Constants.NO_TASK_TEXT)).toBeTruthy();
+});
+
 function getNewTaskInput(c) {
   return c.getByPlaceholderText(Constants.CREATE_TASK_PLACEHOLDER_TEXT);
 }
@@ -56,4 +79,8 @@ function getSaveNewTaskButton(c) {
 
 function getTaskElement(c, taskName) {
   return c.getByLabelText(taskName);
+}
+
+function getTaskElementChecked(c, taskName) {
+  return getTaskElement(c, taskName).checked;
 }

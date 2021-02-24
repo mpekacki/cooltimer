@@ -3,27 +3,9 @@ import React from 'react';
 class Timer extends React.Component {
     constructor(props) {
         super(props);
-        // let state = JSON.parse(JSON.stringify(props));
-        // this.timerStartedAt = state.timerStartedAt;
-        // this.timerStartedWithSeconds = state.timerStartedWithSeconds;
-        // delete state.timerStartedAt;
-        // delete state.timerStartedWithSeconds;
-        // this.state = { ...state };
-        // console.log(props);
         setInterval(this.tick, 1000);
         this.tick();
     }
-
-    // componentWillReceiveProps(props) {
-    //     // if (!this.timerStartedAt)
-    //     //     this.timerStartedAt = props.timerStartedAt;
-    //     // if (!this.timerStartedWithSeconds)
-    //     //     this.timerStartedWithSeconds = props.timerStartedWithSeconds;
-    //     let state = JSON.parse(JSON.stringify(props));
-    //     // delete state.timerStartedAt;
-    //     // delete state.timerStartedWithSeconds;
-    //     this.setState(state);
-    // }
 
     formatSecondsAsTimer(seconds) {
         let minutesPart = String(Math.floor(seconds / 60)).padStart(2, '0');
@@ -164,11 +146,6 @@ class Timer extends React.Component {
     }
 
     notifyCycleChange = (wasWork, oldTimerSeconds, newTimerSeconds) => {
-        // console.log({
-        //     oldTimerSeconds: oldTimerSeconds,
-        //     newTimerSeconds: newTimerSeconds,
-        //     stateTimerStartedWithSeconds: this.timerStartedWithSeconds
-        // });
         const timerEndAt = this.props.timerStartedAt + (this.props.timerStartedWithSeconds - oldTimerSeconds) * 1000;
         const event = {
             wasWork: wasWork,
@@ -176,7 +153,6 @@ class Timer extends React.Component {
             end: timerEndAt
         };
         this.props.onTimerFinish(event);
-        // console.log(event);
         this.markTimerStart(newTimerSeconds, timerEndAt);
     }
 
@@ -185,9 +161,6 @@ class Timer extends React.Component {
             timerStartedAt: timerStartedAt,
             timerStartedWithSeconds: timerSeconds
         };
-        // console.log(newState);
-        // this.timerStartedAt = timerStartedAt;
-        // this.timerStartedWithSeconds = timerSeconds;
         this.props.setStateAndStorage(newState);
     }
 
@@ -218,7 +191,6 @@ class Timer extends React.Component {
     }
 
     setStateAndStorage = (newState) => {
-        // this.setState(newState);
         this.props.setStateAndStorage(newState);
     }
 
