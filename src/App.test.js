@@ -686,12 +686,14 @@ test('resets using updated settings', () => {
   verifyTimer(c, "19:00");
 });
 
-test('resets without events', () => {
+test('resets without events or tasks', () => {
   const c = render(<App defaultSettings={ new Settings(25, 5, 10, 4) }/>);
+  createTask(c, TEST_TASK_NAME);
   fireEvent.click(startWorkingButton(c));
   advanceTimersByTime((25 * 60) * 1000);
   fireEvent.click(resetButton(c));
   expect(c.getAllByText(`Work ${MOCK_START_TIME} ${MOCK_START_TIME + 25 * 60 * 1000}`).length).toBe(1);
+  expect(getTaskElement(c, TEST_TASK_NAME)).toBeInTheDocument();
 });
 
 test('displays event in calendar', () => {
@@ -809,6 +811,37 @@ test('does not create zero length events', () => {
   expect(c.queryByText(`Break ${MOCK_START_TIME + 35 * 60 * 1000} ${MOCK_START_TIME + 35 * 60 * 1000}`)).not.toBeInTheDocument();
 });
 
+test('stores task info in storage and restores it', () => {
+  let mockStorage = new MockStorage();
+  mockStorage.state = {};
+  let c = render(<App defaultSettings={ new Settings(25, 5, 10, 4) } storage={ mockStorage }/>);
+  createTask(c, TEST_TASK_NAME);
+  createTask(c, TEST_TASK_NAME2);
+  selectTask(c, TEST_TASK_NAME);
+  cleanup();
+  c = render(<App defaultSettings={ new Settings(25, 5, 10, 4) } storage={ mockStorage }/>);
+  expect(getTaskElement(c, TEST_TASK_NAME)).toBeInTheDocument();
+  expect(getTaskElement(c, TEST_TASK_NAME2)).toBeInTheDocument();
+  fireEvent.click(startWorkingButton(c));
+  advanceTimersByTime((25 * 60) * 1000);
+  verifyEventCreatedForWorkWithTask(c, TEST_TASK_NAME, MOCK_START_TIME, MOCK_START_TIME + 25 * 60 * 1000);
+});
+
+// test('shows total time worked per task', () => {
+//   const c = render(<App defaultSettings={ new Settings(25, 5, 10, 4) }/>);
+//   createTask(c, TEST_TASK_NAME);
+//   createTask(c, TEST_TASK_NAME2);
+//   fireEvent.click(startWorkingButton(c));
+//   advanceTimersByTime((15 * 60) * 1000);
+//   selectTask(c, TEST_TASK_NAME);
+//   advanceTimersByTime((6 * 60) * 1000);
+//   selectTask(c, TEST_TASK_NAME2);
+//   advanceTimersByTime((4 * 60) * 1000);
+//   verifyTotalTimeWorkedTodayForTask(c, Constants.NO_TASK_TEXT, 15 * 60);
+//   verifyTotalTimeWorkedTodayForTask(c, TEST_TASK_NAME, 6 * 60);
+//   verifyTotalTimeWorkedTodayForTask(c, TEST_TASK_NAME2, 4 * 60);
+// });
+
 function startWorkingButton(container) {
   return container.getByTestId("start-working-btn");
 }
@@ -847,6 +880,17 @@ function verifyAvailableBreakTime(container, expected) {
 
 function verifyEventCreatedForWorkWithTask(c, taskName, start, end) {
   expect(c.getAllByText(`Work (${taskName}) ${start} ${end}`).length).toBe(1);
+}
+
+function verifyTotalTimeWorkedTodayForTask(c, taskName, expectedSeconds) {
+  expect(c.getByText(taskName + ' ' + formatSeconds(expectedSeconds))).toBeInTheDocument();
+}
+
+function formatSeconds(seconds) {
+  let hours = Math.floor(seconds / 3600);
+  let minutes = Math.floor((seconds % 3600) / 60);
+  let secs = seconds % 60;
+  return hours + 'h' + minutes + 'm' + secs + 's';
 }
 
 function createTask(c, taskName) {

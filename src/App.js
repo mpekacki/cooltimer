@@ -91,6 +91,7 @@ class App extends React.Component {
     stateForReset.longBreakFreq = this.state.longBreakFreq;
     stateForReset.timerSeconds = this.state.workMinutes * 60;
     stateForReset.events = this.state.events;
+    stateForReset.tasks = this.state.tasks;
     return stateForReset;
   }
 
