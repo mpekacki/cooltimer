@@ -32,9 +32,13 @@ afterEach(() => {
   jest.clearAllTimers();
 });
 
-function advanceTimersByTime(time) {
+function advanceDateMock(time) {
   mockedTime.val += time;
   mockDate();
+}
+
+function advanceTimersByTime(time) {
+  advanceDateMock(time);
   jest.advanceTimersByTime(time);
 }
 
@@ -829,7 +833,7 @@ test('stores task info in storage and restores it', () => {
   verifyEventCreatedForWorkWithTask(c, TEST_TASK_NAME, MOCK_START_TIME, MOCK_START_TIME + 25 * 60 * 1000);
 });
 
-test('shows total time worked per task', () => {
+test('shows total time worked per task today', () => {
   const c = render(<App defaultSettings={ new Settings(25, 5, 10, 4) }/>);
   createTask(c, TEST_TASK_NAME);
   createTask(c, TEST_TASK_NAME2);
@@ -846,6 +850,20 @@ test('shows total time worked per task', () => {
   verifyTotalTimeWorkedTodayForTask(c, Constants.NO_TASK_TEXT, 15 * 60);
   verifyTotalTimeWorkedTodayForTask(c, TEST_TASK_NAME, 9 * 60);
   verifyTotalTimeWorkedTodayForTask(c, TEST_TASK_NAME2, 4 * 60);
+});
+
+test('does not show yesterday\'s task total time worked in today column', () => {
+  let mockStorage = new MockStorage();
+  mockStorage.state = {};
+  let c = render(<App defaultSettings={ new Settings(25, 5, 10, 4) } storage={ mockStorage }/>);
+  createTask(c, TEST_TASK_NAME);
+  fireEvent.click(startWorkingButton(c));
+  advanceTimersByTime((25 * 60) * 1000);
+  verifyTotalTimeWorkedTodayForTask(c, TEST_TASK_NAME, 25 * 60);
+  cleanup();
+  advanceDateMock(24 * 60 * 60 * 1000);
+  c = render(<App defaultSettings={ new Settings(25, 5, 10, 4) } storage={ mockStorage }/>);
+  verifyNoTotalTimeWorkedTodayForTask(c, TEST_TASK_NAME, 25 * 60);
 });
 
 function startWorkingButton(container) {
@@ -894,6 +912,10 @@ function verifyEventCreatedForWorkWithoutTask(c, start, end) {
 
 function verifyTotalTimeWorkedTodayForTask(c, taskName, expectedSeconds) {
   expect(c.getByText(formatSeconds(expectedSeconds))).toBeInTheDocument();
+}
+
+function verifyNoTotalTimeWorkedTodayForTask(c, taskName, expectedSeconds) {
+  expect(c.queryByText(formatSeconds(expectedSeconds))).not.toBeInTheDocument();
 }
 
 function formatSeconds(seconds) {
