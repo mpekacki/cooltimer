@@ -787,11 +787,13 @@ test('when selected task changes, finish current event and start new one', () =>
   const c = render(<App defaultSettings={ new Settings(25, 5, 10, 4) }/>);
   createTask(c, TEST_TASK_NAME);
   createTask(c, TEST_TASK_NAME2);
-  selectTask(c, TEST_TASK_NAME);
   fireEvent.click(startWorkingButton(c));
-  advanceTimersByTime((15 * 60) * 1000);
+  advanceTimersByTime((3 * 60) * 1000);
+  selectTask(c, TEST_TASK_NAME);
+  advanceTimersByTime((12 * 60) * 1000);
   selectTask(c, TEST_TASK_NAME2);
-  verifyEventCreatedForWorkWithTask(c, TEST_TASK_NAME, MOCK_START_TIME, MOCK_START_TIME + 15 * 60 * 1000);
+  verifyEventCreatedForWorkWithoutTask(c, MOCK_START_TIME, MOCK_START_TIME + 3 * 60 * 1000);
+  verifyEventCreatedForWorkWithTask(c, TEST_TASK_NAME, MOCK_START_TIME + 3 * 60 * 1000, MOCK_START_TIME + 15 * 60 * 1000);
   advanceTimersByTime((10 * 60) * 1000);
   verifyEventCreatedForWorkWithTask(c, TEST_TASK_NAME2, MOCK_START_TIME + 15 * 60 * 1000, MOCK_START_TIME + 25 * 60 * 1000);
   expect(c.queryByText('Break 0 -1500000')).not.toBeInTheDocument();
@@ -827,20 +829,24 @@ test('stores task info in storage and restores it', () => {
   verifyEventCreatedForWorkWithTask(c, TEST_TASK_NAME, MOCK_START_TIME, MOCK_START_TIME + 25 * 60 * 1000);
 });
 
-// test('shows total time worked per task', () => {
-//   const c = render(<App defaultSettings={ new Settings(25, 5, 10, 4) }/>);
-//   createTask(c, TEST_TASK_NAME);
-//   createTask(c, TEST_TASK_NAME2);
-//   fireEvent.click(startWorkingButton(c));
-//   advanceTimersByTime((15 * 60) * 1000);
-//   selectTask(c, TEST_TASK_NAME);
-//   advanceTimersByTime((6 * 60) * 1000);
-//   selectTask(c, TEST_TASK_NAME2);
-//   advanceTimersByTime((4 * 60) * 1000);
-//   verifyTotalTimeWorkedTodayForTask(c, Constants.NO_TASK_TEXT, 15 * 60);
-//   verifyTotalTimeWorkedTodayForTask(c, TEST_TASK_NAME, 6 * 60);
-//   verifyTotalTimeWorkedTodayForTask(c, TEST_TASK_NAME2, 4 * 60);
-// });
+test('shows total time worked per task', () => {
+  const c = render(<App defaultSettings={ new Settings(25, 5, 10, 4) }/>);
+  createTask(c, TEST_TASK_NAME);
+  createTask(c, TEST_TASK_NAME2);
+  fireEvent.click(startWorkingButton(c));
+  advanceTimersByTime((15 * 60) * 1000);
+  selectTask(c, TEST_TASK_NAME);
+  advanceTimersByTime((6 * 60) * 1000);
+  selectTask(c, TEST_TASK_NAME2);
+  advanceTimersByTime((4 * 60) * 1000);
+  selectTask(c, TEST_TASK_NAME);
+  advanceTimersByTime((5 * 60) * 1000);
+  advanceTimersByTime((3 * 60) * 1000);
+  selectTask(c, TEST_TASK_NAME2);
+  verifyTotalTimeWorkedTodayForTask(c, Constants.NO_TASK_TEXT, 15 * 60);
+  verifyTotalTimeWorkedTodayForTask(c, TEST_TASK_NAME, 9 * 60);
+  verifyTotalTimeWorkedTodayForTask(c, TEST_TASK_NAME2, 4 * 60);
+});
 
 function startWorkingButton(container) {
   return container.getByTestId("start-working-btn");
@@ -882,8 +888,12 @@ function verifyEventCreatedForWorkWithTask(c, taskName, start, end) {
   expect(c.getAllByText(`Work (${taskName}) ${start} ${end}`).length).toBe(1);
 }
 
+function verifyEventCreatedForWorkWithoutTask(c, start, end) {
+  expect(c.getAllByText(`Work ${start} ${end}`).length).toBe(1);
+}
+
 function verifyTotalTimeWorkedTodayForTask(c, taskName, expectedSeconds) {
-  expect(c.getByText(taskName + ' ' + formatSeconds(expectedSeconds))).toBeInTheDocument();
+  expect(c.getByText(formatSeconds(expectedSeconds))).toBeInTheDocument();
 }
 
 function formatSeconds(seconds) {

@@ -8,6 +8,7 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import dayGridMonth from '@fullcalendar/daygrid';
 import listPlugin from '@fullcalendar/list';
 import SimpleTaskManager from './SimpleTaskManager';
+import TaskTimes from './TaskTimes';
 
 class App extends React.Component {
   constructor(props) {
@@ -145,15 +146,13 @@ class App extends React.Component {
   }
 
   handleTaskSelected = (task) => {
-    const oldSelectedTask = this.state.selectedTask;
     const end = this.state.timerStartedAt + (this.state.timerStartedWithSeconds - this.state.timerSeconds) * 1000;
-    if (oldSelectedTask !== undefined) {
-      this.handleEventCreated({
-        wasWork: this.state.isWork,
-        start: this.state.timerStartedAt,
-        end: end
-      });
-    }
+    this.handleEventCreated({
+      wasWork: this.state.isWork,
+      start: this.state.timerStartedAt,
+      end: end
+    });
+  
     this.setStateAndStorage({
       timerStartedAt: end,
       timerStartedWithSeconds: this.state.timerSeconds,
@@ -212,6 +211,9 @@ class App extends React.Component {
           </div>
           <div className="row">
             <SimpleTaskManager onTaskCreate={this.handleTaskCreated} onTaskSelected={this.handleTaskSelected} tasks={this.state.tasks} />
+          </div>
+          <div className="row">
+            <TaskTimes events={this.state.events}/>
           </div>
           <div className="card card-body">
             <FullCalendar events={this.state.events} plugins={[timeGridPlugin, dayGridMonth, listPlugin]} initialView="timeGridWeek" headerToolbar={
