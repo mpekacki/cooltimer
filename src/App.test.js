@@ -861,8 +861,10 @@ test('does not show yesterday\'s task total time worked in today column', () => 
   advanceTimersByTime((25 * 60) * 1000);
   verifyTotalTimeWorkedTodayForTask(c, TEST_TASK_NAME, 25 * 60);
   cleanup();
+  jest.clearAllTimers();
   advanceDateMock(24 * 60 * 60 * 1000);
   c = render(<App defaultSettings={ new Settings(25, 5, 10, 4) } storage={ mockStorage }/>);
+  advanceTimersByTime((1 * 60) * 1000);
   verifyNoTotalTimeWorkedTodayForTask(c, TEST_TASK_NAME, 25 * 60);
 });
 

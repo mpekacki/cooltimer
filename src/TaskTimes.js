@@ -11,8 +11,11 @@ class TaskTimes extends React.Component {
 
     render() {
         const timesMap = {};
+        const today = new Date(Date.now());
         this.props.events.forEach(event => {
-            if (!event.isWork) {
+            if (!event.isWork 
+                // TODO: add test
+                || !(event.start.getFullYear() === today.getFullYear() && event.start.getMonth() === today.getMonth() && event.start.getDate() === today.getDate() )) {
                 return;
             }
             let taskName = event.task;
