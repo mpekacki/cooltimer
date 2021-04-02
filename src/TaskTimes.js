@@ -2,18 +2,32 @@ import React from 'react';
 import Constants from './Constants';
 
 class TaskTimes extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            events: props.events
+        };
+    }
+
+    componentDidUpdate(prevProps) {
+        if (this.props.events && prevProps.events && this.props.events.length != prevProps.events.length) {
+            this.setState({
+                events: this.props.events
+            });
+        }
+    }
+
     formatSeconds = (seconds) => {
         seconds /= 1000;
         let hours = Math.floor(seconds / 3600);
         let minutes = Math.floor((seconds % 3600) / 60);
-        let secs = seconds % 60;
         return `${hours}h${minutes}m`;
     }
 
     render() {
         const timesMap = {};
         const today = new Date(Date.now());
-        this.props.events.forEach(event => {
+        this.state.events.forEach(event => {
             if (!event.isWork) {
                 return;
             }
