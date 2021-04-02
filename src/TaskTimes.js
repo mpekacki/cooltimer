@@ -1,4 +1,5 @@
 import React from 'react';
+import Constants from './Constants';
 
 class TaskTimes extends React.Component {
     formatSeconds = (seconds) => {
@@ -13,29 +14,51 @@ class TaskTimes extends React.Component {
         const timesMap = {};
         const today = new Date(Date.now());
         this.props.events.forEach(event => {
-            if (!event.isWork 
-                // TODO: add test
-                || !(event.start.getFullYear() === today.getFullYear() && event.start.getMonth() === today.getMonth() && event.start.getDate() === today.getDate() )) {
+            if (!event.isWork) {
+                return;
+            }
+            let isForToday = event.start.getFullYear() === today.getFullYear() && event.start.getMonth() === today.getMonth() && event.start.getDate() === today.getDate();
+            let isForYesterday = event.start.getFullYear() === today.getFullYear() && event.start.getMonth() === today.getMonth() && event.start.getDate() === today.getDate() - 1;
+            // TODO add test
+            if (!isForToday && !isForYesterday) {
                 return;
             }
             let taskName = event.task;
             if (taskName === null || taskName === undefined || taskName === '' || taskName === 'null') {
-                taskName = '(no task)';
+                taskName = Constants.NO_TASK_TEXT;
             }
             if (!(taskName in timesMap)) {
-                timesMap[taskName] = 0;
+                timesMap[taskName] = {
+                    today: 0,
+                    yesterday: 0
+                };
             }
             if (event.end !== undefined) {
-                timesMap[taskName] += event.end.getTime() - event.start.getTime();
+                let len = event.end.getTime() - event.start.getTime();
+                if (isForToday) {
+                    timesMap[taskName].today += len;
+                } else if (isForYesterday) {
+                    timesMap[taskName].yesterday += len;
+                }
             }
         });
         return (
             <table>
+                <thead>
                 <tr>
                     <th>Task</th>
                     <th>Today</th>
+                    <th>Yesterday</th>
                 </tr>
-                {Object.entries(timesMap).map((entry) => (<tr><td>{entry[0]}</td><td>{this.formatSeconds(entry[1])}</td></tr>))}
+                </thead>
+                <tbody>
+                    {Object.entries(timesMap).map((entry) => (
+                    <tr key={entry[0]}>
+                        <td>{entry[0]}</td>
+                        <td data-testid={'today-' + entry[0].charAt(0) + entry[0].length}>{this.formatSeconds(entry[1].today)}</td>
+                        <td data-testid={'yesterday-' + entry[0].charAt(0) + entry[0].length}>{this.formatSeconds(entry[1].yesterday)}</td>
+                    </tr>))}
+                </tbody>
             </table>
         );
     }

@@ -47,7 +47,7 @@ jest.mock('@fullcalendar/react', () => {
     __esModule: true,
     A: true,
     default: (props) => {
-      return <ul>{props && props.events && props.events.map((event) => <li>{event.title + ' ' + event.start.getTime() + ' ' + event.end.getTime()}</li>)}</ul>;
+      return <ul>{props && props.events && props.events.map((event, i) => <li key={i}>{event.title + ' ' + event.start.getTime() + ' ' + event.end.getTime()}</li>)}</ul>;
     },
   };
 });
@@ -834,7 +834,9 @@ test('stores task info in storage and restores it', () => {
 });
 
 test('shows total time worked per task today', () => {
-  const c = render(<App defaultSettings={ new Settings(25, 5, 10, 4) }/>);
+  let mockStorage = new MockStorage();
+  mockStorage.state = {};
+  let c = render(<App defaultSettings={ new Settings(25, 5, 10, 4) } storage={ mockStorage }/>);
   createTask(c, TEST_TASK_NAME);
   createTask(c, TEST_TASK_NAME2);
   fireEvent.click(startWorkingButton(c));
@@ -850,22 +852,32 @@ test('shows total time worked per task today', () => {
   verifyTotalTimeWorkedTodayForTask(c, Constants.NO_TASK_TEXT, 15 * 60);
   verifyTotalTimeWorkedTodayForTask(c, TEST_TASK_NAME, 9 * 60);
   verifyTotalTimeWorkedTodayForTask(c, TEST_TASK_NAME2, 4 * 60);
+  cleanup();
+  c = render(<App defaultSettings={ new Settings(25, 5, 10, 4) } storage={ mockStorage }/>);
+  verifyTotalTimeWorkedTodayForTask(c, Constants.NO_TASK_TEXT, 15 * 60);
+  verifyTotalTimeWorkedTodayForTask(c, TEST_TASK_NAME, 9 * 60);
+  verifyTotalTimeWorkedTodayForTask(c, TEST_TASK_NAME2, 4 * 60);
 });
 
-test('does not show yesterday\'s task total time worked in today column', () => {
+test('shows yesterday\'s task total time worked in yesterday column', () => {
   let mockStorage = new MockStorage();
   mockStorage.state = {};
   let c = render(<App defaultSettings={ new Settings(25, 5, 10, 4) } storage={ mockStorage }/>);
   createTask(c, TEST_TASK_NAME);
+  selectTask(c, TEST_TASK_NAME);
   fireEvent.click(startWorkingButton(c));
   advanceTimersByTime((25 * 60) * 1000);
   verifyTotalTimeWorkedTodayForTask(c, TEST_TASK_NAME, 25 * 60);
+  verifyTotalTimeWorkedYesterdayForTask(c, TEST_TASK_NAME, 0);
+  fireEvent.click(holdWorkButton(c));
   cleanup();
   jest.clearAllTimers();
-  advanceDateMock(24 * 60 * 60 * 1000);
+  // jest.useFakeTimers();
+  advanceTimersByTime(24 * 60 * 60 * 1000);
   c = render(<App defaultSettings={ new Settings(25, 5, 10, 4) } storage={ mockStorage }/>);
-  advanceTimersByTime((1 * 60) * 1000);
-  verifyNoTotalTimeWorkedTodayForTask(c, TEST_TASK_NAME, 25 * 60);
+  // advanceTimersByTime((1 * 60) * 1000);
+  verifyTotalTimeWorkedYesterdayForTask(c, TEST_TASK_NAME, 25 * 60);
+  verifyTotalTimeWorkedTodayForTask(c, TEST_TASK_NAME, 0);
 });
 
 function startWorkingButton(container) {
@@ -913,11 +925,27 @@ function verifyEventCreatedForWorkWithoutTask(c, start, end) {
 }
 
 function verifyTotalTimeWorkedTodayForTask(c, taskName, expectedSeconds) {
-  expect(c.getByText(formatSeconds(expectedSeconds))).toBeInTheDocument();
+  expect(getTimeWorkedToday(c, taskName).textContent).toBe(formatSeconds(expectedSeconds));
 }
 
-function verifyNoTotalTimeWorkedTodayForTask(c, taskName, expectedSeconds) {
-  expect(c.queryByText(formatSeconds(expectedSeconds))).not.toBeInTheDocument();
+function verifyTotalTimeWorkedYesterdayForTask(c, taskName, expectedSeconds) {
+  expect(getTimeWorkedYesterday(c, taskName).textContent).toBe(formatSeconds(expectedSeconds));
+}
+
+function getTimeWorkedToday(c, taskName) {
+  return c.queryByTestId('today-' + taskName.charAt(0) + taskName.length);
+}
+
+function getTimeWorkedYesterday(c, taskName) {
+  return c.queryByTestId('yesterday-' + taskName.charAt(0) + taskName.length);
+}
+
+function verifyNoTotalTimeWorkedTodayForTask(c, taskName) {
+  expect(getTimeWorkedToday(c, taskName)).not.toBeInTheDocument();
+}
+
+function verifyNoTotalTimeWorkedYesterdayForTask(c, taskName) {
+  expect(getTimeWorkedYesterday(c, taskName)).not.toBeInTheDocument();
 }
 
 function formatSeconds(seconds) {
