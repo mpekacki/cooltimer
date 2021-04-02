@@ -7,7 +7,7 @@ class TaskTimes extends React.Component {
         let hours = Math.floor(seconds / 3600);
         let minutes = Math.floor((seconds % 3600) / 60);
         let secs = seconds % 60;
-        return hours + 'h' + minutes + 'm' + secs + 's';
+        return `${hours}h${minutes}m`;
     }
 
     render() {
