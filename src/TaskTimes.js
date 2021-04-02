@@ -43,7 +43,7 @@ class TaskTimes extends React.Component {
             }
         });
         return (
-            <table>
+            <table class="table-sm">
                 <thead>
                 <tr>
                     <th>Task</th>
