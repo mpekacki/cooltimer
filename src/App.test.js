@@ -5,7 +5,7 @@ import Settings from './Settings';
 import { Simulate } from 'react-dom/test-utils';
 import Constants from './Constants';
 
-const MOCK_START_TIME = 1603829345000;
+const MOCK_START_TIME = 1614544215000;
 
 let container;
 let mockedTime = {
@@ -859,7 +859,7 @@ test('shows total time worked per task today', () => {
   verifyTotalTimeWorkedTodayForTask(c, TEST_TASK_NAME2, 4 * 60);
 });
 
-test('shows yesterday\'s task total time worked in yesterday column', () => {
+test('shows today, yesterday and week summaries for task times', () => {
   let mockStorage = new MockStorage();
   mockStorage.state = {};
   let c = render(<App defaultSettings={ new Settings(25, 5, 10, 4) } storage={ mockStorage }/>);
@@ -869,6 +869,7 @@ test('shows yesterday\'s task total time worked in yesterday column', () => {
   advanceTimersByTime((25 * 60) * 1000);
   verifyTotalTimeWorkedTodayForTask(c, TEST_TASK_NAME, 25 * 60);
   verifyTotalTimeWorkedYesterdayForTask(c, TEST_TASK_NAME, 0);
+  verifyTotalTimeWorkedThisWeekForTask(c, TEST_TASK_NAME, 25 * 60);
   fireEvent.click(holdWorkButton(c));
   cleanup();
   jest.clearAllTimers();
@@ -878,6 +879,21 @@ test('shows yesterday\'s task total time worked in yesterday column', () => {
   // advanceTimersByTime((1 * 60) * 1000);
   verifyTotalTimeWorkedYesterdayForTask(c, TEST_TASK_NAME, 25 * 60);
   verifyTotalTimeWorkedTodayForTask(c, TEST_TASK_NAME, 0);
+  verifyTotalTimeWorkedThisWeekForTask(c, TEST_TASK_NAME, 25 * 60);
+  cleanup();
+  jest.clearAllTimers();
+  advanceTimersByTime(24 * 60 * 60 * 1000);
+  c = render(<App defaultSettings={ new Settings(25, 5, 10, 4) } storage={ mockStorage }/>);
+  verifyTotalTimeWorkedTodayForTask(c, TEST_TASK_NAME, 0);
+  verifyTotalTimeWorkedYesterdayForTask(c, TEST_TASK_NAME, 0);
+  verifyTotalTimeWorkedThisWeekForTask(c, TEST_TASK_NAME, 25 * 60);
+  cleanup();
+  jest.clearAllTimers();
+  advanceTimersByTime(7 * 24 * 60 * 60 * 1000);
+  c = render(<App defaultSettings={ new Settings(25, 5, 10, 4) } storage={ mockStorage }/>);
+  verifyNonexistenceOfTotalTimeWorkedTodayForTask(c, TEST_TASK_NAME);
+  verifyNonexistenceOfTotalTimeWorkedYesterdayForTask(c, TEST_TASK_NAME);
+  verifyNonexistenceOfTotalTimeWorkedThisWeekForTask(c, TEST_TASK_NAME);
 });
 
 function startWorkingButton(container) {
@@ -932,6 +948,22 @@ function verifyTotalTimeWorkedYesterdayForTask(c, taskName, expectedSeconds) {
   expect(getTimeWorkedYesterday(c, taskName).textContent).toBe(formatSeconds(expectedSeconds));
 }
 
+function verifyTotalTimeWorkedThisWeekForTask(c, taskName, expectedSeconds) {
+  expect(getTimeWorkedThisWeek(c, taskName).textContent).toBe(formatSeconds(expectedSeconds));
+}
+
+function verifyNonexistenceOfTotalTimeWorkedTodayForTask(c, taskName) {
+  expect(getTimeWorkedToday(c, taskName)).not.toBeInTheDocument();
+}
+
+function verifyNonexistenceOfTotalTimeWorkedYesterdayForTask(c, taskName) {
+  expect(getTimeWorkedYesterday(c, taskName)).not.toBeInTheDocument();
+}
+
+function verifyNonexistenceOfTotalTimeWorkedThisWeekForTask(c, taskName) {
+  expect(getTimeWorkedThisWeek(c, taskName)).not.toBeInTheDocument();
+}
+
 function getTimeWorkedToday(c, taskName) {
   return c.queryByTestId('today-' + taskName.charAt(0) + taskName.length);
 }
@@ -940,12 +972,8 @@ function getTimeWorkedYesterday(c, taskName) {
   return c.queryByTestId('yesterday-' + taskName.charAt(0) + taskName.length);
 }
 
-function verifyNoTotalTimeWorkedTodayForTask(c, taskName) {
-  expect(getTimeWorkedToday(c, taskName)).not.toBeInTheDocument();
-}
-
-function verifyNoTotalTimeWorkedYesterdayForTask(c, taskName) {
-  expect(getTimeWorkedYesterday(c, taskName)).not.toBeInTheDocument();
+function getTimeWorkedThisWeek(c, taskName) {
+  return c.queryByTestId('week-' + taskName.charAt(0) + taskName.length);
 }
 
 function formatSeconds(seconds) {

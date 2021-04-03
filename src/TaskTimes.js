@@ -10,7 +10,7 @@ class TaskTimes extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        if (this.props.events && prevProps.events && this.props.events.length != prevProps.events.length) {
+        if (this.props.events && prevProps.events && this.props.events.length !== prevProps.events.length) {
             this.setState({
                 events: this.props.events
             });
@@ -33,8 +33,9 @@ class TaskTimes extends React.Component {
             }
             let isForToday = event.start.getFullYear() === today.getFullYear() && event.start.getMonth() === today.getMonth() && event.start.getDate() === today.getDate();
             let isForYesterday = event.start.getFullYear() === today.getFullYear() && event.start.getMonth() === today.getMonth() && event.start.getDate() === today.getDate() - 1;
+            let isForThisWeek = event.start.getFullYear() === today.getFullYear() && event.start.getMonth() === today.getMonth() && event.start.getDate() >= today.getDate() - 7;
             // TODO add test
-            if (!isForToday && !isForYesterday) {
+            if (!isForToday && !isForYesterday && !isForThisWeek) {
                 return;
             }
             let taskName = event.task;
@@ -44,7 +45,8 @@ class TaskTimes extends React.Component {
             if (!(taskName in timesMap)) {
                 timesMap[taskName] = {
                     today: 0,
-                    yesterday: 0
+                    yesterday: 0,
+                    week: 0
                 };
             }
             if (event.end !== undefined) {
@@ -53,6 +55,9 @@ class TaskTimes extends React.Component {
                     timesMap[taskName].today += len;
                 } else if (isForYesterday) {
                     timesMap[taskName].yesterday += len;
+                }
+                if (isForThisWeek) {
+                    timesMap[taskName].week += len;
                 }
             }
         });
@@ -63,6 +68,7 @@ class TaskTimes extends React.Component {
                     <th>Task</th>
                     <th>Today</th>
                     <th>Yesterday</th>
+                    <th>Week</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -71,6 +77,7 @@ class TaskTimes extends React.Component {
                         <td>{entry[0]}</td>
                         <td data-testid={'today-' + entry[0].charAt(0) + entry[0].length}>{this.formatSeconds(entry[1].today)}</td>
                         <td data-testid={'yesterday-' + entry[0].charAt(0) + entry[0].length}>{this.formatSeconds(entry[1].yesterday)}</td>
+                        <td data-testid={'week-' + entry[0].charAt(0) + entry[0].length}>{this.formatSeconds(entry[1].week)}</td>
                     </tr>))}
                 </tbody>
             </table>
