@@ -896,6 +896,27 @@ test('shows today, yesterday and week summaries for task times', () => {
   verifyNonexistenceOfTotalTimeWorkedThisWeekForTask(c, TEST_TASK_NAME);
 });
 
+test('show percentages of time per task', () => {
+  let mockStorage = new MockStorage();
+  mockStorage.state = {};
+  let c = render(<App defaultSettings={ new Settings(25, 5, 10, 4) } storage={ mockStorage }/>);
+  createTask(c, TEST_TASK_NAME);
+  createTask(c, TEST_TASK_NAME2);
+  selectTask(c, TEST_TASK_NAME);
+  fireEvent.click(startWorkingButton(c));
+  advanceTimersByTime((5 * 60) * 1000);
+  selectTask(c, TEST_TASK_NAME2);
+  verifyPercentageOfTimeTodayForTask(c, TEST_TASK_NAME, '100%');
+  advanceTimersByTime((5 * 60) * 1000);
+  selectTask(c, TEST_TASK_NAME);
+  verifyPercentageOfTimeTodayForTask(c, TEST_TASK_NAME, '50%');
+  verifyPercentageOfTimeTodayForTask(c, TEST_TASK_NAME2, '50%');
+  advanceTimersByTime((10 * 60) * 1000);
+  selectTask(c, TEST_TASK_NAME2);
+  verifyPercentageOfTimeTodayForTask(c, TEST_TASK_NAME, '75%');
+  verifyPercentageOfTimeTodayForTask(c, TEST_TASK_NAME2, '25%');
+});
+
 function startWorkingButton(container) {
   return container.getByTestId("start-working-btn");
 }
@@ -962,6 +983,10 @@ function verifyNonexistenceOfTotalTimeWorkedYesterdayForTask(c, taskName) {
 
 function verifyNonexistenceOfTotalTimeWorkedThisWeekForTask(c, taskName) {
   expect(getTimeWorkedThisWeek(c, taskName)).not.toBeInTheDocument();
+}
+
+function verifyPercentageOfTimeTodayForTask(c, taskName, percentageText) {
+  expect(c.getByTestId('todayp-' + taskName.charAt(0) + taskName.length).textContent).toBe(percentageText);
 }
 
 function getTimeWorkedToday(c, taskName) {

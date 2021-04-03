@@ -6,15 +6,15 @@ class TaskTimes extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            events: props.events
+            timesMap: this.calculateTimes()
         };
     }
 
     componentDidUpdate(prevProps) {
         if (this.props.events && prevProps.events && this.props.events.length !== prevProps.events.length) {
             this.setState({
-                events: this.props.events
-            });
+                timesMap: this.calculateTimes()
+            })
         }
     }
 
@@ -25,16 +25,16 @@ class TaskTimes extends React.Component {
         return `${hours}h${minutes}m`;
     }
 
-    render() {
+    calculateTimes() {
         const timesMap = {};
-        this.state.events.forEach(event => {
+        let totalToday = 0, totalYesterday = 0, totalThisWeek = 0;
+        this.props.events.forEach(event => {
             if (!event.isWork) {
                 return;
             }
             let isForToday = isToday(event.start);;
             let isForYesterday = isYesterday(event.start);
             let isForThisWeek = isThisWeek(event.start);
-            // TODO add test
             if (!isForToday && !isForYesterday && !isForThisWeek) {
                 return;
             }
@@ -53,32 +53,50 @@ class TaskTimes extends React.Component {
                 let len = event.end.getTime() - event.start.getTime();
                 if (isForToday) {
                     timesMap[taskName].today += len;
+                    totalToday += len;
                 } else if (isForYesterday) {
                     timesMap[taskName].yesterday += len;
+                    totalYesterday += len;
                 }
                 if (isForThisWeek) {
                     timesMap[taskName].week += len;
+                    totalThisWeek += len;
                 }
             }
         });
+        Object.entries(timesMap).map((entry) => {
+            entry[1].todayPercentage = Math.round(entry[1].today / totalToday * 100) + '%';
+            entry[1].yesterdayPercentage = Math.round(entry[1].yesterday / totalYesterday * 100) + '%';
+            entry[1].weekPercentage = Math.round(entry[1].week / totalThisWeek * 100) + '%';
+        });
+        return timesMap;
+    }
+
+    render() {
         return (
             <table class="table-sm">
                 <thead>
-                <tr>
-                    <th>Task</th>
-                    <th>Today</th>
-                    <th>Yesterday</th>
-                    <th>Week</th>
-                </tr>
+                    <tr>
+                        <th>Task</th>
+                        <th>Today</th>
+                        <th>%</th>
+                        <th>Yesterday</th>
+                        <th>%</th>
+                        <th>Week</th>
+                        <th>%</th>
+                    </tr>
                 </thead>
                 <tbody>
-                    {Object.entries(timesMap).map((entry) => (
-                    <tr key={entry[0]}>
-                        <td>{entry[0]}</td>
-                        <td data-testid={'today-' + entry[0].charAt(0) + entry[0].length}>{this.formatSeconds(entry[1].today)}</td>
-                        <td data-testid={'yesterday-' + entry[0].charAt(0) + entry[0].length}>{this.formatSeconds(entry[1].yesterday)}</td>
-                        <td data-testid={'week-' + entry[0].charAt(0) + entry[0].length}>{this.formatSeconds(entry[1].week)}</td>
-                    </tr>))}
+                    {Object.entries(this.state.timesMap).map((entry) => (
+                        <tr key={entry[0]}>
+                            <td>{entry[0]}</td>
+                            <td data-testid={'today-' + entry[0].charAt(0) + entry[0].length}>{this.formatSeconds(entry[1].today)}</td>
+                            <td data-testid={'todayp-' + entry[0].charAt(0) + entry[0].length}>{entry[1].todayPercentage}</td>
+                            <td data-testid={'yesterday-' + entry[0].charAt(0) + entry[0].length}>{this.formatSeconds(entry[1].yesterday)}</td>
+                            <td data-testid={'yesterdayp-' + entry[0].charAt(0) + entry[0].length}>{entry[1].yesterdayPercentage}</td>
+                            <td data-testid={'week-' + entry[0].charAt(0) + entry[0].length}>{this.formatSeconds(entry[1].week)}</td>
+                            <td data-testid={'weekp-' + entry[0].charAt(0) + entry[0].length}>{entry[1].weekPercentage}</td>
+                        </tr>))}
                 </tbody>
             </table>
         );
