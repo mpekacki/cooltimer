@@ -1,23 +1,23 @@
 {
   "files": {
     "main.css": "/cooltimer/static/css/main.7d180cbf.chunk.css",
-    "main.js": "/cooltimer/static/js/main.de20659a.chunk.js",
-    "main.js.map": "/cooltimer/static/js/main.de20659a.chunk.js.map",
+    "main.js": "/cooltimer/static/js/main.a0f5f0f4.chunk.js",
+    "main.js.map": "/cooltimer/static/js/main.a0f5f0f4.chunk.js.map",
     "runtime-main.js": "/cooltimer/static/js/runtime-main.469aaf17.js",
     "runtime-main.js.map": "/cooltimer/static/js/runtime-main.469aaf17.js.map",
     "static/css/2.edff86ce.chunk.css": "/cooltimer/static/css/2.edff86ce.chunk.css",
-    "static/js/2.a35ee1f0.chunk.js": "/cooltimer/static/js/2.a35ee1f0.chunk.js",
-    "static/js/2.a35ee1f0.chunk.js.map": "/cooltimer/static/js/2.a35ee1f0.chunk.js.map",
+    "static/js/2.7c5d5dff.chunk.js": "/cooltimer/static/js/2.7c5d5dff.chunk.js",
+    "static/js/2.7c5d5dff.chunk.js.map": "/cooltimer/static/js/2.7c5d5dff.chunk.js.map",
     "index.html": "/cooltimer/index.html",
     "static/css/2.edff86ce.chunk.css.map": "/cooltimer/static/css/2.edff86ce.chunk.css.map",
     "static/css/main.7d180cbf.chunk.css.map": "/cooltimer/static/css/main.7d180cbf.chunk.css.map",
-    "static/js/2.a35ee1f0.chunk.js.LICENSE.txt": "/cooltimer/static/js/2.a35ee1f0.chunk.js.LICENSE.txt"
+    "static/js/2.7c5d5dff.chunk.js.LICENSE.txt": "/cooltimer/static/js/2.7c5d5dff.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.469aaf17.js",
     "static/css/2.edff86ce.chunk.css",
-    "static/js/2.a35ee1f0.chunk.js",
+    "static/js/2.7c5d5dff.chunk.js",
     "static/css/main.7d180cbf.chunk.css",
-    "static/js/main.de20659a.chunk.js"
+    "static/js/main.a0f5f0f4.chunk.js"
   ]
 }

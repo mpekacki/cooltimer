@@ -1,4 +1,5 @@
 import React from 'react';
+import { isToday, isYesterday, isThisWeek } from 'date-fns';
 import Constants from './Constants';
 
 class TaskTimes extends React.Component {
@@ -26,14 +27,13 @@ class TaskTimes extends React.Component {
 
     render() {
         const timesMap = {};
-        const today = new Date(Date.now());
         this.state.events.forEach(event => {
             if (!event.isWork) {
                 return;
             }
-            let isForToday = event.start.getFullYear() === today.getFullYear() && event.start.getMonth() === today.getMonth() && event.start.getDate() === today.getDate();
-            let isForYesterday = event.start.getFullYear() === today.getFullYear() && event.start.getMonth() === today.getMonth() && event.start.getDate() === today.getDate() - 1;
-            let isForThisWeek = event.start.getFullYear() === today.getFullYear() && event.start.getMonth() === today.getMonth() && event.start.getDate() >= today.getDate() - 7;
+            let isForToday = isToday(event.start);;
+            let isForYesterday = isYesterday(event.start);
+            let isForThisWeek = isThisWeek(event.start);
             // TODO add test
             if (!isForToday && !isForYesterday && !isForThisWeek) {
                 return;
