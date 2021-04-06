@@ -2,6 +2,8 @@ import React from 'react';
 import { isToday, isYesterday, isThisWeek } from 'date-fns';
 import Constants from './Constants';
 
+const TOTALS_KEY = '@@@TOTALS';
+
 class TaskTimes extends React.Component {
     constructor(props) {
         super(props);
@@ -64,11 +66,16 @@ class TaskTimes extends React.Component {
                 }
             }
         });
-        Object.entries(timesMap).map((entry) => {
+        Object.entries(timesMap).forEach((entry) => {
             entry[1].todayPercentage = Math.round(entry[1].today / totalToday * 100) + '%';
             entry[1].yesterdayPercentage = Math.round(entry[1].yesterday / totalYesterday * 100) + '%';
             entry[1].weekPercentage = Math.round(entry[1].week / totalThisWeek * 100) + '%';
         });
+        timesMap[TOTALS_KEY] = {
+            today: totalToday,
+            yesterday: totalYesterday,
+            week: totalThisWeek
+        }
         return timesMap;
     }
 
@@ -87,7 +94,7 @@ class TaskTimes extends React.Component {
                     </tr>
                 </thead>
                 <tbody>
-                    {Object.entries(this.state.timesMap).map((entry) => (
+                    {Object.entries(this.state.timesMap).filter(entry => entry[0] !== TOTALS_KEY).map(entry => (
                         <tr key={entry[0]}>
                             <td>{entry[0]}</td>
                             <td data-testid={'today-' + entry[0].charAt(0) + entry[0].length}>{this.formatSeconds(entry[1].today)}</td>
@@ -96,7 +103,17 @@ class TaskTimes extends React.Component {
                             <td data-testid={'yesterdayp-' + entry[0].charAt(0) + entry[0].length}>{entry[1].yesterdayPercentage}</td>
                             <td data-testid={'week-' + entry[0].charAt(0) + entry[0].length}>{this.formatSeconds(entry[1].week)}</td>
                             <td data-testid={'weekp-' + entry[0].charAt(0) + entry[0].length}>{entry[1].weekPercentage}</td>
-                        </tr>))}
+                        </tr>
+                    ))}
+                    <tr>
+                        <td>Total</td>
+                        <td data-testid={'today-total'}>{this.formatSeconds(this.state.timesMap[TOTALS_KEY].today)}</td>
+                        <td data-testid={'todayp-total'}>100%</td>
+                        <td data-testid={'yesterday-total'}>{this.formatSeconds(this.state.timesMap[TOTALS_KEY].yesterday)}</td>
+                        <td data-testid={'yesterdayp-total'}>100%</td>
+                        <td data-testid={'week-total'}>{this.formatSeconds(this.state.timesMap[TOTALS_KEY].week)}</td>
+                        <td data-testid={'weekp-total'}>100%</td>
+                    </tr>
                 </tbody>
             </table>
         );

@@ -852,11 +852,13 @@ test('shows total time worked per task today', () => {
   verifyTotalTimeWorkedTodayForTask(c, Constants.NO_TASK_TEXT, 15 * 60);
   verifyTotalTimeWorkedTodayForTask(c, TEST_TASK_NAME, 9 * 60);
   verifyTotalTimeWorkedTodayForTask(c, TEST_TASK_NAME2, 4 * 60);
+  verifyTotalTimeWorkedTodayForAllTasks(c, 28 * 60);
   cleanup();
   c = render(<App defaultSettings={ new Settings(25, 5, 10, 4) } storage={ mockStorage }/>);
   verifyTotalTimeWorkedTodayForTask(c, Constants.NO_TASK_TEXT, 15 * 60);
   verifyTotalTimeWorkedTodayForTask(c, TEST_TASK_NAME, 9 * 60);
   verifyTotalTimeWorkedTodayForTask(c, TEST_TASK_NAME2, 4 * 60);
+  verifyTotalTimeWorkedTodayForAllTasks(c, 28 * 60);
 });
 
 test('shows today, yesterday and week summaries for task times', () => {
@@ -917,6 +919,23 @@ test('show percentages of time per task', () => {
   verifyPercentageOfTimeTodayForTask(c, TEST_TASK_NAME2, '25%');
 });
 
+test('updates total time worked per task even if no new event is created', () => {
+  let mockStorage = new MockStorage();
+  mockStorage.state = {};
+  let c = render(<App defaultSettings={ new Settings(25, 5, 10, 4) } storage={ mockStorage }/>);
+  createTask(c, TEST_TASK_NAME);
+  selectTask(c, TEST_TASK_NAME);
+  fireEvent.click(startWorkingButton(c));
+  advanceTimersByTime((5 * 60) * 1000);
+  fireEvent.click(holdWorkButton(c));
+  verifyTotalTimeWorkedTodayForTask(c, TEST_TASK_NAME, 5 * 60);
+  fireEvent.click(resumeWorkButton(c));
+  advanceTimersByTime((10 * 60) * 1000);
+  fireEvent.click(holdWorkButton(c));
+  advanceTimersByTime((1 * 60) * 1000);
+  verifyTotalTimeWorkedTodayForTask(c, TEST_TASK_NAME, 15 * 60);
+});
+
 function startWorkingButton(container) {
   return container.getByTestId("start-working-btn");
 }
@@ -963,6 +982,10 @@ function verifyEventCreatedForWorkWithoutTask(c, start, end) {
 
 function verifyTotalTimeWorkedTodayForTask(c, taskName, expectedSeconds) {
   expect(getTimeWorkedToday(c, taskName).textContent).toBe(formatSeconds(expectedSeconds));
+}
+
+function verifyTotalTimeWorkedTodayForAllTasks(c, expectedSeconds) {
+  expect(c.queryByTestId('today-total').textContent).toBe(formatSeconds(expectedSeconds));
 }
 
 function verifyTotalTimeWorkedYesterdayForTask(c, taskName, expectedSeconds) {
