@@ -17,6 +17,8 @@ afterEach(() => {
 });
 
 const TEST_TASK_NAME = 'petting the dog';
+const TEST_TASK_NAME2 = 'eating cake';
+
 test('creates new task', () => {
   let createdTask = null;
   const taskCreateCallback = (task) => {
@@ -38,7 +40,6 @@ test('selects existing task', () => {
   expect(selectedTask).toBe(TEST_TASK_NAME);
 });
 
-const TEST_TASK_NAME2 = 'eating cake';
 test('displays tasks', () => {
   const tasks = [TEST_TASK_NAME, TEST_TASK_NAME2];
   const c = render(<SimpleTaskManager tasks={tasks} />);
@@ -69,16 +70,32 @@ test('selects option passed in props', () => {
   expect(getTaskElementChecked(c, Constants.NO_TASK_TEXT)).toBeTruthy();
 });
 
+test('does not show create task button if task already exists', () => {
+  const c = render(<SimpleTaskManager tasks={[TEST_TASK_NAME]}/>);
+  Simulate.change(getNewTaskInput(c), { target: { value: TEST_TASK_NAME } });
+  expect(getSaveNewTaskButton(c)).not.toBeInTheDocument();
+});
+
+test('searches for tasks', () => {
+  const tasks = [TEST_TASK_NAME, TEST_TASK_NAME2];
+  const c = render(<SimpleTaskManager tasks={tasks} />);
+  expect(getTaskElement(c, TEST_TASK_NAME)).toBeInTheDocument();
+  expect(getTaskElement(c, TEST_TASK_NAME2)).toBeInTheDocument();
+  Simulate.change(getNewTaskInput(c), { target: { value: 'cake' } });
+  expect(getTaskElement(c, TEST_TASK_NAME)).not.toBeInTheDocument();
+  expect(getTaskElement(c, TEST_TASK_NAME2)).toBeInTheDocument();
+});
+
 function getNewTaskInput(c) {
   return c.getByPlaceholderText(Constants.CREATE_TASK_PLACEHOLDER_TEXT);
 }
 
 function getSaveNewTaskButton(c) {
-  return c.getByText(Constants.SAVE_NEW_TASK_BUTTON_TEXT);
+  return c.queryByText(Constants.SAVE_NEW_TASK_BUTTON_TEXT);
 }
 
 function getTaskElement(c, taskName) {
-  return c.getByLabelText(taskName);
+  return c.queryByLabelText(taskName);
 }
 
 function getTaskElementChecked(c, taskName) {

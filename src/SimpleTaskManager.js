@@ -6,7 +6,9 @@ class SimpleTaskManager extends React.Component {
     super(props);
     this.state = {
       taskInput: '',
-      selectedTask: props.selectedTask
+      selectedTask: props.selectedTask,
+      visibleTasks: props.tasks,
+      createButtonVisible: true
     };
   }
 
@@ -19,11 +21,18 @@ class SimpleTaskManager extends React.Component {
   }
 
   handleTextInputChange = (event) => {
-    this.setState({ taskInput: event.target.value });
+    this.setState({ 
+      taskInput: event.target.value,
+      createButtonVisible: !this.props.tasks || !this.props.tasks.includes(event.target.value),
+      visibleTasks: this.props.tasks ? this.props.tasks.filter(x => x.includes(event.target.value)) : []
+    });
   }
 
   handleSaveClick = () => {
     this.props.onTaskCreate(this.state.taskInput);
+    this.setState({
+      taskInput: ''
+    });
   }
 
   handleTaskSelected = (event) => {
@@ -40,15 +49,15 @@ class SimpleTaskManager extends React.Component {
   render() {
     return (
       <div>
-        <input type="text" onChange={this.handleTextInputChange} placeholder={Constants.CREATE_TASK_PLACEHOLDER_TEXT} />
-        <button onClick={this.handleSaveClick}>{Constants.SAVE_NEW_TASK_BUTTON_TEXT}</button>
+        <input type="text" onChange={this.handleTextInputChange} placeholder={Constants.CREATE_TASK_PLACEHOLDER_TEXT} value={this.state.taskInput} />
+        {(this.state.createButtonVisible ? <button onClick={this.handleSaveClick}>{Constants.SAVE_NEW_TASK_BUTTON_TEXT}</button> : null )}
         <div className="btn-group btn-group-toggle" data-toggle="buttons" style={{'flex-wrap' : 'wrap'}}>
           <>
             <label className={'btn btn-secondary' + (this.state.selectedTask == null ? ' active' : '')} htmlFor="no-task">{Constants.NO_TASK_TEXT}
               <input type="radio" id="no-task" name="task" value="" autocomplete="off" onChange={this.handleTaskSelected} checked={this.state.selectedTask == null}></input>
             </label>
           </>
-          {this.props && this.props.tasks && this.props.tasks.map(
+          {this.state && this.state.visibleTasks && this.state.visibleTasks.map(
             task => {
               return (
                 <>
