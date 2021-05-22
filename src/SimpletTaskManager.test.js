@@ -84,6 +84,9 @@ test('searches for tasks', () => {
   Simulate.change(getNewTaskInput(c), { target: { value: 'cake' } });
   expect(getTaskElement(c, TEST_TASK_NAME)).not.toBeInTheDocument();
   expect(getTaskElement(c, TEST_TASK_NAME2)).toBeInTheDocument();
+  Simulate.change(getNewTaskInput(c), { target: { value: 'DOG' } });
+  expect(getTaskElement(c, TEST_TASK_NAME)).toBeInTheDocument();
+  expect(getTaskElement(c, TEST_TASK_NAME2)).not.toBeInTheDocument();
 });
 
 function getNewTaskInput(c) {

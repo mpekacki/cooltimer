@@ -24,7 +24,7 @@ class SimpleTaskManager extends React.Component {
     this.setState({ 
       taskInput: event.target.value,
       createButtonVisible: !this.props.tasks || !this.props.tasks.includes(event.target.value),
-      visibleTasks: this.props.tasks ? this.props.tasks.filter(x => x.includes(event.target.value)) : []
+      visibleTasks: this.props.tasks ? this.props.tasks.filter(x => x.toUpperCase().includes(event.target.value.toUpperCase())) : []
     });
   }
 
