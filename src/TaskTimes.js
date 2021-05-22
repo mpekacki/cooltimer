@@ -13,10 +13,10 @@ class TaskTimes extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        if (this.props.events && prevProps.events && this.props.events.length !== prevProps.events.length) {
+        if (this.props.eventsTimestamp !== prevProps.eventsTimestamp) {
             this.setState({
                 timesMap: this.calculateTimes()
-            })
+            });
         }
     }
 

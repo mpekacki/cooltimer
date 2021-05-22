@@ -135,6 +135,9 @@ class App extends React.Component {
     this.setStateAndStorage({
       events: newEvents
     });
+    this.setState({
+      eventsTimestamp: Date.now()
+    })
   }
 
   handleTaskCreated = (task) => {
@@ -210,10 +213,10 @@ class App extends React.Component {
             </div>
           </div>
           <div className="row">
-            <SimpleTaskManager onTaskCreate={this.handleTaskCreated} onTaskSelected={this.handleTaskSelected} tasks={this.state.tasks} />
+            <SimpleTaskManager onTaskCreate={this.handleTaskCreated} onTaskSelected={this.handleTaskSelected} tasks={this.state.tasks} selectedTask={this.state.selectedTask} />
           </div>
           <div className="row">
-            <TaskTimes events={this.state.events}/>
+            <TaskTimes events={this.state.events} eventsTimestamp={this.state.eventsTimestamp}/>
           </div>
           <div className="card card-body">
             <FullCalendar events={this.state.events} plugins={[timeGridPlugin, dayGridMonth, listPlugin]} initialView="timeGridWeek" headerToolbar={

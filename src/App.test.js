@@ -826,6 +826,7 @@ test('stores task info in storage and restores it', () => {
   selectTask(c, TEST_TASK_NAME);
   cleanup();
   c = render(<App defaultSettings={ new Settings(25, 5, 10, 4) } storage={ mockStorage }/>);
+  expect(c.getByTestId('button-' + TEST_TASK_NAME).classList.contains('active')).toBe(true);
   expect(getTaskElement(c, TEST_TASK_NAME)).toBeInTheDocument();
   expect(getTaskElement(c, TEST_TASK_NAME2)).toBeInTheDocument();
   fireEvent.click(startWorkingButton(c));
@@ -932,7 +933,6 @@ test('updates total time worked per task even if no new event is created', () =>
   fireEvent.click(resumeWorkButton(c));
   advanceTimersByTime((10 * 60) * 1000);
   fireEvent.click(holdWorkButton(c));
-  advanceTimersByTime((1 * 60) * 1000);
   verifyTotalTimeWorkedTodayForTask(c, TEST_TASK_NAME, 15 * 60);
 });
 

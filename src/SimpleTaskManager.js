@@ -42,7 +42,7 @@ class SimpleTaskManager extends React.Component {
       <div>
         <input type="text" onChange={this.handleTextInputChange} placeholder={Constants.CREATE_TASK_PLACEHOLDER_TEXT} />
         <button onClick={this.handleSaveClick}>{Constants.SAVE_NEW_TASK_BUTTON_TEXT}</button>
-        <div className="btn-group btn-group-toggle" data-toggle="buttons">
+        <div className="btn-group btn-group-toggle" data-toggle="buttons" style={{'flex-wrap' : 'wrap'}}>
           <>
             <label className={'btn btn-secondary' + (this.state.selectedTask == null ? ' active' : '')} htmlFor="no-task">{Constants.NO_TASK_TEXT}
               <input type="radio" id="no-task" name="task" value="" autocomplete="off" onChange={this.handleTaskSelected} checked={this.state.selectedTask == null}></input>
@@ -52,7 +52,7 @@ class SimpleTaskManager extends React.Component {
             task => {
               return (
                 <>
-                  <label className={'btn btn-secondary' + (task === this.state.selectedTask ? ' active' : '')} htmlFor={task}>{task}
+                  <label className={'btn btn-secondary' + (task === this.state.selectedTask ? ' active' : '')} htmlFor={task} data-testid={'button-' + task}>{task}
                     <input type="radio" id={task} name="task" value={task} autocomplete="off" onChange={this.handleTaskSelected} checked={task === this.state.selectedTask}></input>
                   </label>
                 </>
