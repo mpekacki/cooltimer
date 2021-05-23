@@ -13,25 +13,27 @@ class SimpleTaskManager extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.selectedTask !== prevProps.selectedTask) {
+    if (this.props.selectedTask !== prevProps.selectedTask || !!this.props.tasks !== !!prevProps.tasks || (this.props.tasks && prevProps.tasks && this.props.tasks.length !== prevProps.tasks.length)) {
       this.setState({
-        selectedTask: this.props.selectedTask
+        selectedTask: this.props.selectedTask,
+        visibleTasks: this.getVisibleTasks(this.state.taskInput)
       });
     }
   }
 
   handleTextInputChange = (event) => {
-    this.setState({ 
+    this.setState({
       taskInput: event.target.value,
       createButtonVisible: !this.props.tasks || !this.props.tasks.includes(event.target.value),
-      visibleTasks: this.props.tasks ? this.props.tasks.filter(x => x.toUpperCase().includes(event.target.value.toUpperCase())) : []
+      visibleTasks: this.getVisibleTasks(event.target.value)
     });
   }
 
   handleSaveClick = () => {
     this.props.onTaskCreate(this.state.taskInput);
     this.setState({
-      taskInput: ''
+      taskInput: '',
+      visibleTasks: this.getVisibleTasks('')
     });
   }
 
@@ -46,14 +48,18 @@ class SimpleTaskManager extends React.Component {
     this.props.onTaskSelected(value);
   }
 
+  getVisibleTasks(searchText) {
+    return this.props.tasks ? this.props.tasks.filter(x => x.toUpperCase().includes(searchText.toUpperCase())) : [];
+  }
+
   render() {
     return (
       <div>
         <div class="form-inline">
-        <input type="text" class="form-control" onChange={this.handleTextInputChange} placeholder={Constants.CREATE_TASK_PLACEHOLDER_TEXT} value={this.state.taskInput} />
-        {(this.state.createButtonVisible ? <button class="btn btn-primary" onClick={this.handleSaveClick}>{Constants.SAVE_NEW_TASK_BUTTON_TEXT}</button> : null )}
+          <input type="text" class="form-control" onChange={this.handleTextInputChange} placeholder={Constants.CREATE_TASK_PLACEHOLDER_TEXT} value={this.state.taskInput} />
+          {(this.state.createButtonVisible ? <button class="btn btn-primary" onClick={this.handleSaveClick}>{Constants.SAVE_NEW_TASK_BUTTON_TEXT}</button> : null)}
         </div>
-        <div className="btn-group btn-group-toggle" data-toggle="buttons" style={{'flex-wrap' : 'wrap'}}>
+        <div className="btn-group btn-group-toggle" data-toggle="buttons" style={{ 'flex-wrap': 'wrap' }}>
           <>
             <label className={'btn btn-secondary' + (this.state.selectedTask == null ? ' active' : '')} htmlFor="no-task">{Constants.NO_TASK_TEXT}
               <input type="radio" id="no-task" name="task" value="" autocomplete="off" onChange={this.handleTaskSelected} checked={this.state.selectedTask == null}></input>

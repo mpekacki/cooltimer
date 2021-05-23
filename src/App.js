@@ -135,9 +135,7 @@ class App extends React.Component {
     this.setStateAndStorage({
       events: newEvents
     });
-    this.setState({
-      eventsTimestamp: Date.now()
-    })
+    this.setEventsTimestamp();
   }
 
   handleTaskCreated = (task) => {
@@ -146,6 +144,7 @@ class App extends React.Component {
     this.setStateAndStorage({
       tasks: newTasks
     });
+    this.setEventsTimestamp();
   }
 
   handleTaskSelected = (task) => {
@@ -160,6 +159,12 @@ class App extends React.Component {
       timerStartedAt: end,
       timerStartedWithSeconds: this.state.timerSeconds,
       selectedTask: task
+    });
+  }
+
+  setEventsTimestamp() {
+    this.setState({
+      eventsTimestamp: Date.now()
     });
   }
 
