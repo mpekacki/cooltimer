@@ -217,10 +217,10 @@ class App extends React.Component {
                 onchange={this.onChangeSettings} />
             </div>
           </div>
-          <div className="row">
+          <div className="row mb-3">
             <SimpleTaskManager onTaskCreate={this.handleTaskCreated} onTaskSelected={this.handleTaskSelected} tasks={this.state.tasks} selectedTask={this.state.selectedTask} />
           </div>
-          <div className="row">
+          <div className="row mb-3">
             <TaskTimes events={this.state.events} eventsTimestamp={this.state.eventsTimestamp}/>
           </div>
           <div className="card card-body">

@@ -55,7 +55,7 @@ class SimpleTaskManager extends React.Component {
   render() {
     return (
       <div>
-        <div class="form-inline">
+        <div class="form-inline mb-2">
           <input type="text" class="form-control" onChange={this.handleTextInputChange} placeholder={Constants.CREATE_TASK_PLACEHOLDER_TEXT} value={this.state.taskInput} />
           {(this.state.createButtonVisible ? <button class="btn btn-primary" onClick={this.handleSaveClick}>{Constants.SAVE_NEW_TASK_BUTTON_TEXT}</button> : null)}
         </div>

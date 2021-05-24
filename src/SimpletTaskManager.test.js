@@ -28,6 +28,7 @@ test('creates new task', () => {
   Simulate.change(getNewTaskInput(c), { target: { value: TEST_TASK_NAME } });
   fireEvent.click(getSaveNewTaskButton(c));
   expect(createdTask).toBe(TEST_TASK_NAME);
+  expect(getNewTaskInput(c).value).toBe('');
 });
 
 test('selects existing task', () => {
