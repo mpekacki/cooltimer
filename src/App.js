@@ -226,7 +226,7 @@ class App extends React.Component {
           <div className="card card-body">
             <FullCalendar events={this.state.events} plugins={[timeGridPlugin, dayGridMonth, listPlugin]} initialView="timeGridWeek" headerToolbar={
               { right: 'today prev,next dayGridMonth,timeGridWeek,timeGridDay listWeek' }
-            } slotDuration='00:15:00' />
+            } slotDuration='00:10:00' />
           </div>
         </div>
       </div>
