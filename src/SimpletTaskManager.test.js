@@ -25,7 +25,9 @@ test('creates new task', () => {
     createdTask = task;
   }
   const c = render(<SimpleTaskManager onTaskCreate={taskCreateCallback} />);
+  expect(getSaveNewTaskButton(c)).not.toBeInTheDocument();
   Simulate.change(getNewTaskInput(c), { target: { value: TEST_TASK_NAME } });
+  expect(getSaveNewTaskButton(c)).toBeInTheDocument();
   fireEvent.click(getSaveNewTaskButton(c));
   expect(createdTask).toBe(TEST_TASK_NAME);
   expect(getNewTaskInput(c).value).toBe('');

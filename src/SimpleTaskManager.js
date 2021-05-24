@@ -8,7 +8,7 @@ class SimpleTaskManager extends React.Component {
       taskInput: '',
       selectedTask: props.selectedTask,
       visibleTasks: props.tasks,
-      createButtonVisible: true
+      createButtonVisible: false
     };
   }
 
@@ -24,7 +24,7 @@ class SimpleTaskManager extends React.Component {
   handleTextInputChange = (event) => {
     this.setState({
       taskInput: event.target.value,
-      createButtonVisible: !this.props.tasks || !this.props.tasks.includes(event.target.value),
+      createButtonVisible: event.target.value && (!this.props.tasks || !this.props.tasks.includes(event.target.value)),
       visibleTasks: this.getVisibleTasks(event.target.value)
     });
   }
