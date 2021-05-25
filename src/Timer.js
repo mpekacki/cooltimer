@@ -4,8 +4,12 @@ import Constants from './Constants';
 class Timer extends React.Component {
     constructor(props) {
         super(props);
-        setInterval(this.tick, 1000);
+        this.interval = setInterval(this.tick, 1000);
         this.tick();
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.interval);
     }
 
     formatSecondsAsTimer(seconds) {
