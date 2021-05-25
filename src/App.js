@@ -65,6 +65,7 @@ class App extends React.Component {
       isWork: null,
       availableBreakSeconds: 0,
       hiddenAvailableBreakSeconds: 0,
+      totalCombinedTime: 0,
       cycle: 0,
       notificationsGranted: false,
       timerRunning: null,
@@ -176,11 +177,11 @@ class App extends React.Component {
           <title>Timer</title>
         </Helmet>
 
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous"></link>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossOrigin="anonymous"></link>
 
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossOrigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossOrigin="anonymous"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossOrigin="anonymous"></script>
 
         <div className="container">
           <div className="row">
@@ -193,6 +194,7 @@ class App extends React.Component {
             isWork={this.state.isWork}
             availableBreakSeconds={this.state.availableBreakSeconds}
             hiddenAvailableBreakSeconds={this.state.hiddenAvailableBreakSeconds}
+            totalCombinedTime={this.state.totalCombinedTime}
             cycle={this.state.cycle}
             timerRunning={this.state.timerRunning}
             continousWork={this.state.continousWork}

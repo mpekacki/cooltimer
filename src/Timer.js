@@ -74,11 +74,13 @@ class Timer extends React.Component {
             timerLastUpdatedAt: this.props.timerLastUpdatedAt,
             cycle: this.props.cycle,
             continousWork: this.props.continousWork,
-            timerSeconds: this.props.timerSeconds
+            timerSeconds: this.props.timerSeconds,
+            totalCombinedTime: this.props.totalCombinedTime
         };
 
         for (let secondsPassed = secondsDiff; secondsPassed > 0; secondsPassed--) {
             this.tempState.timerSeconds--;
+            this.tempState.totalCombinedTime++;
             if (this.tempState.isWork) {
                 this.tempState.totalWorkedSeconds++;
                 let availableBreakSecondsIncrement = this.props.shortBreakMinutes * 1.0 / this.props.workMinutes;
@@ -202,8 +204,8 @@ class Timer extends React.Component {
     render() {
         return (
             <div>
-                <div class="row">
-                    <div class="col-sm">
+                <div className="row">
+                    <div className="col-sm">
                         {this.props.timerRunning === true &&
                             <button className="btn btn-warning" onClick={this.onClickHoldWork}>{Constants.HOLD_WORK_BUTTON_TEXT}</button>
                         }
@@ -215,13 +217,13 @@ class Timer extends React.Component {
                         }
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-sm">
+                <div className="row">
+                    <div className="col-sm">
                         <h1 data-testid="timer">{this.formatSecondsAsTimer(this.props.timerSeconds)}</h1>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-sm">
+                <div className="row">
+                    <div className="col-sm">
                         {(this.props.isWork === true && this.props.availableBreakSeconds) ?
                             <>
                                 <button className="btn btn-success" onClick={this.onClickGoOnABreak}>{Constants.GO_ON_A_BREAT_BUTTON_TEXT}</button>
@@ -234,47 +236,55 @@ class Timer extends React.Component {
                         }
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-sm font-weight-light text-md-right">
+                <div className="row">
+                    <div className="col-sm font-weight-light text-md-right">
                         Total time worked:
             </div>
-                    <div class="col-sm text-md-left" data-testid="totalWorkedTime">
+                    <div className="col-sm text-md-left" data-testid="totalWorkedTime">
                         {this.formatSecondsAsText(this.props.totalWorkedSeconds)}
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-sm font-weight-light text-md-right">
+                <div className="row">
+                    <div className="col-sm font-weight-light text-md-right">
                         Available break time:
             </div>
-                    <div class="col-sm text-md-left" data-testid="availableBreakTime">
+                    <div className="col-sm text-md-left" data-testid="availableBreakTime">
                         {this.formatSecondsAsText(this.props.availableBreakSeconds)}
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-sm font-weight-light text-md-right">
+                <div className="row">
+                    <div className="col-sm font-weight-light text-md-right">
                         Cycles until long break ({this.props.longBreakMinutes} minutes):
             </div>
-                    <div class="col-sm text-md-left" data-testid="longBreakInfo">
+                    <div className="col-sm text-md-left" data-testid="longBreakInfo">
                         {this.cyclesUntilLongBreak}
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-sm">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="" onChange={this.onChangeContinousWork}
+                <div className="row">
+                    <div className="col-sm font-weight-light text-md-right">
+                        Total time (work + break):
+            </div>
+                    <div className="col-sm text-md-left" data-testid="totalCombinedTime">
+                        {this.formatSecondsAsText(this.props.totalCombinedTime)}
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col-sm">
+                        <div className="form-check">
+                            <input className="form-check-input" type="checkbox" value="" onChange={this.onChangeContinousWork}
                                 checked={this.props.continousWork} data-testid="cont-work" id="cont-work-check" />
-                            <label class="form-check-label" htmlFor="cont-work-check">
+                            <label className="form-check-label" htmlFor="cont-work-check">
                                 {Constants.CONTINOUS_WORK_TEXT}
                 </label>
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-sm">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="" onChange={this.onChangeAutoStartTimers}
+                <div className="row">
+                    <div className="col-sm">
+                        <div className="form-check">
+                            <input className="form-check-input" type="checkbox" value="" onChange={this.onChangeAutoStartTimers}
                                 checked={this.props.autoStartTimers} data-testid="auto-start-timers" id="auto-start-timers-check" />
-                            <label class="form-check-label" htmlFor="auto-start-timers-check">
+                            <label className="form-check-label" htmlFor="auto-start-timers-check">
                                 {Constants.START_TIMERS_AUTOMATICALLY_TEXT}
                 </label>
                         </div>

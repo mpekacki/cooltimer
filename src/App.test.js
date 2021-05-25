@@ -89,45 +89,45 @@ test('renders timer based on passed settings', () => {
 });
 
 test('starts timer after clicking the button', () => {
-  const { getByText } = render(<App defaultSettings={ getTestSettings() }/>);
-  fireEvent.click(getByText(Constants.START_WORKING_BUTTON_TEXT));
+  const c = render(<App defaultSettings={ getTestSettings() }/>);
+  fireEvent.click(startWorkingButton(c));
   advanceTimersByTime(1000);
-  expect(getByText(/24:59/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 0 minutes 1 second/i)).toBeInTheDocument();
+  verifyTimer(c, '24:59');
+  verifyTotalWorkedTime(c, '0 hours 0 minutes 1 second');
   // expect(document.title).toBe("24:59");
   advanceTimersByTime((12 * 60 + 12) * 1000);
-  expect(getByText(/12:47/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 12 minutes 13 seconds/i)).toBeInTheDocument();
+  verifyTimer(c, '12:47');
+  verifyTotalWorkedTime(c, '0 hours 12 minutes 13 seconds');
   // expect(document.title).toBe("12:47");
   advanceTimersByTime((12 * 60 + 46) * 1000);
-  expect(getByText(/00:01/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 24 minutes 59 seconds/i)).toBeInTheDocument();
+  verifyTimer(c, '00:01');
+  verifyTotalWorkedTime(c, '0 hours 24 minutes 59 seconds');
   // expect(document.title).toBe("00:01");
 });
 
 test('switches to break after work time elapses', () => {
-  const { getByText } = render(<App defaultSettings={ getTestSettings() }/>);
-  fireEvent.click(getByText(Constants.START_WORKING_BUTTON_TEXT));
+  const c = render(<App defaultSettings={ getTestSettings() }/>);
+  fireEvent.click(startWorkingButton(c));
   advanceTimersByTime((25 * 60) * 1000);
-  expect(getByText(/05:00/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 5 minutes 0 seconds/i)).toBeInTheDocument();
+  verifyTimer(c, '05:00');
+  verifyTotalWorkedTime(c, '0 hours 25 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 5 minutes 0 seconds');
   advanceTimersByTime(1000);
-  expect(getByText(/04:59/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 4 minutes 59 seconds/i)).toBeInTheDocument();
+  verifyTimer(c, '04:59');
+  verifyTotalWorkedTime(c, '0 hours 25 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 4 minutes 59 seconds');
   advanceTimersByTime(15 * 1000);
-  expect(getByText(/04:44/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 4 minutes 44 seconds/i)).toBeInTheDocument();
+  verifyTimer(c, '04:44');
+  verifyTotalWorkedTime(c, '0 hours 25 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 4 minutes 44 seconds');
   advanceTimersByTime((4 * 60 + 44) * 1000);
-  expect(getByText(/25:00/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 0 minutes 0 seconds/i)).toBeInTheDocument();
+  verifyTimer(c, '25:00');
+  verifyTotalWorkedTime(c, '0 hours 25 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 0 minutes 0 seconds');
   advanceTimersByTime(1000);
-  expect(getByText(/24:59/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 25 minutes 1 second/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 0 minutes 0 seconds/i)).toBeInTheDocument();
+  verifyTimer(c, '24:59');
+  verifyTotalWorkedTime(c, '0 hours 25 minutes 1 second');
+  verifyAvailableBreakTime(c, '0 hours 0 minutes 0 seconds');
 });
 
 test('renders total work time correctly', () => {
@@ -144,195 +144,207 @@ test('renders total work time correctly', () => {
   verifyTotalWorkedTime(c, "1 hour 1 minute 0 seconds");
 });
 
+test('renders total combined time correctly', () => {
+  const c = render(<App defaultSettings={ getTestSettings() }/>);
+  fireEvent.click(startWorkingButton(c));
+  verifyTotalCombinedTime(c, "0 hours 0 minutes 0 seconds");
+  advanceTimersByTime((25 * 60) * 1000);
+  verifyTotalCombinedTime(c, "0 hours 25 minutes 0 seconds");
+  advanceTimersByTime((5 * 60) * 1000);
+  verifyTotalCombinedTime(c, "0 hours 30 minutes 0 seconds");
+  advanceTimersByTime((25 * 60) * 1000);
+  verifyTotalCombinedTime(c, "0 hours 55 minutes 0 seconds");
+});
+
 test('after n periods, uses long break instead of short break', () => {
-  const { getByText } = render(<App defaultSettings={ getTestSettings() }/>);
-  fireEvent.click(getByText(Constants.START_WORKING_BUTTON_TEXT));
+  const c = render(<App defaultSettings={ getTestSettings() }/>);
+  fireEvent.click(startWorkingButton(c));
   advanceTimersByTime(((25 + 5 + 25 + 5 + 25 + 5 + 25) * 60) * 1000);
-  expect(getByText(/10:00/i)).toBeInTheDocument();
-  expect(getByText(/1 hour 40 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 10 minutes 0 seconds/i)).toBeInTheDocument();
+  verifyTimer(c, '10:00');
+  verifyTotalWorkedTime(c, '1 hour 40 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 10 minutes 0 seconds');
   advanceTimersByTime(((10 + 25) * 60) * 1000);
-  expect(getByText(/05:00/i)).toBeInTheDocument();
-  expect(getByText(/2 hours 5 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 5 minutes 0 seconds/i)).toBeInTheDocument();
+  verifyTimer(c, '05:00');
+  verifyTotalWorkedTime(c, '2 hours 5 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 5 minutes 0 seconds');
 });
 
 test('after clicking on "Return to work" during break, resumes work', () => {
-  const { getByText } = render(<App defaultSettings={ getTestSettings() }/>);
-  fireEvent.click(getByText(Constants.START_WORKING_BUTTON_TEXT));
+  const c = render(<App defaultSettings={ getTestSettings() }/>);
+  fireEvent.click(startWorkingButton(c));
   advanceTimersByTime((25 * 60) * 1000);
-  expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 5 minutes 0 seconds/i)).toBeInTheDocument();
+  verifyTotalWorkedTime(c, '0 hours 25 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 5 minutes 0 seconds');
   advanceTimersByTime(10 * 1000);
-  expect(getByText(/04:50/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 4 minutes 50 seconds/i)).toBeInTheDocument();
-  fireEvent.click(getByText(Constants.RETURN_TO_WORK_BUTTON_TEXT));
-  expect(getByText(/25:00/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 4 minutes 50 seconds/i)).toBeInTheDocument();
+  verifyTimer(c, '04:50');
+  verifyTotalWorkedTime(c, '0 hours 25 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 4 minutes 50 seconds');
+  fireEvent.click(returnToWorkButton(c));
+  verifyTimer(c, '25:00');
+  verifyTotalWorkedTime(c, '0 hours 25 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 4 minutes 50 seconds');
   advanceTimersByTime((10 * 60) * 1000);
-  expect(getByText(/15:00/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 35 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 4 minutes 50 seconds/i)).toBeInTheDocument();
+  verifyTimer(c, '15:00');
+  verifyTotalWorkedTime(c, '0 hours 35 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 4 minutes 50 seconds');
   advanceTimersByTime((15 * 60) * 1000);
-  expect(getByText(/09:50/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 50 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 9 minutes 50 seconds/i)).toBeInTheDocument();
+  verifyTimer(c, '09:50');
+  verifyTotalWorkedTime(c, '0 hours 50 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 9 minutes 50 seconds');
   advanceTimersByTime((9 * 60 + 50) * 1000);
-  expect(getByText(/25:00/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 50 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 0 minutes 0 seconds/i)).toBeInTheDocument();
+  verifyTimer(c, '25:00');
+  verifyTotalWorkedTime(c, '0 hours 50 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 0 minutes 0 seconds');
 });
 
 test('if during work there is break time available, clicking on "Go on a break" starts break', () => {
-  const { getByText } = render(<App defaultSettings={ getTestSettings() }/>);
-  fireEvent.click(getByText(Constants.START_WORKING_BUTTON_TEXT));
+  const c = render(<App defaultSettings={ getTestSettings() }/>);
+  fireEvent.click(startWorkingButton(c));
   advanceTimersByTime((25 * 60) * 1000);
-  expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 5 minutes 0 seconds/i)).toBeInTheDocument();
+  verifyTotalWorkedTime(c, '0 hours 25 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 5 minutes 0 seconds');
   advanceTimersByTime(10 * 1000);
-  expect(getByText(/04:50/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 4 minutes 50 seconds/i)).toBeInTheDocument();
-  fireEvent.click(getByText(Constants.RETURN_TO_WORK_BUTTON_TEXT));
-  expect(getByText(/25:00/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 4 minutes 50 seconds/i)).toBeInTheDocument();
+  verifyTimer(c, '04:50');
+  verifyTotalWorkedTime(c, '0 hours 25 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 4 minutes 50 seconds');
+  fireEvent.click(returnToWorkButton(c));
+  verifyTimer(c, '25:00');
+  verifyTotalWorkedTime(c, '0 hours 25 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 4 minutes 50 seconds');
   advanceTimersByTime((10 * 60) * 1000);
-  expect(getByText(/15:00/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 35 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 4 minutes 50 seconds/i)).toBeInTheDocument();
-  fireEvent.click(getByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT));
-  expect(getByText(/04:50/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 35 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 4 minutes 50 seconds/i)).toBeInTheDocument();
+  verifyTimer(c, '15:00');
+  verifyTotalWorkedTime(c, '0 hours 35 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 4 minutes 50 seconds');
+  fireEvent.click(goOnABreakButton(c));
+  verifyTimer(c, '04:50');
+  verifyTotalWorkedTime(c, '0 hours 35 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 4 minutes 50 seconds');
   advanceTimersByTime(50 * 1000);
-  expect(getByText(/04:00/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 35 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 4 minutes 0 seconds/i)).toBeInTheDocument();
-  fireEvent.click(getByText(Constants.RETURN_TO_WORK_BUTTON_TEXT));
-  expect(getByText(/25:00/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 35 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 4 minutes 0 seconds/i)).toBeInTheDocument();
+  verifyTimer(c, '04:00');
+  verifyTotalWorkedTime(c, '0 hours 35 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 4 minutes 0 seconds');
+  fireEvent.click(returnToWorkButton(c));
+  verifyTimer(c, '25:00');
+  verifyTotalWorkedTime(c, '0 hours 35 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 4 minutes 0 seconds');
   advanceTimersByTime((5 * 60) * 1000);
-  expect(getByText(/20:00/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 40 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 4 minutes 0 seconds/i)).toBeInTheDocument();
-  fireEvent.click(getByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT));
-  expect(getByText(/04:00/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 40 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 4 minutes 0 seconds/i)).toBeInTheDocument();
+  verifyTimer(c, '20:00');
+  verifyTotalWorkedTime(c, '0 hours 40 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 4 minutes 0 seconds');
+  fireEvent.click(goOnABreakButton(c));
+  verifyTimer(c, '04:00');
+  verifyTotalWorkedTime(c, '0 hours 40 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 4 minutes 0 seconds');
   advanceTimersByTime((4 * 60) * 1000);
-  expect(getByText(/25:00/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 40 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 0 minutes 0 seconds/i)).toBeInTheDocument();
+  verifyTimer(c, '25:00');
+  verifyTotalWorkedTime(c, '0 hours 40 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 0 minutes 0 seconds');
 });
 
 test('after clicking on "Hold work" button, holds all timers, and after clicking on "Resume work" starts them again', () => {
-  const { getByText, queryByText } = render(<App defaultSettings={ getTestSettings() }/>);
-  expect(queryByText(Constants.HOLD_WORK_BUTTON_TEXT)).toBeNull();
-  expect(queryByText(Constants.RESUME_WORK_BUTTON_TEXT)).toBeNull();
-  fireEvent.click(getByText(Constants.START_WORKING_BUTTON_TEXT));
-  expect(queryByText(Constants.HOLD_WORK_BUTTON_TEXT)).toBeInTheDocument();
-  expect(queryByText(Constants.RESUME_WORK_BUTTON_TEXT)).toBeNull();
+  const c = render(<App defaultSettings={ getTestSettings() }/>);
+  expect(c.queryByText(Constants.HOLD_WORK_BUTTON_TEXT)).toBeNull();
+  expect(c.queryByText(Constants.RESUME_WORK_BUTTON_TEXT)).toBeNull();
+  fireEvent.click(startWorkingButton(c));
+  expect(c.queryByText(Constants.HOLD_WORK_BUTTON_TEXT)).toBeInTheDocument();
+  expect(c.queryByText(Constants.RESUME_WORK_BUTTON_TEXT)).toBeNull();
   advanceTimersByTime((15 * 60) * 1000);
-  expect(getByText(/10:00/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 15 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 0 minutes 0 seconds/i)).toBeInTheDocument();
-  fireEvent.click(getByText(Constants.HOLD_WORK_BUTTON_TEXT));
-  expect(queryByText(Constants.HOLD_WORK_BUTTON_TEXT)).toBeNull();
-  expect(queryByText(Constants.RESUME_WORK_BUTTON_TEXT)).toBeInTheDocument();
-  expect(getByText(/10:00/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 15 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 0 minutes 0 seconds/i)).toBeInTheDocument();
+  verifyTimer(c, '10:00');
+  verifyTotalWorkedTime(c, '0 hours 15 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 0 minutes 0 seconds');
+  fireEvent.click(holdWorkButton(c));
+  expect(c.queryByText(Constants.HOLD_WORK_BUTTON_TEXT)).toBeNull();
+  expect(c.queryByText(Constants.RESUME_WORK_BUTTON_TEXT)).toBeInTheDocument();
+  verifyTimer(c, '10:00');
+  verifyTotalWorkedTime(c, '0 hours 15 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 0 minutes 0 seconds');
   advanceTimersByTime((5 * 60) * 1000);
-  expect(queryByText(Constants.HOLD_WORK_BUTTON_TEXT)).toBeNull();
-  expect(queryByText(Constants.RESUME_WORK_BUTTON_TEXT)).toBeInTheDocument();
-  expect(getByText(/10:00/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 15 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 0 minutes 0 seconds/i)).toBeInTheDocument();
-  fireEvent.click(getByText(Constants.RESUME_WORK_BUTTON_TEXT));
-  expect(queryByText(Constants.HOLD_WORK_BUTTON_TEXT)).toBeInTheDocument();
-  expect(queryByText(Constants.RESUME_WORK_BUTTON_TEXT)).toBeNull();
-  expect(getByText(/10:00/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 15 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 0 minutes 0 seconds/i)).toBeInTheDocument();
+  expect(c.queryByText(Constants.HOLD_WORK_BUTTON_TEXT)).toBeNull();
+  expect(c.queryByText(Constants.RESUME_WORK_BUTTON_TEXT)).toBeInTheDocument();
+  verifyTimer(c, '10:00');
+  verifyTotalWorkedTime(c, '0 hours 15 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 0 minutes 0 seconds');
+  fireEvent.click(resumeWorkButton(c));
+  expect(c.queryByText(Constants.HOLD_WORK_BUTTON_TEXT)).toBeInTheDocument();
+  expect(c.queryByText(Constants.RESUME_WORK_BUTTON_TEXT)).toBeNull();
+  verifyTimer(c, '10:00');
+  verifyTotalWorkedTime(c, '0 hours 15 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 0 minutes 0 seconds');
   advanceTimersByTime((5 * 60) * 1000);
-  expect(queryByText(Constants.HOLD_WORK_BUTTON_TEXT)).toBeInTheDocument();
-  expect(queryByText(Constants.RESUME_WORK_BUTTON_TEXT)).toBeNull();
-  expect(getByText(/05:00/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 20 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 0 minutes 0 seconds/i)).toBeInTheDocument();
+  expect(c.queryByText(Constants.HOLD_WORK_BUTTON_TEXT)).toBeInTheDocument();
+  expect(c.queryByText(Constants.RESUME_WORK_BUTTON_TEXT)).toBeNull();
+  verifyTimer(c, '05:00');
+  verifyTotalWorkedTime(c, '0 hours 20 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 0 minutes 0 seconds');
   advanceTimersByTime((5 * 60) * 1000);
-  expect(queryByText(Constants.HOLD_WORK_BUTTON_TEXT)).toBeInTheDocument();
-  expect(queryByText(Constants.RESUME_WORK_BUTTON_TEXT)).toBeNull();
-  expect(getByText(/05:00/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 5 minutes 0 seconds/i)).toBeInTheDocument();
+  expect(c.queryByText(Constants.HOLD_WORK_BUTTON_TEXT)).toBeInTheDocument();
+  expect(c.queryByText(Constants.RESUME_WORK_BUTTON_TEXT)).toBeNull();
+  verifyTimer(c, '05:00');
+  verifyTotalWorkedTime(c, '0 hours 25 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 5 minutes 0 seconds');
   advanceTimersByTime((1 * 60) * 1000);
-  expect(getByText(/04:00/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 4 minutes 0 seconds/i)).toBeInTheDocument();
-  fireEvent.click(getByText(Constants.HOLD_WORK_BUTTON_TEXT));
-  expect(queryByText(Constants.HOLD_WORK_BUTTON_TEXT)).toBeNull();
-  expect(queryByText(Constants.RESUME_WORK_BUTTON_TEXT)).toBeInTheDocument();
-  expect(getByText(/04:00/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 4 minutes 0 seconds/i)).toBeInTheDocument();
+  verifyTimer(c, '04:00');
+  verifyTotalWorkedTime(c, '0 hours 25 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 4 minutes 0 seconds');
+  fireEvent.click(holdWorkButton(c));
+  expect(c.queryByText(Constants.HOLD_WORK_BUTTON_TEXT)).toBeNull();
+  expect(c.queryByText(Constants.RESUME_WORK_BUTTON_TEXT)).toBeInTheDocument();
+  verifyTimer(c, '04:00');
+  verifyTotalWorkedTime(c, '0 hours 25 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 4 minutes 0 seconds');
   advanceTimersByTime(1000);
-  expect(queryByText(Constants.HOLD_WORK_BUTTON_TEXT)).toBeNull();
-  expect(queryByText(Constants.RESUME_WORK_BUTTON_TEXT)).toBeInTheDocument();
-  expect(getByText(/04:00/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 4 minutes 0 seconds/i)).toBeInTheDocument();
-  fireEvent.click(getByText(Constants.RESUME_WORK_BUTTON_TEXT));
-  expect(queryByText(Constants.HOLD_WORK_BUTTON_TEXT)).toBeInTheDocument();
-  expect(queryByText(Constants.RESUME_WORK_BUTTON_TEXT)).toBeNull();
-  expect(getByText(/04:00/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 4 minutes 0 seconds/i)).toBeInTheDocument();
+  expect(c.queryByText(Constants.HOLD_WORK_BUTTON_TEXT)).toBeNull();
+  expect(c.queryByText(Constants.RESUME_WORK_BUTTON_TEXT)).toBeInTheDocument();
+  verifyTimer(c, '04:00');
+  verifyTotalWorkedTime(c, '0 hours 25 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 4 minutes 0 seconds');
+  fireEvent.click(resumeWorkButton(c));
+  expect(c.queryByText(Constants.HOLD_WORK_BUTTON_TEXT)).toBeInTheDocument();
+  expect(c.queryByText(Constants.RESUME_WORK_BUTTON_TEXT)).toBeNull();
+  verifyTimer(c, '04:00');
+  verifyTotalWorkedTime(c, '0 hours 25 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 4 minutes 0 seconds');
   advanceTimersByTime(1000);
-  expect(queryByText(Constants.HOLD_WORK_BUTTON_TEXT)).toBeInTheDocument();
-  expect(queryByText(Constants.RESUME_WORK_BUTTON_TEXT)).toBeNull();
-  expect(getByText(/03:59/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 3 minutes 59 seconds/i)).toBeInTheDocument();
+  expect(c.queryByText(Constants.HOLD_WORK_BUTTON_TEXT)).toBeInTheDocument();
+  expect(c.queryByText(Constants.RESUME_WORK_BUTTON_TEXT)).toBeNull();
+  verifyTimer(c, '03:59');
+  verifyTotalWorkedTime(c, '0 hours 25 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 3 minutes 59 seconds');
 });
 
 test('hides "Start working" button after it\'s clicked', () => {
-  const { getByText, queryByText } = render(<App defaultSettings={ getTestSettings() }/>);
-  fireEvent.click(getByText(Constants.START_WORKING_BUTTON_TEXT));
-  expect(queryByText(Constants.START_WORKING_BUTTON_TEXT)).toBeNull();
+  const c = render(<App defaultSettings={ getTestSettings() }/>);
+  fireEvent.click(startWorkingButton(c));
+  expect(c.queryByText(Constants.START_WORKING_BUTTON_TEXT)).toBeNull();
 });
 
 test('displays "Return to work" button only if on a break', () => {
-  const { getByText, queryByText } = render(<App defaultSettings={ getTestSettings() }/>);
-  expect(queryByText(Constants.RETURN_TO_WORK_BUTTON_TEXT)).toBeNull();
-  fireEvent.click(getByText(Constants.START_WORKING_BUTTON_TEXT));
-  expect(queryByText(Constants.RETURN_TO_WORK_BUTTON_TEXT)).toBeNull();
+  const c = render(<App defaultSettings={ getTestSettings() }/>);
+  expect(c.queryByText(Constants.RETURN_TO_WORK_BUTTON_TEXT)).toBeNull();
+  fireEvent.click(startWorkingButton(c));
+  expect(c.queryByText(Constants.RETURN_TO_WORK_BUTTON_TEXT)).toBeNull();
   advanceTimersByTime((25 * 60) * 1000);
-  expect(getByText(Constants.RETURN_TO_WORK_BUTTON_TEXT)).toBeInTheDocument();
+  expect(c.getByText(Constants.RETURN_TO_WORK_BUTTON_TEXT)).toBeInTheDocument();
   advanceTimersByTime((5 * 60) * 1000);
-  expect(queryByText(Constants.RETURN_TO_WORK_BUTTON_TEXT)).toBeNull();
+  expect(c.queryByText(Constants.RETURN_TO_WORK_BUTTON_TEXT)).toBeNull();
 });
 
 test('displays "Go on a break" button only during work and when there is break time available', () => {
-  const { getByText, queryByText } = render(<App defaultSettings={ getTestSettings() }/>);
-  expect(queryByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT)).toBeNull();
-  fireEvent.click(getByText(Constants.START_WORKING_BUTTON_TEXT));
-  expect(queryByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT)).toBeNull();
+  const c = render(<App defaultSettings={ getTestSettings() }/>);
+  expect(c.queryByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT)).toBeNull();
+  fireEvent.click(startWorkingButton(c));
+  expect(c.queryByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT)).toBeNull();
   advanceTimersByTime((25 * 60) * 1000);
-  expect(queryByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT)).toBeNull();
+  expect(c.queryByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT)).toBeNull();
   advanceTimersByTime((5 * 60) * 1000);
-  expect(queryByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT)).toBeNull();
+  expect(c.queryByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT)).toBeNull();
   advanceTimersByTime((25 * 60) * 1000);
-  expect(queryByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT)).toBeNull();
+  expect(c.queryByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT)).toBeNull();
   advanceTimersByTime((1 * 60) * 1000);
-  fireEvent.click(getByText(Constants.RETURN_TO_WORK_BUTTON_TEXT));
-  expect(getByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT)).toBeInTheDocument();
-  fireEvent.click(getByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT));
-  expect(queryByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT)).toBeNull();
+  fireEvent.click(returnToWorkButton(c));
+  expect(c.getByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT)).toBeInTheDocument();
+  fireEvent.click(goOnABreakButton(c));
+  expect(c.queryByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT)).toBeNull();
 });
 
 test('asks for notification permission on startup', () => {
@@ -343,8 +355,8 @@ test('asks for notification permission on startup', () => {
 
 test('if permission for notifications is granted, displays notification after time elapses', () => {
   let mockNotifications = new MockNotifications('granted');
-  const { getByText } = render(<App defaultSettings={ getTestSettings() } notifications={ mockNotifications }/>);
-  fireEvent.click(getByText(Constants.START_WORKING_BUTTON_TEXT));
+  const c = render(<App defaultSettings={ getTestSettings() } notifications={ mockNotifications }/>);
+  fireEvent.click(startWorkingButton(c));
   expect(mockNotifications.createdNotifications.length).toBe(0);
   advanceTimersByTime((10 * 60) * 1000);
   expect(mockNotifications.createdNotifications.length).toBe(0);
@@ -360,8 +372,8 @@ test('if permission for notifications is granted, displays notification after ti
 
 test('if permission for notifications is not granted, does not attempt to create a notfication', () => {
   let mockNotifications = new MockNotifications('denied');
-  const { getByText } = render(<App defaultSettings={ getTestSettings() } notifications={ mockNotifications }/>);
-  fireEvent.click(getByText(Constants.START_WORKING_BUTTON_TEXT));
+  const c = render(<App defaultSettings={ getTestSettings() } notifications={ mockNotifications }/>);
+  fireEvent.click(startWorkingButton(c));
   expect(mockNotifications.createdNotifications.length).toBe(0);
   advanceTimersByTime((10 * 60) * 1000);
   expect(mockNotifications.createdNotifications.length).toBe(0);
@@ -370,97 +382,97 @@ test('if permission for notifications is not granted, does not attempt to create
 });
 
 test('if "Continous work" is checked, should switch to next work period instead of break period', () => {
-  const { getByText, getByTestId } = render(<App defaultSettings={ getTestSettings() }/>);
-  expect(getByTestId("cont-work")).toBeInTheDocument();
-  fireEvent.click(getByText(Constants.START_WORKING_BUTTON_TEXT));
-  expect(getByTestId("cont-work")).toBeInTheDocument();
-  Simulate.change(getByTestId("cont-work"), {target: {checked: true}});
+  const c = render(<App defaultSettings={ getTestSettings() }/>);
+  expect(c.getByTestId("cont-work")).toBeInTheDocument();
+  fireEvent.click(startWorkingButton(c));
+  expect(c.getByTestId("cont-work")).toBeInTheDocument();
+  Simulate.change(c.getByTestId("cont-work"), {target: {checked: true}});
   advanceTimersByTime((25 * 60) * 1000);
-  expect(getByText(/25:00/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 5 minutes 0 seconds/i)).toBeInTheDocument();
+  verifyTimer(c, '25:00');
+  verifyTotalWorkedTime(c, '0 hours 25 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 5 minutes 0 seconds');
   advanceTimersByTime(1000);
-  expect(getByText(/24:59/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 25 minutes 1 second/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 5 minutes 0 seconds/i)).toBeInTheDocument();
-  Simulate.change(getByTestId("cont-work"), {target: {checked: false}});
+  verifyTimer(c, '24:59');
+  verifyTotalWorkedTime(c, '0 hours 25 minutes 1 second');
+  verifyAvailableBreakTime(c, '0 hours 5 minutes 0 seconds');
+  Simulate.change(c.getByTestId("cont-work"), {target: {checked: false}});
   advanceTimersByTime((24 * 60 + 59) * 1000);
-  expect(getByText(/10:00/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 50 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 10 minutes 0 seconds/i)).toBeInTheDocument();
+  verifyTimer(c, '10:00');
+  verifyTotalWorkedTime(c, '0 hours 50 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 10 minutes 0 seconds');
 });
 
 test('if work is continued even though there is full break available, then add incrementally to break time during work', () => {
-  const { getByText, getByTestId } = render(<App defaultSettings={ getTestSettings() }/>);
-  fireEvent.click(getByText(Constants.START_WORKING_BUTTON_TEXT));
-  Simulate.change(getByTestId("cont-work"), {target: {checked: true}});
+  const c = render(<App defaultSettings={ getTestSettings() }/>);
+  fireEvent.click(startWorkingButton(c));
+  Simulate.change(c.getByTestId("cont-work"), {target: {checked: true}});
   advanceTimersByTime((25 * 60) * 1000);
-  expect(getByText(/25:00/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 5 minutes 0 seconds/i)).toBeInTheDocument();
+  verifyTimer(c, '25:00');
+  verifyTotalWorkedTime(c, '0 hours 25 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 5 minutes 0 seconds');
   advanceTimersByTime((5 * 60) * 1000);
-  expect(getByText(/20:00/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 30 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 6 minutes 0 seconds/i)).toBeInTheDocument();
+  verifyTimer(c, '20:00');
+  verifyTotalWorkedTime(c, '0 hours 30 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 6 minutes 0 seconds');
   advanceTimersByTime((5 * 60) * 1000);
-  expect(getByText(/15:00/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 35 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 7 minutes 0 seconds/i)).toBeInTheDocument();
+  verifyTimer(c, '15:00');
+  verifyTotalWorkedTime(c, '0 hours 35 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 7 minutes 0 seconds');
   advanceTimersByTime((5 * 60) * 1000);
-  expect(getByText(/10:00/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 40 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 8 minutes 0 seconds/i)).toBeInTheDocument();
+  verifyTimer(c, '10:00');
+  verifyTotalWorkedTime(c, '0 hours 40 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 8 minutes 0 seconds');
   advanceTimersByTime((5 * 60) * 1000);
-  expect(getByText(/05:00/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 45 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 9 minutes 0 seconds/i)).toBeInTheDocument();
+  verifyTimer(c, '05:00');
+  verifyTotalWorkedTime(c, '0 hours 45 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 9 minutes 0 seconds');
   advanceTimersByTime((5 * 60) * 1000);
-  expect(getByText(/25:00/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 50 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 10 minutes 0 seconds/i)).toBeInTheDocument();
+  verifyTimer(c, '25:00');
+  verifyTotalWorkedTime(c, '0 hours 50 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 10 minutes 0 seconds');
   advanceTimersByTime((5 * 60) * 1000);
-  expect(getByText(/20:00/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 55 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 11 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT)).toBeInTheDocument();
-  fireEvent.click(getByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT));
-  expect(getByText(/11:00/i)).toBeInTheDocument();
+  verifyTimer(c, '20:00');
+  verifyTotalWorkedTime(c, '0 hours 55 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 11 minutes 0 seconds');
+  expect(c.getByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT)).toBeInTheDocument();
+  fireEvent.click(goOnABreakButton(c));
+  verifyTimer(c, '11:00');
   advanceTimersByTime((11 * 60) * 1000);
-  expect(getByText(/25:00/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 55 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 0 minutes 0 seconds/i)).toBeInTheDocument();
+  verifyTimer(c, '25:00');
+  verifyTotalWorkedTime(c, '0 hours 55 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 0 minutes 0 seconds');
 });
 
 test('if there is less than short break time during work and break is started, then the awarded break is not lost and is added to next break time', () => {
-  const { getByText, getByTestId } = render(<App defaultSettings={ getTestSettings() }/>);
-  fireEvent.click(getByText(Constants.START_WORKING_BUTTON_TEXT));
-  Simulate.change(getByTestId("cont-work"), {target: {checked: true}});
+  const c = render(<App defaultSettings={ getTestSettings() }/>);
+  fireEvent.click(startWorkingButton(c));
+  Simulate.change(c.getByTestId("cont-work"), {target: {checked: true}});
   advanceTimersByTime((25 * 60) * 1000);
-  expect(getByText(/25:00/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 25 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 5 minutes 0 seconds/i)).toBeInTheDocument();
-  clickGoOnABreak(getByText);
+  verifyTimer(c, '25:00');
+  verifyTotalWorkedTime(c, '0 hours 25 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 5 minutes 0 seconds');
+  fireEvent.click(goOnABreakButton(c));
   advanceTimersByTime((1 * 60) * 1000);
-  expect(getByText(/04:00/i)).toBeInTheDocument();
-  clickReturnToWork(getByText);
-  expect(getByText(/25:00/i)).toBeInTheDocument();
+  verifyTimer(c, '04:00');
+  fireEvent.click(returnToWorkButton(c));
+  verifyTimer(c, '25:00');
   advanceTimersByTime((20 * 60) * 1000);
-  expect(getByText(/0 hours 45 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 4 minutes 0 seconds/i)).toBeInTheDocument();
-  clickGoOnABreak(getByText);
+  verifyTotalWorkedTime(c, '0 hours 45 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 4 minutes 0 seconds');
+  fireEvent.click(goOnABreakButton(c));
   advanceTimersByTime((4 * 60) * 1000);
   advanceTimersByTime((25 * 60) * 1000);
-  clickGoOnABreak(getByText);
-  expect(getByText(/09:00/i)).toBeInTheDocument();
-  expect(getByText(/1 hour 10 minutes 0 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 9 minutes 0 seconds/i)).toBeInTheDocument();
+  fireEvent.click(goOnABreakButton(c));
+  verifyTimer(c, '09:00');
+  verifyTotalWorkedTime(c, '1 hour 10 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 9 minutes 0 seconds');
 });
 
 test('saves app state to provided storage', () => {
   let mockStorage = new MockStorage();
   mockStorage.state = null;
-  const { getByText } = render(<App defaultSettings={ getTestSettings() } storage={ mockStorage }/>);
-  fireEvent.click(getByText(Constants.START_WORKING_BUTTON_TEXT));
+  const c = render(<App defaultSettings={ getTestSettings() } storage={ mockStorage }/>);
+  fireEvent.click(startWorkingButton(c));
   advanceTimersByTime(1000);
   expect(mockStorage.state).toBeTruthy();
   expect(mockStorage.state).toMatchObject({
@@ -502,12 +514,12 @@ test('restores app state from provided storage', () => {
     longBreakFreq: 4
   };
   mockStorage.state = savedState;
-  const { getByText, queryByText } = render(<App defaultSettings={ getTestSettings() } storage={ mockStorage }/>);
-  expect(getByText(/21:35/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 0 minutes 10 seconds/i)).toBeInTheDocument();
-  expect(getByText(/0 hours 0 minutes 3 seconds/i)).toBeInTheDocument();
+  const c = render(<App defaultSettings={ getTestSettings() } storage={ mockStorage }/>);
+  verifyTimer(c, '21:35');
+  verifyTotalWorkedTime(c, '0 hours 0 minutes 10 seconds');
+  verifyAvailableBreakTime(c, '0 hours 0 minutes 3 seconds');
   advanceTimersByTime(1000);
-  expect(getByText(/21:34/i)).toBeInTheDocument();
+  verifyTimer(c, '21:34');
 });
 
 test('restores app state from incomplete storage', () => {
@@ -527,10 +539,10 @@ test('restores app state from incomplete storage', () => {
 test('saves app state with timer stopped if timer is stopped', () => {
   let mockStorage = new MockStorage();
   mockStorage.state = null;
-  const { getByText } = render(<App defaultSettings={ getTestSettings() } storage={ mockStorage }/>);
-  fireEvent.click(getByText(Constants.START_WORKING_BUTTON_TEXT));
+  const c = render(<App defaultSettings={ getTestSettings() } storage={ mockStorage }/>);
+  fireEvent.click(startWorkingButton(c));
   advanceTimersByTime(1000);
-  fireEvent.click(getByText(Constants.HOLD_WORK_BUTTON_TEXT));
+  fireEvent.click(holdWorkButton(c));
   expect(mockStorage.state).toBeTruthy();
   expect(mockStorage.state).toMatchObject({
     autoStartTimers: true,
@@ -701,45 +713,45 @@ test('resets without events or tasks', () => {
 });
 
 test('displays event in calendar', () => {
-  const { getByText, getAllByText } = render(<App defaultSettings={ getTestSettings() }/>);
-  fireEvent.click(getByText(Constants.START_WORKING_BUTTON_TEXT));
+  const c = render(<App defaultSettings={ getTestSettings() }/>);
+  fireEvent.click(startWorkingButton(c));
   advanceTimersByTime((25 * 60) * 1000);
-  expect(getAllByText(`Work ${MOCK_START_TIME} ${MOCK_START_TIME + 25 * 60 * 1000}`).length).toBe(1);
+  expect(c.getAllByText(`Work ${MOCK_START_TIME} ${MOCK_START_TIME + 25 * 60 * 1000}`).length).toBe(1);
   advanceTimersByTime((5 * 60) * 1000);
-  expect(getAllByText(`Break ${MOCK_START_TIME + 25 * 60 * 1000} ${MOCK_START_TIME + 30 * 60 * 1000}`).length).toBe(1);
+  expect(c.getAllByText(`Break ${MOCK_START_TIME + 25 * 60 * 1000} ${MOCK_START_TIME + 30 * 60 * 1000}`).length).toBe(1);
 });
 
 test('displays events in calendar correctly when manually switching timer', () => {
-  const { getByText, getAllByText } = render(<App defaultSettings={ getTestSettings() }/>);
-  fireEvent.click(getByText(Constants.START_WORKING_BUTTON_TEXT));
+  const c = render(<App defaultSettings={ getTestSettings() }/>);
+  fireEvent.click(startWorkingButton(c));
   advanceTimersByTime((25 * 60) * 1000);
-  expect(getAllByText(`Work ${MOCK_START_TIME} ${MOCK_START_TIME + 25 * 60 * 1000}`).length).toBe(1);
+  expect(c.getAllByText(`Work ${MOCK_START_TIME} ${MOCK_START_TIME + 25 * 60 * 1000}`).length).toBe(1);
   advanceTimersByTime((1 * 60) * 1000);
-  clickReturnToWork(getByText);
-  expect(getAllByText(`Break ${MOCK_START_TIME + 25 * 60 * 1000} ${MOCK_START_TIME + 26 * 60 * 1000}`).length).toBe(1);
+  fireEvent.click(returnToWorkButton(c));
+  expect(c.getAllByText(`Break ${MOCK_START_TIME + 25 * 60 * 1000} ${MOCK_START_TIME + 26 * 60 * 1000}`).length).toBe(1);
   advanceTimersByTime((4 * 60) * 1000);
-  clickGoOnABreak(getByText);
-  expect(getAllByText(`Work ${MOCK_START_TIME + 26 * 60 * 1000} ${MOCK_START_TIME + 30 * 60 * 1000}`).length).toBe(1);
+  fireEvent.click(goOnABreakButton(c));
+  expect(c.getAllByText(`Work ${MOCK_START_TIME + 26 * 60 * 1000} ${MOCK_START_TIME + 30 * 60 * 1000}`).length).toBe(1);
   advanceTimersByTime((1 * 60) * 1000);
-  fireEvent.click(getByText(Constants.HOLD_WORK_BUTTON_TEXT));
-  expect(getAllByText(`Break ${MOCK_START_TIME + 30 * 60 * 1000} ${MOCK_START_TIME + 31 * 60 * 1000}`).length).toBe(1);
+  fireEvent.click(holdWorkButton(c));
+  expect(c.getAllByText(`Break ${MOCK_START_TIME + 30 * 60 * 1000} ${MOCK_START_TIME + 31 * 60 * 1000}`).length).toBe(1);
   advanceTimersByTime((1 * 60) * 1000);
-  fireEvent.click(getByText(Constants.RESUME_WORK_BUTTON_TEXT));
+  fireEvent.click(resumeWorkButton(c));
   advanceTimersByTime((1 * 60) * 1000);
-  clickReturnToWork(getByText);
-  expect(getAllByText(`Break ${MOCK_START_TIME + 32 * 60 * 1000} ${MOCK_START_TIME + 33 * 60 * 1000}`).length).toBe(1);
+  fireEvent.click(returnToWorkButton(c));
+  expect(c.getAllByText(`Break ${MOCK_START_TIME + 32 * 60 * 1000} ${MOCK_START_TIME + 33 * 60 * 1000}`).length).toBe(1);
 });
 
 test('saves and restores event state in storage', () => {
   let mockStorage = new MockStorage();
   mockStorage.state = {};
-  const { getByText, getAllByText } = render(<App defaultSettings={ getTestSettings() } storage={ mockStorage }/>);
-  fireEvent.click(getByText(Constants.START_WORKING_BUTTON_TEXT));
+  let c = render(<App defaultSettings={ getTestSettings() } storage={ mockStorage }/>);
+  fireEvent.click(startWorkingButton(c));
   advanceTimersByTime((25 * 60) * 1000);
-  expect(getAllByText(`Work ${MOCK_START_TIME} ${MOCK_START_TIME + 25 * 60 * 1000}`).length).toBe(1);
+  expect(c.getAllByText(`Work ${MOCK_START_TIME} ${MOCK_START_TIME + 25 * 60 * 1000}`).length).toBe(1);
   advanceTimersByTime((2 * 60) * 1000);
   cleanup();
-  const c = render(<App defaultSettings={ getTestSettings() } storage={ mockStorage }/>);
+  c = render(<App defaultSettings={ getTestSettings() } storage={ mockStorage }/>);
   expect(c.getAllByText(`Work ${MOCK_START_TIME} ${MOCK_START_TIME + 25 * 60 * 1000}`).length).toBe(1);
   advanceTimersByTime((3 * 60) * 1000);
   expect(c.getAllByText(`Break ${MOCK_START_TIME + 25 * 60 * 1000} ${MOCK_START_TIME + 30 * 60 * 1000}`).length).toBe(1);
@@ -748,13 +760,13 @@ test('saves and restores event state in storage', () => {
 test('correctly creates events when restoring app after delay', () => {
   let mockStorage = new MockStorage();
   mockStorage.state = {};
-  const { getByText, getAllByText } = render(<App defaultSettings={ getTestSettings() } storage={ mockStorage }/>);
-  fireEvent.click(getByText(Constants.START_WORKING_BUTTON_TEXT));
+  let c = render(<App defaultSettings={ getTestSettings() } storage={ mockStorage }/>);
+  fireEvent.click(startWorkingButton(c));
   advanceTimersByTime((25 * 60) * 1000);
-  expect(getAllByText(`Work ${MOCK_START_TIME} ${MOCK_START_TIME + 25 * 60 * 1000}`).length).toBe(1);
+  expect(c.getAllByText(`Work ${MOCK_START_TIME} ${MOCK_START_TIME + 25 * 60 * 1000}`).length).toBe(1);
   advanceTimersByTime((2 * 60) * 1000);
   cleanup();
-  const c = render(<App defaultSettings={ getTestSettings() } storage={ mockStorage }/>);
+  c = render(<App defaultSettings={ getTestSettings() } storage={ mockStorage }/>);
   advanceTimersByTime((10 * 60) * 1000);
   expect(c.getAllByText(`Break ${MOCK_START_TIME + 25 * 60 * 1000} ${MOCK_START_TIME + 30 * 60 * 1000}`).length).toBe(1);
 });
@@ -813,7 +825,7 @@ test('does not create zero length events', () => {
   fireEvent.click(holdWorkButton(c));
   expect(c.getAllByText(`Work ${MOCK_START_TIME} ${MOCK_START_TIME + 35 * 60 * 1000}`).length).toBe(1);
   fireEvent.click(goOnABreakButton(c));
-  clickReturnToWork(c.getByText);
+  fireEvent.click(returnToWorkButton(c))
   expect(c.queryByText(`Break ${MOCK_START_TIME + 35 * 60 * 1000} ${MOCK_START_TIME + 35 * 60 * 1000}`)).not.toBeInTheDocument();
 });
 
@@ -944,6 +956,10 @@ function startWorkingButton(container) {
   return container.getByTestId("start-working-btn");
 }
 
+function returnToWorkButton(container) {
+  return container.getByText(Constants.RETURN_TO_WORK_BUTTON_TEXT);
+}
+
 function resetButton(container) {
   return container.getByTestId("reset-btn");
 }
@@ -970,6 +986,10 @@ function verifyTimer(container, expected) {
 
 function verifyTotalWorkedTime(container, expected) {
   return expect(container.getByTestId("totalWorkedTime").textContent).toBe(expected);
+}
+
+function verifyTotalCombinedTime(container, expected) {
+  return expect(container.getByTestId("totalCombinedTime").textContent).toBe(expected);
 }
 
 function verifyAvailableBreakTime(container, expected) {
@@ -1098,14 +1118,6 @@ class MockStorage {
   set state(state) {
     this._state = JSON.stringify(state);
   }
-}
-
-function clickGoOnABreak(getByText) {
-  fireEvent.click(getByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT));
-}
-
-function clickReturnToWork(getByText) {
-  fireEvent.click(getByText(Constants.RETURN_TO_WORK_BUTTON_TEXT));
 }
 
 function tickContinousWork(container, checked) {

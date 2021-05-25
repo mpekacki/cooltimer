@@ -55,24 +55,22 @@ class SimpleTaskManager extends React.Component {
   render() {
     return (
       <div>
-        <div class="form-inline mb-2">
-          <input type="text" class="form-control" onChange={this.handleTextInputChange} placeholder={Constants.CREATE_TASK_PLACEHOLDER_TEXT} value={this.state.taskInput} />
-          {(this.state.createButtonVisible ? <button class="btn btn-primary" onClick={this.handleSaveClick}>{Constants.SAVE_NEW_TASK_BUTTON_TEXT}</button> : null)}
+        <div className="form-inline mb-2">
+          <input type="text" className="form-control" onChange={this.handleTextInputChange} placeholder={Constants.CREATE_TASK_PLACEHOLDER_TEXT} value={this.state.taskInput} />
+          {(this.state.createButtonVisible ? <button className="btn btn-primary" onClick={this.handleSaveClick}>{Constants.SAVE_NEW_TASK_BUTTON_TEXT}</button> : null)}
         </div>
-        <div className="btn-group btn-group-toggle" data-toggle="buttons" style={{ 'flex-wrap': 'wrap' }}>
+        <div className="btn-group btn-group-toggle" data-toggle="buttons" style={{ 'flexWrap': 'wrap' }}>
           <>
             <label className={'btn btn-secondary' + (this.state.selectedTask == null ? ' active' : '')} htmlFor="no-task">{Constants.NO_TASK_TEXT}
-              <input type="radio" id="no-task" name="task" value="" autocomplete="off" onChange={this.handleTaskSelected} checked={this.state.selectedTask == null}></input>
+              <input type="radio" id="no-task" name="task" value="" autoComplete="off" onChange={this.handleTaskSelected} checked={this.state.selectedTask == null}></input>
             </label>
           </>
           {this.state && this.state.visibleTasks && this.state.visibleTasks.map(
             task => {
               return (
-                <>
-                  <label className={'btn btn-secondary' + (task === this.state.selectedTask ? ' active' : '')} htmlFor={task} data-testid={'button-' + task}>{task}
-                    <input type="radio" id={task} name="task" value={task} autocomplete="off" onChange={this.handleTaskSelected} checked={task === this.state.selectedTask}></input>
+                  <label key={task} className={'btn btn-secondary' + (task === this.state.selectedTask ? ' active' : '')} htmlFor={task} data-testid={'button-' + task}>{task}
+                    <input type="radio" id={task} name="task" value={task} autoComplete="off" onChange={this.handleTaskSelected} checked={task === this.state.selectedTask}></input>
                   </label>
-                </>
               )
             }
           )}
