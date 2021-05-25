@@ -24,7 +24,7 @@ class SimpleTaskManager extends React.Component {
   handleTextInputChange = (event) => {
     this.setState({
       taskInput: event.target.value,
-      createButtonVisible: event.target.value && (!this.props.tasks || !this.props.tasks.includes(event.target.value)),
+      createButtonVisible: event.target.value && (!this.props.tasks || !this.props.tasks.some(task => task.toUpperCase() === event.target.value.toUpperCase())),
       visibleTasks: this.getVisibleTasks(event.target.value)
     });
   }

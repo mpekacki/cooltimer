@@ -77,6 +77,8 @@ test('does not show create task button if task already exists', () => {
   const c = render(<SimpleTaskManager tasks={[TEST_TASK_NAME]}/>);
   Simulate.change(getNewTaskInput(c), { target: { value: TEST_TASK_NAME } });
   expect(getSaveNewTaskButton(c)).not.toBeInTheDocument();
+  Simulate.change(getNewTaskInput(c), { target: { value: TEST_TASK_NAME.toUpperCase() } });
+  expect(getSaveNewTaskButton(c)).not.toBeInTheDocument();
 });
 
 test('searches for tasks', () => {
