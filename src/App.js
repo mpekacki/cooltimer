@@ -9,6 +9,7 @@ import dayGridMonth from '@fullcalendar/daygrid';
 import listPlugin from '@fullcalendar/list';
 import SimpleTaskManager from './SimpleTaskManager';
 import TaskTimes from './TaskTimes';
+import Constants from './Constants';
 
 class App extends React.Component {
   constructor(props) {
@@ -35,7 +36,7 @@ class App extends React.Component {
   }
 
   onClickReset = () => {
-    if (window.confirm("Are you sure you want to reset everything to inital state?")) {
+    if (window.confirm(Constants.RESET_CONFIRMATION_TEXT)) {
       this.setStateAndStorage(this.getStateForReset());
     }
   }
@@ -184,7 +185,7 @@ class App extends React.Component {
         <div className="container">
           <div className="row">
             <div className="col-sm offset-sm-11">
-              <button className="btn" onClick={this.onClickReset} data-testid="reset-btn">Reset</button>
+              <button className="btn" onClick={this.onClickReset} data-testid="reset-btn">{Constants.RESET_BUTTON_TEXT}</button>
             </div>
           </div>
           <Timer timerSeconds={this.state.timerSeconds}

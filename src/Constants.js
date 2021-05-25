@@ -38,4 +38,12 @@ export default class Constants {
     static get START_TIMERS_AUTOMATICALLY_TEXT() {
         return 'Start new timers automatically';
     }
+
+    static get RESET_CONFIRMATION_TEXT() {
+        return 'Do you want to reset timer values? (tasks, events, settings etc. will be kept)';
+    }
+
+    static get RESET_BUTTON_TEXT() {
+        return 'Reset timer';
+    }
 }
