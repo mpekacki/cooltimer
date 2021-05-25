@@ -1,4 +1,5 @@
 import React from 'react';
+import Constants from './Constants';
 
 class Timer extends React.Component {
     constructor(props) {
@@ -204,13 +205,13 @@ class Timer extends React.Component {
                 <div class="row">
                     <div class="col-sm">
                         {this.props.timerRunning === true &&
-                            <button className="btn btn-warning" onClick={this.onClickHoldWork}>Hold work</button>
+                            <button className="btn btn-warning" onClick={this.onClickHoldWork}>{Constants.HOLD_WORK_BUTTON_TEXT}</button>
                         }
                         {this.props.timerRunning === false &&
-                            <button className="btn btn-secondary" onClick={this.onClickResumeWork} data-testid="resume-work-btn">Resume work</button>
+                            <button className="btn btn-secondary" onClick={this.onClickResumeWork} data-testid="resume-work-btn">{Constants.RESUME_WORK_BUTTON_TEXT}</button>
                         }
                         {this.props.isWork === null &&
-                            <button className="btn btn-success" onClick={this.onClickStartWorking} data-testid="start-working-btn">Start working</button>
+                            <button className="btn btn-success" onClick={this.onClickStartWorking} data-testid="start-working-btn">{Constants.START_WORKING_BUTTON_TEXT}</button>
                         }
                     </div>
                 </div>
@@ -223,12 +224,12 @@ class Timer extends React.Component {
                     <div class="col-sm">
                         {(this.props.isWork === true && this.props.availableBreakSeconds) ?
                             <>
-                                <button className="btn btn-success" onClick={this.onClickGoOnABreak}>Go on a break</button>
+                                <button className="btn btn-success" onClick={this.onClickGoOnABreak}>{Constants.GO_ON_A_BREAT_BUTTON_TEXT}</button>
                             </> : null
                         }
                         {this.props.isWork === false ?
                             <>
-                                <button className="btn btn-secondary" onClick={this.onClickReturnToWork}>Return to work</button>
+                                <button className="btn btn-secondary" onClick={this.onClickReturnToWork}>{Constants.RETURN_TO_WORK_BUTTON_TEXT}</button>
                             </> : null
                         }
                     </div>
@@ -263,7 +264,7 @@ class Timer extends React.Component {
                             <input class="form-check-input" type="checkbox" value="" onChange={this.onChangeContinousWork}
                                 checked={this.props.continousWork} data-testid="cont-work" id="cont-work-check" />
                             <label class="form-check-label" htmlFor="cont-work-check">
-                                Continuous work
+                                {Constants.CONTINOUS_WORK_TEXT}
                 </label>
                         </div>
                     </div>
@@ -274,7 +275,7 @@ class Timer extends React.Component {
                             <input class="form-check-input" type="checkbox" value="" onChange={this.onChangeAutoStartTimers}
                                 checked={this.props.autoStartTimers} data-testid="auto-start-timers" id="auto-start-timers-check" />
                             <label class="form-check-label" htmlFor="auto-start-timers-check">
-                                Start timers automatically
+                                {Constants.START_TIMERS_AUTOMATICALLY_TEXT}
                 </label>
                         </div>
                     </div>

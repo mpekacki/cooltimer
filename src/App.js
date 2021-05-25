@@ -67,7 +67,7 @@ class App extends React.Component {
       cycle: 0,
       notificationsGranted: false,
       timerRunning: null,
-      continousWork: false,
+      continousWork: this.defaultSettings.continousWork,
       timerLastUpdatedAt: Date.now(),
       autoStartTimers: true,
       workMinutes: this.defaultSettings.workMinutes,
