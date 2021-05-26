@@ -33,7 +33,8 @@ class SimpleTaskManager extends React.Component {
     this.props.onTaskCreate(this.state.taskInput);
     this.setState({
       taskInput: '',
-      visibleTasks: this.getVisibleTasks('')
+      visibleTasks: this.getVisibleTasks(''),
+      createButtonVisible: false
     });
   }
 

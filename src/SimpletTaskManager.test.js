@@ -31,6 +31,7 @@ test('creates new task', () => {
   fireEvent.click(getSaveNewTaskButton(c));
   expect(createdTask).toBe(TEST_TASK_NAME);
   expect(getNewTaskInput(c).value).toBe('');
+  expect(getSaveNewTaskButton(c)).not.toBeInTheDocument();
 });
 
 test('selects existing task', () => {
