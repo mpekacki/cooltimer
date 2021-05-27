@@ -70,39 +70,9 @@ class Timer extends React.Component {
 
         let now = Date.now();
         let secondsDiff = Math.round((now - this.props.timerLastUpdatedAt) / 1000);
-        this.tempState = {
-            isWork: this.props.isWork,
-            totalWorkedSeconds: this.props.totalWorkedSeconds,
-            availableBreakSeconds: this.props.availableBreakSeconds,
-            hiddenAvailableBreakSeconds: this.props.hiddenAvailableBreakSeconds,
-            timerLastUpdatedAt: this.props.timerLastUpdatedAt,
-            cycle: this.props.cycle,
-            continousWork: this.props.continousWork,
-            timerSeconds: this.props.timerSeconds,
-            totalCombinedTime: this.props.totalCombinedTime
-        };
+        let newState = this.calculateNewState(secondsDiff, now);
 
-        for (let secondsPassed = secondsDiff; secondsPassed > 0; secondsPassed--) {
-            this.tempState.timerSeconds--;
-            this.tempState.totalCombinedTime++;
-            if (this.tempState.isWork) {
-                this.tempState.totalWorkedSeconds++;
-                let availableBreakSecondsIncrement = this.props.shortBreakMinutes * 1.0 / this.props.workMinutes;
-                if (this.tempState.availableBreakSeconds >= this.props.shortBreakMinutes * 60) {
-                    this.tempState.availableBreakSeconds += availableBreakSecondsIncrement;
-                } else {
-                    this.tempState.hiddenAvailableBreakSeconds += availableBreakSecondsIncrement;
-                }
-            } else {
-                this.tempState.availableBreakSeconds--;
-            }
-            this.tempState.timerLastUpdatedAt = now;
-            if (this.tempState.timerSeconds === 0) {
-                this.onTimerFinish();
-            }
-        }
-
-        this.setStateAndStorage(this.tempState);
+        this.setStateAndStorage(newState);
     }
 
     onTimerFinish = () => {
@@ -199,6 +169,42 @@ class Timer extends React.Component {
 
     setStateAndStorage = (newState) => {
         this.props.setStateAndStorage(newState);
+    }
+
+    calculateNewState(secondsDiff, now) {
+        this.tempState = {
+            isWork: this.props.isWork,
+            totalWorkedSeconds: this.props.totalWorkedSeconds,
+            availableBreakSeconds: this.props.availableBreakSeconds,
+            hiddenAvailableBreakSeconds: this.props.hiddenAvailableBreakSeconds,
+            timerLastUpdatedAt: this.props.timerLastUpdatedAt,
+            cycle: this.props.cycle,
+            continousWork: this.props.continousWork,
+            timerSeconds: this.props.timerSeconds,
+            totalCombinedTime: this.props.totalCombinedTime
+        };
+
+        for (let secondsPassed = secondsDiff; secondsPassed > 0; secondsPassed--) {
+            this.tempState.timerSeconds--;
+            this.tempState.totalCombinedTime++;
+            if (this.tempState.isWork) {
+                this.tempState.totalWorkedSeconds++;
+                let availableBreakSecondsIncrement = this.props.shortBreakMinutes * 1.0 / this.props.workMinutes;
+                if (this.tempState.availableBreakSeconds >= this.props.shortBreakMinutes * 60) {
+                    this.tempState.availableBreakSeconds += availableBreakSecondsIncrement;
+                } else {
+                    this.tempState.hiddenAvailableBreakSeconds += availableBreakSecondsIncrement;
+                }
+            } else {
+                this.tempState.availableBreakSeconds--;
+            }
+            this.tempState.timerLastUpdatedAt = now;
+            if (this.tempState.timerSeconds === 0) {
+                this.onTimerFinish();
+            }
+        }
+
+        return this.tempState;
     }
 
     get cyclesUntilLongBreak() {

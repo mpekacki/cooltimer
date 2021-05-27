@@ -113,7 +113,7 @@ class App extends React.Component {
 
   handleEventCreated = (event) => {
     let eventTitle = event.wasWork ? 'Work' : 'Break';
-    if (this.state.selectedTask !== undefined) {
+    if (this.state.selectedTask) {
       eventTitle += ' (' + this.state.selectedTask + ')';
     }
     const newEvent = {
