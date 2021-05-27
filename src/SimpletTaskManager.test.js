@@ -34,6 +34,21 @@ test('creates new task', () => {
   expect(getSaveNewTaskButton(c)).not.toBeInTheDocument();
 });
 
+test('creates new task trimmed', () => {
+  let createdTask = null;
+  const taskCreateCallback = (task) => {
+    createdTask = task;
+  }
+  const c = render(<SimpleTaskManager onTaskCreate={taskCreateCallback} />);
+  expect(getSaveNewTaskButton(c)).not.toBeInTheDocument();
+  Simulate.change(getNewTaskInput(c), { target: { value: '   ' + TEST_TASK_NAME + ' ' } });
+  expect(getSaveNewTaskButton(c)).toBeInTheDocument();
+  fireEvent.click(getSaveNewTaskButton(c));
+  expect(createdTask).toBe(TEST_TASK_NAME);
+  expect(getNewTaskInput(c).value).toBe('');
+  expect(getSaveNewTaskButton(c)).not.toBeInTheDocument();
+});
+
 test('selects existing task', () => {
   let selectedTask = null;
   const taskSelectedCallback = (task) => {
@@ -79,6 +94,16 @@ test('does not show create task button if task already exists', () => {
   Simulate.change(getNewTaskInput(c), { target: { value: TEST_TASK_NAME } });
   expect(getSaveNewTaskButton(c)).not.toBeInTheDocument();
   Simulate.change(getNewTaskInput(c), { target: { value: TEST_TASK_NAME.toUpperCase() } });
+  expect(getSaveNewTaskButton(c)).not.toBeInTheDocument();
+});
+
+test('does not show create task button if task input is blank', () => {
+  const c = render(<SimpleTaskManager tasks={[TEST_TASK_NAME]}/>);
+  Simulate.change(getNewTaskInput(c), { target: { value: '' } });
+  expect(getSaveNewTaskButton(c)).not.toBeInTheDocument();
+  Simulate.change(getNewTaskInput(c), { target: { value: ' ' } });
+  expect(getSaveNewTaskButton(c)).not.toBeInTheDocument();
+  Simulate.change(getNewTaskInput(c), { target: { value: '  ' } });
   expect(getSaveNewTaskButton(c)).not.toBeInTheDocument();
 });
 
