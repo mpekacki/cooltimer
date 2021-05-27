@@ -22,16 +22,16 @@ class SimpleTaskManager extends React.Component {
   }
 
   handleTextInputChange = (event) => {
-    const value = event.target.value.trim();
+    const value = event.target.value;
     this.setState({
       taskInput: value,
-      createButtonVisible: value && value !== '' && (!this.props.tasks || !this.props.tasks.some(task => task.toUpperCase() === value.toUpperCase())),
+      createButtonVisible: value && value.trim() !== '' && (!this.props.tasks || !this.props.tasks.some(task => task.toUpperCase() === value.toUpperCase())),
       visibleTasks: this.getVisibleTasks(value)
     });
   }
 
   handleSaveClick = () => {
-    this.props.onTaskCreate(this.state.taskInput);
+    this.props.onTaskCreate(this.state.taskInput.trim());
     this.setState({
       taskInput: '',
       visibleTasks: this.getVisibleTasks(''),

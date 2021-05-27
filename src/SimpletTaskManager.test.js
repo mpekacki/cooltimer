@@ -49,6 +49,12 @@ test('creates new task trimmed', () => {
   expect(getSaveNewTaskButton(c)).not.toBeInTheDocument();
 });
 
+test('allows to type space in task input', () => {
+  const c = render(<SimpleTaskManager />);
+  Simulate.change(getNewTaskInput(c), { target: { value: TEST_TASK_NAME + ' ' } });
+  expect(getNewTaskInput(c).value).toBe(TEST_TASK_NAME + ' ');
+});
+
 test('selects existing task', () => {
   let selectedTask = null;
   const taskSelectedCallback = (task) => {
