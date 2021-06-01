@@ -757,6 +757,17 @@ test('saves and restores event state in storage', () => {
   expect(c.getAllByText(`Break ${MOCK_START_TIME + 25 * 60 * 1000} ${MOCK_START_TIME + 30 * 60 * 1000}`).length).toBe(1);
 });
 
+test('restores state after a long time', () => {
+  let mockStorage = new MockStorage();
+  mockStorage.state = {};
+  let c = render(<App defaultSettings={ getTestSettings() } storage={ mockStorage }/>);
+  fireEvent.click(startWorkingButton(c));
+  cleanup();
+  advanceTimersByTime(100 * 60 * 60 * 1000);
+  c = render(<App defaultSettings={ getTestSettings() } storage={ mockStorage }/>);
+  verifyTotalCombinedTime(c, '100 hours 0 minutes 0 seconds');
+});
+
 test('correctly creates events when restoring app after delay', () => {
   let mockStorage = new MockStorage();
   mockStorage.state = {};
@@ -796,6 +807,10 @@ test('when task is selected, saves calendar work events with task name', () => {
   fireEvent.click(startWorkingButton(c));
   advanceTimersByTime((25 * 60) * 1000);
   verifyEventCreatedForWorkWithTask(c, TEST_TASK_NAME, MOCK_START_TIME, MOCK_START_TIME + 25 * 60 * 1000);
+  advanceTimersByTime((5 * 60) * 1000);
+  selectTask(c, Constants.NO_TASK_TEXT);
+  advanceTimersByTime((25 * 60) * 1000);
+  verifyEventCreatedForWorkWithoutTask(c, MOCK_START_TIME + 30 * 60 * 1000, MOCK_START_TIME + 55 * 60 * 1000);
 });
 
 const TEST_TASK_NAME2 = 'eating cake';

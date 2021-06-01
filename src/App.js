@@ -107,8 +107,17 @@ class App extends React.Component {
 
   handleShowNotification = (notificationTitle) => {
     if (this.notifications && this.notificationsGranted) {
-      this.notifications.createNotification(notificationTitle);
+      if (!this.notificationQueued) {
+        // makes sure that notifications are sent not more frequently than 10 seconds apart
+        this.notificationQueued = true;
+        setTimeout(this.clearNotificationQueue, 10000);
+        this.notifications.createNotification(notificationTitle);
+      }
     }
+  }
+
+  clearNotificationQueue = () => {
+    this.notificationQueued = null;
   }
 
   handleEventCreated = (event) => {
@@ -157,10 +166,17 @@ class App extends React.Component {
       end: end
     });
 
+    let newTasks = this.state.tasks;
+    if (task) {
+      newTasks.splice(this.state.tasks.indexOf(task), 1);
+      newTasks.splice(0, 0, task);
+    }
+
     this.setStateAndStorage({
       timerStartedAt: end,
       timerStartedWithSeconds: this.state.timerSeconds,
-      selectedTask: task
+      selectedTask: task,
+      tasks: newTasks
     });
   }
 
