@@ -202,7 +202,7 @@ class App extends React.Component {
         <div className="container">
           <div className="row">
             <div className="col-sm offset-sm-11">
-              <button className="btn" onClick={this.onClickReset} data-testid="reset-btn">{Constants.RESET_BUTTON_TEXT}</button>
+              <button className="btn btn-light" onClick={this.onClickReset} data-testid="reset-btn">{Constants.RESET_BUTTON_TEXT}</button>
             </div>
           </div>
           <Timer timerSeconds={this.state.timerSeconds}
@@ -225,7 +225,7 @@ class App extends React.Component {
             setStateAndStorage={this.handleTimerStateChange}
             showNotification={this.handleShowNotification}
             onTimerFinish={this.handleEventCreated} />
-          <button className="btn m-2" type="button" onClick={this.onClickSettings}>
+          <button className="btn btn-light m-2" type="button" onClick={this.onClickSettings}>
             Settings
           </button>
           <div className={this.state.settingsVisible ? 'collapse show' : 'collapse'}>

@@ -1084,7 +1084,7 @@ function getNewTaskInput(c) {
 }
 
 function getSaveNewTaskButton(c) {
-  return c.getByText(Constants.SAVE_NEW_TASK_BUTTON_TEXT);
+  return c.queryByText((content, element) => element.tagName.toLowerCase() === 'button' && content.startsWith(Constants.SAVE_NEW_TASK_BUTTON_TEXT));
 }
 
 function getTaskElement(c, taskName) {
