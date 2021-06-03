@@ -67,9 +67,9 @@ class TaskTimes extends React.Component {
             }
         });
         Object.entries(timesMap).forEach((entry) => {
-            entry[1].todayPercentage = Math.round(entry[1].today / totalToday * 100) + '%';
-            entry[1].yesterdayPercentage = Math.round(entry[1].yesterday / totalYesterday * 100) + '%';
-            entry[1].weekPercentage = Math.round(entry[1].week / totalThisWeek * 100) + '%';
+            entry[1].todayPercentage = this.getPercentage(entry[1].today, totalToday);
+            entry[1].yesterdayPercentage = this.getPercentage(entry[1].yesterday, totalYesterday);
+            entry[1].weekPercentage = this.getPercentage(entry[1].week, totalThisWeek);
         });
         timesMap[TOTALS_KEY] = {
             today: totalToday,
@@ -77,6 +77,11 @@ class TaskTimes extends React.Component {
             week: totalThisWeek
         }
         return timesMap;
+    }
+
+    getPercentage(today, totalToday) {
+        const percent = Math.round(today / totalToday * 100);
+        return !isNaN(percent) ? percent + '%' : '-';
     }
 
     render() {
