@@ -1091,12 +1091,6 @@ function getTaskElement(c, taskName) {
   return c.getByLabelText(taskName);
 }
 
-class TestSettings extends Settings {
-  constructor(workMinutes, shortBreakMinutes, longBreakMinutes, longBreakFreq) {
-    super(workMinutes, shortBreakMinutes, longBreakMinutes, longBreakFreq);
-  }
-}
-
 class MockNotifications {
   constructor(responseForRequestPermission) {
     this.permissionRequested = false;

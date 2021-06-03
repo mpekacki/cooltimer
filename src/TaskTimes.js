@@ -1,5 +1,5 @@
 import React from 'react';
-import { isToday, isYesterday, isThisWeek } from 'date-fns';
+import { isToday, isYesterday, isThisWeek, isThisMonth } from 'date-fns';
 import Constants from './Constants';
 
 const TOTALS_KEY = '@@@TOTALS';
@@ -29,7 +29,7 @@ class TaskTimes extends React.Component {
 
     calculateTimes() {
         const timesMap = {};
-        let totalToday = 0, totalYesterday = 0, totalThisWeek = 0;
+        let totalToday = 0, totalYesterday = 0, totalThisWeek = 0, totalThisMonth = 0;
         this.props.events.forEach(event => {
             if (!event.isWork) {
                 return;
@@ -37,7 +37,8 @@ class TaskTimes extends React.Component {
             let isForToday = isToday(event.start);;
             let isForYesterday = isYesterday(event.start);
             let isForThisWeek = isThisWeek(event.start);
-            if (!isForToday && !isForYesterday && !isForThisWeek) {
+            let isForThisMonth = isThisMonth(event.start);
+            if (!isForToday && !isForYesterday && !isForThisWeek && !isForThisMonth) {
                 return;
             }
             let taskName = event.task;
@@ -48,7 +49,8 @@ class TaskTimes extends React.Component {
                 timesMap[taskName] = {
                     today: 0,
                     yesterday: 0,
-                    week: 0
+                    week: 0,
+                    month: 0
                 };
             }
             if (event.end !== undefined) {
@@ -64,17 +66,23 @@ class TaskTimes extends React.Component {
                     timesMap[taskName].week += len;
                     totalThisWeek += len;
                 }
+                if (isForThisMonth) {
+                    timesMap[taskName].month += len;
+                    totalThisMonth += len;
+                }
             }
         });
         Object.entries(timesMap).forEach((entry) => {
             entry[1].todayPercentage = this.getPercentage(entry[1].today, totalToday);
             entry[1].yesterdayPercentage = this.getPercentage(entry[1].yesterday, totalYesterday);
             entry[1].weekPercentage = this.getPercentage(entry[1].week, totalThisWeek);
+            entry[1].monthPercentage = this.getPercentage(entry[1].month, totalThisMonth);
         });
         timesMap[TOTALS_KEY] = {
             today: totalToday,
             yesterday: totalYesterday,
-            week: totalThisWeek
+            week: totalThisWeek,
+            month: totalThisMonth
         }
         return timesMap;
     }
@@ -96,6 +104,8 @@ class TaskTimes extends React.Component {
                         <th>%</th>
                         <th>Week</th>
                         <th>%</th>
+                        <th>Month</th>
+                        <th>%</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -108,6 +118,8 @@ class TaskTimes extends React.Component {
                             <td data-testid={'yesterdayp-' + entry[0].charAt(0) + entry[0].length}>{entry[1].yesterdayPercentage}</td>
                             <td data-testid={'week-' + entry[0].charAt(0) + entry[0].length}>{this.formatSeconds(entry[1].week)}</td>
                             <td data-testid={'weekp-' + entry[0].charAt(0) + entry[0].length}>{entry[1].weekPercentage}</td>
+                            <td data-testid={'month-' + entry[0].charAt(0) + entry[0].length}>{this.formatSeconds(entry[1].month)}</td>
+                            <td data-testid={'monthp-' + entry[0].charAt(0) + entry[0].length}>{entry[1].monthPercentage}</td>
                         </tr>
                     ))}
                     <tr>
@@ -118,6 +130,8 @@ class TaskTimes extends React.Component {
                         <td data-testid={'yesterdayp-total'}>100%</td>
                         <td data-testid={'week-total'}>{this.formatSeconds(this.state.timesMap[TOTALS_KEY].week)}</td>
                         <td data-testid={'weekp-total'}>100%</td>
+                        <td data-testid={'month-total'}>{this.formatSeconds(this.state.timesMap[TOTALS_KEY].month)}</td>
+                        <td data-testid={'monthp-total'}>100%</td>
                     </tr>
                 </tbody>
             </table>
