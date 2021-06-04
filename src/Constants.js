@@ -56,6 +56,14 @@ export default class Constants {
     }
 
     static get CONFIRM_HOLD_TIMER_MODAL_TEXT() {
-        return 'This option should only be used if you\'re stopping work for a significant time. It should not be used for normal mid-work breaks - please wait instead until Go on a break button becomes available.';
+        return 'This option should only be used if you\'re stopping work for a significant amount of time. It should not be used for normal mid-work breaks - instead, please wait for the "Go on a break" button to become available.\n\nAre sure you want to hold the timer anyway?';
+    }
+
+    static get WORK_LABEL_TEXT() {
+        return 'Work';
+    }
+
+    static get BREAK_LABEL_TEXT() {
+        return 'Break';
     }
 }

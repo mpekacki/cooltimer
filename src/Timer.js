@@ -241,7 +241,7 @@ class Timer extends React.Component {
                     <Modal.Body>{Constants.CONFIRM_HOLD_TIMER_MODAL_TEXT}</Modal.Body>
                     <Modal.Footer>
                         <Button variant="secondary" onClick={this.handleClose}>
-                            Close
+                            No
                         </Button>
                         <Button variant="primary" onClick={this.onClickHoldWork}>
                             {Constants.CONFIRM_HOLD_TIMER_BUTTON_TEXT}
@@ -259,6 +259,11 @@ class Timer extends React.Component {
                         {this.props.isWork === null &&
                             <button className="btn btn-success" onClick={this.onClickStartWorking} data-testid="start-working-btn">{Constants.START_WORKING_BUTTON_TEXT}</button>
                         }
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <h3>{this.props.isWork ? Constants.WORK_LABEL_TEXT : Constants.BREAK_LABEL_TEXT}</h3>
                     </Col>
                 </Row>
                 <Row>
