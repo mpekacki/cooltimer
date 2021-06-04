@@ -15,6 +15,7 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
+import Collapse from 'react-bootstrap/Collapse';
 
 class App extends React.Component {
   constructor(props) {
@@ -231,16 +232,18 @@ class App extends React.Component {
             showNotification={this.handleShowNotification}
             onTimerFinish={this.handleEventCreated} />
           <Button variant="light" className="m-2" onClick={this.onClickSettings}>Settings</Button>
-          <div className={this.state.settingsVisible ? 'collapse show' : 'collapse'}>
-            <Card>
-              <Card.Body>
-                <UserSettings
-                  workMinutes={this.state.workMinutes} shortBreakMinutes={this.state.shortBreakMinutes}
-                  longBreakMinutes={this.state.longBreakMinutes} longBreakFreq={this.state.longBreakFreq}
-                  onchange={this.onChangeSettings} />
-              </Card.Body>
-            </Card>
-          </div>
+          <Collapse in={this.state.settingsVisible}>
+            <div>
+              <Card>
+                <Card.Body>
+                  <UserSettings
+                    workMinutes={this.state.workMinutes} shortBreakMinutes={this.state.shortBreakMinutes}
+                    longBreakMinutes={this.state.longBreakMinutes} longBreakFreq={this.state.longBreakFreq}
+                    onchange={this.onChangeSettings} />
+                </Card.Body>
+              </Card>
+            </div>
+          </Collapse>
           <Row className="mb-3">
             <Col>
               <SimpleTaskManager onTaskCreate={this.handleTaskCreated} onTaskSelected={this.handleTaskSelected} tasks={this.state.tasks} selectedTask={this.state.selectedTask} />
