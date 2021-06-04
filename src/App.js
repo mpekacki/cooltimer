@@ -14,6 +14,7 @@ import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Card from 'react-bootstrap/Card';
 
 class App extends React.Component {
   constructor(props) {
@@ -202,7 +203,7 @@ class App extends React.Component {
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossOrigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossOrigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossOrigin="anonymous"></script>
-        
+
         <Container>
           <Row>
             <Col sm={{ offset: 11 }}>
@@ -231,26 +232,34 @@ class App extends React.Component {
             onTimerFinish={this.handleEventCreated} />
           <Button variant="light" className="m-2" onClick={this.onClickSettings}>Settings</Button>
           <div className={this.state.settingsVisible ? 'collapse show' : 'collapse'}>
-            <div className="card card-body row">
-              <UserSettings
-                workMinutes={this.state.workMinutes} shortBreakMinutes={this.state.shortBreakMinutes}
-                longBreakMinutes={this.state.longBreakMinutes} longBreakFreq={this.state.longBreakFreq}
-                onchange={this.onChangeSettings} />
-            </div>
+            <Card>
+              <Card.Body>
+                <UserSettings
+                  workMinutes={this.state.workMinutes} shortBreakMinutes={this.state.shortBreakMinutes}
+                  longBreakMinutes={this.state.longBreakMinutes} longBreakFreq={this.state.longBreakFreq}
+                  onchange={this.onChangeSettings} />
+              </Card.Body>
+            </Card>
           </div>
           <Row className="mb-3">
-            <SimpleTaskManager onTaskCreate={this.handleTaskCreated} onTaskSelected={this.handleTaskSelected} tasks={this.state.tasks} selectedTask={this.state.selectedTask} />
+            <Col>
+              <SimpleTaskManager onTaskCreate={this.handleTaskCreated} onTaskSelected={this.handleTaskSelected} tasks={this.state.tasks} selectedTask={this.state.selectedTask} />
+            </Col>
           </Row>
           <Row className="mb-3">
-            <TaskTimes events={this.state.events} eventsTimestamp={this.state.eventsTimestamp} />
+            <Col>
+              <TaskTimes events={this.state.events} eventsTimestamp={this.state.eventsTimestamp} />
+            </Col>
           </Row>
-          <div className="card card-body">
-            <FullCalendar events={this.state.events} plugins={[timeGridPlugin, dayGridMonth, listPlugin]} initialView="timeGridWeek" headerToolbar={
-              { right: 'today prev,next dayGridMonth,timeGridWeek,timeGridDay listWeek' }
-            } slotDuration='00:10:00' eventDidMount={function (event) {
-              event.el.title = event.event.title;
-            }} />
-          </div>
+          <Card>
+            <Card.Body>
+              <FullCalendar events={this.state.events} plugins={[timeGridPlugin, dayGridMonth, listPlugin]} initialView="timeGridWeek" headerToolbar={
+                { right: 'today prev,next dayGridMonth,timeGridWeek,timeGridDay listWeek' }
+              } slotDuration='00:10:00' eventDidMount={function (event) {
+                event.el.title = event.event.title;
+              }} />
+            </Card.Body>
+          </Card>
         </Container>
       </div>
     );

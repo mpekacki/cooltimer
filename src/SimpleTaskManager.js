@@ -1,5 +1,9 @@
 import React from 'react';
 import Constants from './Constants';
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Form from 'react-bootstrap/Form';
+import ToggleButtonGroup from 'react-bootstrap/ToggleButtonGroup';
 
 class SimpleTaskManager extends React.Component {
   constructor(props) {
@@ -56,28 +60,30 @@ class SimpleTaskManager extends React.Component {
 
   render() {
     return (
-      <div className="container">
-        <div className="row form-inline mb-2">
-          <input type="text" className="form-control" onChange={this.handleTextInputChange} placeholder={Constants.CREATE_TASK_PLACEHOLDER_TEXT} value={this.state.taskInput} />
-          {(this.state.createButtonVisible ? <button className="btn btn-primary" onClick={this.handleSaveClick}>{Constants.SAVE_NEW_TASK_BUTTON_TEXT} "{this.state.taskInput}"</button> : null)}
-        </div>
-        <div className="row">
-        <div className="btn-group btn-group-toggle" data-toggle="buttons" style={{ 'flexWrap': 'wrap' }}>
+      <Container>
+        <Row>
+          <Form className="mb-2">
+            <input type="text" className="form-control" onChange={this.handleTextInputChange} placeholder={Constants.CREATE_TASK_PLACEHOLDER_TEXT} value={this.state.taskInput} />
+            {(this.state.createButtonVisible ? <button className="btn btn-primary" onClick={this.handleSaveClick}>{Constants.SAVE_NEW_TASK_BUTTON_TEXT} "{this.state.taskInput}"</button> : null)}
+          </Form>
+        </Row>
+        <Row>
+          <ToggleButtonGroup name="tasks" style={{ 'flex-wrap': 'wrap' }}>
             <label className={'btn btn-info' + (this.state.selectedTask == null ? ' active' : '')} htmlFor="no-task">{Constants.NO_TASK_TEXT}
               <input type="radio" id="no-task" name="task" value="" autoComplete="off" onChange={this.handleTaskSelected} checked={this.state.selectedTask == null}></input>
             </label>
-          {this.state && this.state.visibleTasks && this.state.visibleTasks.map(
-            task => {
-              return (
+            {this.state && this.state.visibleTasks && this.state.visibleTasks.map(
+              task => {
+                return (
                   <label key={task} className={'btn btn-info' + (task === this.state.selectedTask ? ' active' : '')} htmlFor={task} data-testid={'button-' + task}>{task}
                     <input type="radio" id={task} name="task" value={task} autoComplete="off" onChange={this.handleTaskSelected} checked={task === this.state.selectedTask}></input>
                   </label>
-              )
-            }
-          )}
-        </div>
-        </div>
-      </div>
+                )
+              }
+            )}
+          </ToggleButtonGroup>
+        </Row>
+      </Container>
     );
   }
 }

@@ -233,7 +233,7 @@ class Timer extends React.Component {
 
     render() {
         return (
-            <div>
+            <>
                 <Modal show={this.state.showHoldModal} onHide={this.handleClose}>
                     <Modal.Header closeButton>
                         <Modal.Title>{Constants.CONFIRM_HOLD_TIMER_MODAL_HEADER}</Modal.Title>
@@ -334,7 +334,7 @@ class Timer extends React.Component {
                         </div>
                     </div>
                 </Row>
-            </div>
+            </>
         );
     }
 }
