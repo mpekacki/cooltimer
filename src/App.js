@@ -11,6 +11,9 @@ import SimpleTaskManager from './SimpleTaskManager';
 import TaskTimes from './TaskTimes';
 import Constants from './Constants';
 import Button from 'react-bootstrap/Button';
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 
 class App extends React.Component {
   constructor(props) {
@@ -200,12 +203,12 @@ class App extends React.Component {
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossOrigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossOrigin="anonymous"></script>
         
-        <div className="container">
-          <div className="row">
-            <div className="col-sm offset-sm-11">
+        <Container>
+          <Row>
+            <Col sm={{ offset: 11 }}>
               <Button variant="light" onClick={this.onClickReset} data-testid="reset-btn">{Constants.RESET_BUTTON_TEXT}</Button>
-            </div>
-          </div>
+            </Col>
+          </Row>
           <Timer timerSeconds={this.state.timerSeconds}
             totalWorkedSeconds={this.state.totalWorkedSeconds}
             isWork={this.state.isWork}
@@ -235,12 +238,12 @@ class App extends React.Component {
                 onchange={this.onChangeSettings} />
             </div>
           </div>
-          <div className="row mb-3">
+          <Row className="mb-3">
             <SimpleTaskManager onTaskCreate={this.handleTaskCreated} onTaskSelected={this.handleTaskSelected} tasks={this.state.tasks} selectedTask={this.state.selectedTask} />
-          </div>
-          <div className="row mb-3">
+          </Row>
+          <Row className="mb-3">
             <TaskTimes events={this.state.events} eventsTimestamp={this.state.eventsTimestamp} />
-          </div>
+          </Row>
           <div className="card card-body">
             <FullCalendar events={this.state.events} plugins={[timeGridPlugin, dayGridMonth, listPlugin]} initialView="timeGridWeek" headerToolbar={
               { right: 'today prev,next dayGridMonth,timeGridWeek,timeGridDay listWeek' }
@@ -248,7 +251,7 @@ class App extends React.Component {
               event.el.title = event.event.title;
             }} />
           </div>
-        </div>
+        </Container>
       </div>
     );
   }

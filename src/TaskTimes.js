@@ -1,6 +1,7 @@
 import React from 'react';
 import { isToday, isYesterday, isThisWeek, isThisMonth } from 'date-fns';
 import Constants from './Constants';
+import Table from 'react-bootstrap/Table';
 
 const TOTALS_KEY = '@@@TOTALS';
 
@@ -94,7 +95,7 @@ class TaskTimes extends React.Component {
 
     render() {
         return (
-            <table className="table table-sm">
+            <Table size="sm" responsive>
                 <thead>
                     <tr>
                         <th>Task</th>
@@ -134,7 +135,7 @@ class TaskTimes extends React.Component {
                         <td data-testid={'monthp-total'}>100%</td>
                     </tr>
                 </tbody>
-            </table>
+            </Table>
         );
     }
 }

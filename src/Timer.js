@@ -2,6 +2,8 @@ import React from 'react';
 import Constants from './Constants';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 
 class Timer extends React.Component {
     constructor(props) {
@@ -246,8 +248,8 @@ class Timer extends React.Component {
                         </Button>
                     </Modal.Footer>
                 </Modal>
-                <div className="row">
-                    <div className="col-sm">
+                <Row>
+                    <Col>
                         {this.props.timerRunning === true &&
                             <button type="button" className="btn btn-warning" onClick={this.handleShow}>{Constants.HOLD_WORK_BUTTON_TEXT}</button>
                         }
@@ -257,15 +259,15 @@ class Timer extends React.Component {
                         {this.props.isWork === null &&
                             <button className="btn btn-success" onClick={this.onClickStartWorking} data-testid="start-working-btn">{Constants.START_WORKING_BUTTON_TEXT}</button>
                         }
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col-sm">
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
                         <h1 data-testid="timer">{this.formatSecondsAsTimer(this.props.timerSeconds)}</h1>
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col-sm">
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
                         {(this.props.isWork === true && this.props.availableBreakSeconds) ?
                             <>
                                 <button className="btn btn-success" onClick={this.onClickGoOnABreak}>{Constants.GO_ON_A_BREAT_BUTTON_TEXT}</button>
@@ -276,41 +278,41 @@ class Timer extends React.Component {
                                 <button className="btn btn-secondary" onClick={this.onClickReturnToWork}>{Constants.RETURN_TO_WORK_BUTTON_TEXT}</button>
                             </> : null
                         }
-                    </div>
-                </div>
-                <div className="row">
+                    </Col>
+                </Row>
+                <Row>
                     <div className="col-sm font-weight-light text-md-right">
                         Total time worked:
             </div>
                     <div className="col-sm text-md-left" data-testid="totalWorkedTime">
                         {this.formatSecondsAsText(this.props.totalWorkedSeconds)}
                     </div>
-                </div>
-                <div className="row">
+                </Row>
+                <Row>
                     <div className="col-sm font-weight-light text-md-right">
                         Available break time:
             </div>
                     <div className="col-sm text-md-left" data-testid="availableBreakTime">
                         {this.formatSecondsAsText(this.props.availableBreakSeconds)}
                     </div>
-                </div>
-                <div className="row">
+                </Row>
+                <Row>
                     <div className="col-sm font-weight-light text-md-right">
                         Cycles until long break ({this.props.longBreakMinutes} minutes):
             </div>
                     <div className="col-sm text-md-left" data-testid="longBreakInfo">
                         {this.cyclesUntilLongBreak}
                     </div>
-                </div>
-                <div className="row">
+                </Row>
+                <Row>
                     <div className="col-sm font-weight-light text-md-right">
                         Total time (work + break):
             </div>
                     <div className="col-sm text-md-left" data-testid="totalCombinedTime">
                         {this.formatSecondsAsText(this.props.totalCombinedTime)}
                     </div>
-                </div>
-                <div className="row">
+                </Row>
+                <Row>
                     <div className="col-sm">
                         <div className="form-check">
                             <input className="form-check-input" type="checkbox" value="" onChange={this.onChangeContinousWork}
@@ -320,8 +322,8 @@ class Timer extends React.Component {
                             </label>
                         </div>
                     </div>
-                </div>
-                <div className="row">
+                </Row>
+                <Row>
                     <div className="col-sm">
                         <div className="form-check">
                             <input className="form-check-input" type="checkbox" value="" onChange={this.onChangeAutoStartTimers}
@@ -331,7 +333,7 @@ class Timer extends React.Component {
                             </label>
                         </div>
                     </div>
-                </div>
+                </Row>
             </div>
         );
     }
