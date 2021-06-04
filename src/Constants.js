@@ -46,4 +46,16 @@ export default class Constants {
     static get RESET_BUTTON_TEXT() {
         return 'Reset timer';
     }
+
+    static get CONFIRM_HOLD_TIMER_BUTTON_TEXT() {
+        return 'Yes, hold timer';
+    }
+
+    static get CONFIRM_HOLD_TIMER_MODAL_HEADER() {
+        return 'Warning!';
+    }
+
+    static get CONFIRM_HOLD_TIMER_MODAL_TEXT() {
+        return 'This option should only be used if you\'re stopping work for a significant time. It should not be used for normal mid-work breaks - please wait instead until Go on a break button becomes available.';
+    }
 }

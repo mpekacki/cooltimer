@@ -1,11 +1,16 @@
 import React from 'react';
 import Constants from './Constants';
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
 
 class Timer extends React.Component {
     constructor(props) {
         super(props);
         this.interval = setInterval(this.tick, 1000);
         this.tick();
+        this.state = {
+            showHoldModal: false
+        };
     }
 
     componentWillUnmount() {
@@ -146,6 +151,7 @@ class Timer extends React.Component {
             timerRunning: false
         });
         this.notifyCycleChange(this.props.isWork, this.props.timerSeconds, this.props.timerSeconds);
+        this.handleClose();
     }
 
     onClickResumeWork = () => {
@@ -211,13 +217,39 @@ class Timer extends React.Component {
         return this.props.longBreakFreq - this.props.cycle;
     }
 
+    handleShow = () => {
+        this.setState({
+            showHoldModal: true
+        });
+    }
+
+    handleClose = () => {
+        this.setState({
+            showHoldModal: false
+        });
+    }
+
     render() {
         return (
             <div>
+                <Modal show={this.state.showHoldModal} onHide={this.handleClose}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>{Constants.CONFIRM_HOLD_TIMER_MODAL_HEADER}</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>{Constants.CONFIRM_HOLD_TIMER_MODAL_TEXT}</Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={this.handleClose}>
+                            Close
+                        </Button>
+                        <Button variant="primary" onClick={this.onClickHoldWork}>
+                            {Constants.CONFIRM_HOLD_TIMER_BUTTON_TEXT}
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
                 <div className="row">
                     <div className="col-sm">
                         {this.props.timerRunning === true &&
-                            <button className="btn btn-warning" onClick={this.onClickHoldWork}>{Constants.HOLD_WORK_BUTTON_TEXT}</button>
+                            <button type="button" className="btn btn-warning" onClick={this.handleShow}>{Constants.HOLD_WORK_BUTTON_TEXT}</button>
                         }
                         {this.props.timerRunning === false &&
                             <button className="btn btn-secondary" onClick={this.onClickResumeWork} data-testid="resume-work-btn">{Constants.RESUME_WORK_BUTTON_TEXT}</button>
@@ -285,7 +317,7 @@ class Timer extends React.Component {
                                 checked={this.props.continousWork} data-testid="cont-work" id="cont-work-check" />
                             <label className="form-check-label" htmlFor="cont-work-check">
                                 {Constants.CONTINOUS_WORK_TEXT}
-                </label>
+                            </label>
                         </div>
                     </div>
                 </div>
@@ -296,7 +328,7 @@ class Timer extends React.Component {
                                 checked={this.props.autoStartTimers} data-testid="auto-start-timers" id="auto-start-timers-check" />
                             <label className="form-check-label" htmlFor="auto-start-timers-check">
                                 {Constants.START_TIMERS_AUTOMATICALLY_TEXT}
-                </label>
+                            </label>
                         </div>
                     </div>
                 </div>

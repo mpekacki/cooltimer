@@ -241,7 +241,7 @@ test('if during work there is break time available, clicking on "Go on a break" 
   verifyAvailableBreakTime(c, '0 hours 0 minutes 0 seconds');
 });
 
-test('after clicking on "Hold work" button, holds all timers, and after clicking on "Resume work" starts them again', () => {
+test('after clicking on "Hold work" button (and asking for confirmation), holds all timers, and after clicking on "Resume work" starts them again', () => {
   const c = render(<App defaultSettings={ getTestSettings() }/>);
   expect(c.queryByText(Constants.HOLD_WORK_BUTTON_TEXT)).toBeNull();
   expect(c.queryByText(Constants.RESUME_WORK_BUTTON_TEXT)).toBeNull();
@@ -253,6 +253,8 @@ test('after clicking on "Hold work" button, holds all timers, and after clicking
   verifyTotalWorkedTime(c, '0 hours 15 minutes 0 seconds');
   verifyAvailableBreakTime(c, '0 hours 0 minutes 0 seconds');
   fireEvent.click(holdWorkButton(c));
+  expect(confirmHoldTimerButton(c)).toBeInTheDocument();
+  fireEvent.click(confirmHoldTimerButton(c));
   expect(c.queryByText(Constants.HOLD_WORK_BUTTON_TEXT)).toBeNull();
   expect(c.queryByText(Constants.RESUME_WORK_BUTTON_TEXT)).toBeInTheDocument();
   verifyTimer(c, '10:00');
@@ -287,6 +289,7 @@ test('after clicking on "Hold work" button, holds all timers, and after clicking
   verifyTotalWorkedTime(c, '0 hours 25 minutes 0 seconds');
   verifyAvailableBreakTime(c, '0 hours 4 minutes 0 seconds');
   fireEvent.click(holdWorkButton(c));
+  fireEvent.click(confirmHoldTimerButton(c));
   expect(c.queryByText(Constants.HOLD_WORK_BUTTON_TEXT)).toBeNull();
   expect(c.queryByText(Constants.RESUME_WORK_BUTTON_TEXT)).toBeInTheDocument();
   verifyTimer(c, '04:00');
@@ -542,7 +545,7 @@ test('saves app state with timer stopped if timer is stopped', () => {
   const c = render(<App defaultSettings={ getTestSettings() } storage={ mockStorage }/>);
   fireEvent.click(startWorkingButton(c));
   advanceTimersByTime(1000);
-  fireEvent.click(holdWorkButton(c));
+  holdTimer(c);
   expect(mockStorage.state).toBeTruthy();
   expect(mockStorage.state).toMatchObject({
     autoStartTimers: true,
@@ -733,7 +736,7 @@ test('displays events in calendar correctly when manually switching timer', () =
   fireEvent.click(goOnABreakButton(c));
   expect(c.getAllByText(`Work ${MOCK_START_TIME + 26 * 60 * 1000} ${MOCK_START_TIME + 30 * 60 * 1000}`).length).toBe(1);
   advanceTimersByTime((1 * 60) * 1000);
-  fireEvent.click(holdWorkButton(c));
+  holdTimer(c);
   expect(c.getAllByText(`Break ${MOCK_START_TIME + 30 * 60 * 1000} ${MOCK_START_TIME + 31 * 60 * 1000}`).length).toBe(1);
   advanceTimersByTime((1 * 60) * 1000);
   fireEvent.click(resumeWorkButton(c));
@@ -790,7 +793,7 @@ test('squashes neighbouring events of the same type', () => {
   expect(c.getAllByText(`Work ${MOCK_START_TIME} ${MOCK_START_TIME + 25 * 60 * 1000}`).length).toBe(1);
   advanceTimersByTime((25 * 60) * 1000);
   expect(c.getAllByText(`Work ${MOCK_START_TIME} ${MOCK_START_TIME + 50 * 60 * 1000}`).length).toBe(1);
-  fireEvent.click(c.getByText(Constants.HOLD_WORK_BUTTON_TEXT));
+  holdTimer(c);
   advanceTimersByTime((10 * 60) * 1000);
   fireEvent.click(c.getByText(Constants.RESUME_WORK_BUTTON_TEXT));
   advanceTimersByTime((25 * 60) * 1000);
@@ -837,7 +840,7 @@ test('does not create zero length events', () => {
   advanceTimersByTime((25 * 60) * 1000);
   expect(c.getAllByText(`Work ${MOCK_START_TIME} ${MOCK_START_TIME + 25 * 60 * 1000}`).length).toBe(1);
   advanceTimersByTime((10 * 60) * 1000);
-  fireEvent.click(holdWorkButton(c));
+  holdTimer(c);
   expect(c.getAllByText(`Work ${MOCK_START_TIME} ${MOCK_START_TIME + 35 * 60 * 1000}`).length).toBe(1);
   fireEvent.click(goOnABreakButton(c));
   fireEvent.click(returnToWorkButton(c))
@@ -900,7 +903,7 @@ test('shows today, yesterday and week summaries for task times', () => {
   verifyTotalTimeWorkedTodayForTask(c, TEST_TASK_NAME, 25 * 60);
   verifyTotalTimeWorkedYesterdayForTask(c, TEST_TASK_NAME, 0);
   verifyTotalTimeWorkedThisWeekForTask(c, TEST_TASK_NAME, 25 * 60);
-  fireEvent.click(holdWorkButton(c));
+  holdTimer(c);
   cleanup();
   jest.clearAllTimers();
   // jest.useFakeTimers();
@@ -955,13 +958,17 @@ test('updates total time worked per task even if no new event is created', () =>
   selectTask(c, TEST_TASK_NAME);
   fireEvent.click(startWorkingButton(c));
   advanceTimersByTime((5 * 60) * 1000);
-  fireEvent.click(holdWorkButton(c));
+  holdTimer(c);
   verifyTotalTimeWorkedTodayForTask(c, TEST_TASK_NAME, 5 * 60);
   fireEvent.click(resumeWorkButton(c));
   advanceTimersByTime((10 * 60) * 1000);
-  fireEvent.click(holdWorkButton(c));
+  holdTimer(c);
   verifyTotalTimeWorkedTodayForTask(c, TEST_TASK_NAME, 15 * 60);
 });
+
+function confirmHoldTimerButton(c) {
+  return c.queryByText(Constants.CONFIRM_HOLD_TIMER_BUTTON_TEXT);
+}
 
 function getTestSettings() {
   return new Settings(25, 5, 10, 4, false);
@@ -1089,6 +1096,11 @@ function getSaveNewTaskButton(c) {
 
 function getTaskElement(c, taskName) {
   return c.getByLabelText(taskName);
+}
+
+function holdTimer(c) {
+  fireEvent.click(holdWorkButton(c));
+  fireEvent.click(confirmHoldTimerButton(c));
 }
 
 class MockNotifications {

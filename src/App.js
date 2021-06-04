@@ -10,6 +10,7 @@ import listPlugin from '@fullcalendar/list';
 import SimpleTaskManager from './SimpleTaskManager';
 import TaskTimes from './TaskTimes';
 import Constants from './Constants';
+import Button from 'react-bootstrap/Button';
 
 class App extends React.Component {
   constructor(props) {
@@ -198,11 +199,11 @@ class App extends React.Component {
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossOrigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossOrigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossOrigin="anonymous"></script>
-
+        
         <div className="container">
           <div className="row">
             <div className="col-sm offset-sm-11">
-              <button className="btn btn-light" onClick={this.onClickReset} data-testid="reset-btn">{Constants.RESET_BUTTON_TEXT}</button>
+              <Button variant="light" onClick={this.onClickReset} data-testid="reset-btn">{Constants.RESET_BUTTON_TEXT}</Button>
             </div>
           </div>
           <Timer timerSeconds={this.state.timerSeconds}
@@ -225,9 +226,7 @@ class App extends React.Component {
             setStateAndStorage={this.handleTimerStateChange}
             showNotification={this.handleShowNotification}
             onTimerFinish={this.handleEventCreated} />
-          <button className="btn btn-light m-2" type="button" onClick={this.onClickSettings}>
-            Settings
-          </button>
+          <Button variant="light" className="m-2" onClick={this.onClickSettings}>Settings</Button>
           <div className={this.state.settingsVisible ? 'collapse show' : 'collapse'}>
             <div className="card card-body row">
               <UserSettings
