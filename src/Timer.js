@@ -263,7 +263,7 @@ class Timer extends React.Component {
                 </Row>
                 <Row>
                     <Col>
-                        <h3>{this.props.isWork ? Constants.WORK_LABEL_TEXT : Constants.BREAK_LABEL_TEXT}</h3>
+                        <h3>{this.props.isWork === true ? Constants.WORK_LABEL_TEXT : (this.props.isWork === false ? Constants.BREAK_LABEL_TEXT : '')}</h3>
                     </Col>
                 </Row>
                 <Row>

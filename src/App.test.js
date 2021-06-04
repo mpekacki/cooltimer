@@ -107,9 +107,12 @@ test('starts timer after clicking the button', () => {
 
 test('switches to break after work time elapses', () => {
   const c = render(<App defaultSettings={ getTestSettings() }/>);
+  expect(c.queryByText(Constants.BREAK_LABEL_TEXT)).not.toBeInTheDocument();
   fireEvent.click(startWorkingButton(c));
+  expect(c.getByText(Constants.WORK_LABEL_TEXT)).toBeInTheDocument();
   advanceTimersByTime((25 * 60) * 1000);
   verifyTimer(c, '05:00');
+  expect(c.getByText(Constants.BREAK_LABEL_TEXT)).toBeInTheDocument();
   verifyTotalWorkedTime(c, '0 hours 25 minutes 0 seconds');
   verifyAvailableBreakTime(c, '0 hours 5 minutes 0 seconds');
   advanceTimersByTime(1000);
@@ -122,6 +125,7 @@ test('switches to break after work time elapses', () => {
   verifyAvailableBreakTime(c, '0 hours 4 minutes 44 seconds');
   advanceTimersByTime((4 * 60 + 44) * 1000);
   verifyTimer(c, '25:00');
+  expect(c.getByText(Constants.WORK_LABEL_TEXT)).toBeInTheDocument();
   verifyTotalWorkedTime(c, '0 hours 25 minutes 0 seconds');
   verifyAvailableBreakTime(c, '0 hours 0 minutes 0 seconds');
   advanceTimersByTime(1000);
