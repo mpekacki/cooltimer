@@ -16,6 +16,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
 import Collapse from 'react-bootstrap/Collapse';
+import CloseButton from 'react-bootstrap/CloseButton';
 
 class App extends React.Component {
   constructor(props) {
@@ -231,19 +232,30 @@ class App extends React.Component {
             setStateAndStorage={this.handleTimerStateChange}
             showNotification={this.handleShowNotification}
             onTimerFinish={this.handleEventCreated} />
-          <Button variant="light" className="m-2" onClick={this.onClickSettings}>Settings</Button>
-          <Collapse in={this.state.settingsVisible}>
-            <div>
-              <Card>
-                <Card.Body>
-                  <UserSettings
-                    workMinutes={this.state.workMinutes} shortBreakMinutes={this.state.shortBreakMinutes}
-                    longBreakMinutes={this.state.longBreakMinutes} longBreakFreq={this.state.longBreakFreq}
-                    onchange={this.onChangeSettings} />
-                </Card.Body>
-              </Card>
-            </div>
-          </Collapse>
+          <Row>
+            <Col>
+              <Button variant="light" className="m-2" onClick={this.onClickSettings}>Settings</Button>
+            </Col>
+          </Row>
+          <Row className="mb-3">
+            <Col>
+              <Collapse in={this.state.settingsVisible}>
+                <div>
+                  <Card>
+                    <Card.Header>
+                      <CloseButton onClick={this.onClickSettings} />
+                    </Card.Header>
+                    <Card.Body>
+                      <UserSettings
+                        workMinutes={this.state.workMinutes} shortBreakMinutes={this.state.shortBreakMinutes}
+                        longBreakMinutes={this.state.longBreakMinutes} longBreakFreq={this.state.longBreakFreq}
+                        onchange={this.onChangeSettings} />
+                    </Card.Body>
+                  </Card>
+                </div>
+              </Collapse>
+            </Col>
+          </Row>
           <Row className="mb-3">
             <Col>
               <SimpleTaskManager onTaskCreate={this.handleTaskCreated} onTaskSelected={this.handleTaskSelected} tasks={this.state.tasks} selectedTask={this.state.selectedTask} />

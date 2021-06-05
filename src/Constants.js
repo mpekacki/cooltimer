@@ -66,4 +66,8 @@ export default class Constants {
     static get BREAK_LABEL_TEXT() {
         return 'Break';
     }
+
+    static get BREAK_WILL_BECOME_AVAILABLE_TEXT() {
+        return 'A break will be available when the current work timer finishes.';
+    }
 }

@@ -1,4 +1,7 @@
 import React from 'react';
+import Form from 'react-bootstrap/Form';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 
 class UserSettings extends React.Component {
     onChangeWorkMinutes = (event) => {
@@ -27,32 +30,51 @@ class UserSettings extends React.Component {
 
     render() {
         return (
-            <div>
-                <div className="d-flex flex-row form-group">
-                    <label htmlFor="work-minutes" className="p-2 col-form-label">Work cycle minutes</label>
-                    <div className="p-2">
-                        <input className="form-control" type="number" value={this.props.workMinutes} onChange={this.onChangeWorkMinutes} id="work-minutes" />
-                    </div>
-                </div>
-                <div className="d-flex flex-row form-group">
-                    <label htmlFor="short-break-minutes" className="p-2 col-form-label">Short break minutes</label>
-                    <div className="p-2">
-                        <input className="form-control" type="number" value={this.props.shortBreakMinutes} onChange={this.onChangeShortBreakMinutes} id="short-break-minutes" />
-                    </div>
-                </div>
-                <div className="d-flex flex-row form-group">
-                    <label htmlFor="long-break-minutes" className="p-2 col-form-label">Long break minutes</label>
-                    <div className="p-2">
-                        <input className="form-control" type="number" value={this.props.longBreakMinutes} onChange={this.onChangeLongBreakMinutes} id="long-break-minutes" />
-                    </div>
-                </div>
-                <div className="d-flex flex-row form-group">
-                    <label htmlFor="long-break-freq" className="p-2 col-form-label">Long break after n cycles</label>
-                    <div className="p-2">
-                        <input className="form-control" type="number" value={this.props.longBreakFreq} onChange={this.onChangeLongBreakFreq} id="long-break-freq" />
-                    </div>
-                </div>
-            </div>
+            <Form>
+                <Row>
+                    <Col sm={6}>
+                        <Form.Group as={Row}>
+                            <Form.Label column xs={8}>Work cycle minutes</Form.Label>
+                            <Col xs={4}>
+                                <Form.Control type="number" value={this.props.workMinutes} onChange={this.onChangeWorkMinutes} />
+                            </Col>
+                        </Form.Group>
+                    </Col>
+                    <Col sm={6}>
+                        <Form.Group as={Row}>
+                            <Form.Label column xs={8}>Short break minutes</Form.Label>
+                            <Col xs={4}>
+                                <Form.Control type="number" value={this.props.shortBreakMinutes} onChange={this.onChangeShortBreakMinutes} />
+                            </Col>
+                        </Form.Group>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col sm={6}>
+                        <Form.Group as={Row}>
+                            <Form.Label column xs={8}>Long break minutes</Form.Label>
+                            <Col xs={4}>
+                                <Form.Control type="number" value={this.props.longBreakMinutes} onChange={this.onChangeLongBreakMinutes} />
+                            </Col>
+                        </Form.Group>
+                    </Col>
+                    <Col sm={6}>
+                        <Form.Group as={Row}>
+                            <Form.Label column xs={8}>Long break after n cycles</Form.Label>
+                            <Col xs={4}>
+                                <Form.Control type="number" value={this.props.longBreakFreq} onChange={this.onChangeLongBreakFreq} />
+                            </Col>
+                        </Form.Group>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <Form.Text className="text-muted">
+                            Changes are effective after timer reset.
+    </Form.Text>
+                    </Col>
+                </Row>
+            </Form>
         );
     }
 }

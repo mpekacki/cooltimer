@@ -4,6 +4,7 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Form from 'react-bootstrap/Form';
 
 class Timer extends React.Component {
     constructor(props) {
@@ -273,9 +274,14 @@ class Timer extends React.Component {
                 </Row>
                 <Row>
                     <Col>
-                        {(this.props.isWork === true && this.props.availableBreakSeconds) ?
+                        {this.props.isWork === true ?
                             <>
-                                <button className="btn btn-success" onClick={this.onClickGoOnABreak}>{Constants.GO_ON_A_BREAT_BUTTON_TEXT}</button>
+                                <Button disabled={!this.props.availableBreakSeconds} variant="success" onClick={this.onClickGoOnABreak}>{Constants.GO_ON_A_BREAT_BUTTON_TEXT}</Button>
+                                {!this.props.availableBreakSeconds ? <>
+                                    <Form.Text className='text-muted'>
+                                        {Constants.BREAK_WILL_BECOME_AVAILABLE_TEXT}
+                                    </Form.Text>
+                                </> : null}
                             </> : null
                         }
                         {this.props.isWork === false ?

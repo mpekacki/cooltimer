@@ -336,22 +336,29 @@ test('displays "Return to work" button only if on a break', () => {
   expect(c.queryByText(Constants.RETURN_TO_WORK_BUTTON_TEXT)).toBeNull();
 });
 
-test('displays "Go on a break" button only during work and when there is break time available', () => {
+test('"Go on a break" button is active only during work and when there is break time available', () => {
   const c = render(<App defaultSettings={ getTestSettings() }/>);
   expect(c.queryByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT)).toBeNull();
+  expect(c.queryByText(Constants.BREAK_WILL_BECOME_AVAILABLE_TEXT)).toBeNull();
   fireEvent.click(startWorkingButton(c));
-  expect(c.queryByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT)).toBeNull();
+  expect(c.queryByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT)).toBeDisabled();
+  expect(c.queryByText(Constants.BREAK_WILL_BECOME_AVAILABLE_TEXT)).toBeInTheDocument();
   advanceTimersByTime((25 * 60) * 1000);
   expect(c.queryByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT)).toBeNull();
+  expect(c.queryByText(Constants.BREAK_WILL_BECOME_AVAILABLE_TEXT)).toBeNull();
   advanceTimersByTime((5 * 60) * 1000);
-  expect(c.queryByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT)).toBeNull();
+  expect(c.queryByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT)).toBeDisabled();
+  expect(c.queryByText(Constants.BREAK_WILL_BECOME_AVAILABLE_TEXT)).toBeInTheDocument();
   advanceTimersByTime((25 * 60) * 1000);
   expect(c.queryByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT)).toBeNull();
+  expect(c.queryByText(Constants.BREAK_WILL_BECOME_AVAILABLE_TEXT)).toBeNull();
   advanceTimersByTime((1 * 60) * 1000);
   fireEvent.click(returnToWorkButton(c));
-  expect(c.getByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT)).toBeInTheDocument();
+  expect(c.getByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT)).not.toBeDisabled();
+  expect(c.queryByText(Constants.BREAK_WILL_BECOME_AVAILABLE_TEXT)).toBeNull();
   fireEvent.click(goOnABreakButton(c));
   expect(c.queryByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT)).toBeNull();
+  expect(c.queryByText(Constants.BREAK_WILL_BECOME_AVAILABLE_TEXT)).toBeNull();
 });
 
 test('asks for notification permission on startup', () => {
