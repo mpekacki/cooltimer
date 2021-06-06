@@ -252,13 +252,13 @@ class Timer extends React.Component {
                 <Row>
                     <Col>
                         {this.props.timerRunning === true &&
-                            <button type="button" className="btn btn-warning" onClick={this.handleShow}>{Constants.HOLD_WORK_BUTTON_TEXT}</button>
+                            <Button variant="warning" onClick={this.handleShow}>{Constants.HOLD_WORK_BUTTON_TEXT}</Button>
                         }
                         {this.props.timerRunning === false &&
-                            <button className="btn btn-secondary" onClick={this.onClickResumeWork} data-testid="resume-work-btn">{Constants.RESUME_WORK_BUTTON_TEXT}</button>
+                            <Button variant="secondary" onClick={this.onClickResumeWork} data-testid="resume-work-btn">{Constants.RESUME_WORK_BUTTON_TEXT}</Button>
                         }
                         {this.props.isWork === null &&
-                            <button className="btn btn-success" onClick={this.onClickStartWorking} data-testid="start-working-btn">{Constants.START_WORKING_BUTTON_TEXT}</button>
+                            <Button variant="success" onClick={this.onClickStartWorking} data-testid="start-working-btn">{Constants.START_WORKING_BUTTON_TEXT}</Button>
                         }
                     </Col>
                 </Row>
@@ -286,64 +286,66 @@ class Timer extends React.Component {
                         }
                         {this.props.isWork === false ?
                             <>
-                                <button className="btn btn-secondary" onClick={this.onClickReturnToWork}>{Constants.RETURN_TO_WORK_BUTTON_TEXT}</button>
+                                <Button variant="secondary" onClick={this.onClickReturnToWork}>{Constants.RETURN_TO_WORK_BUTTON_TEXT}</Button>
                             </> : null
                         }
                     </Col>
                 </Row>
                 <Row>
-                    <div className="col-sm font-weight-light text-md-right">
+                    <Col sm={6} className="font-weight-light text-md-right">
                         Total time worked:
-            </div>
-                    <div className="col-sm text-md-left" data-testid="totalWorkedTime">
+                    </Col>
+                    <Col sm={6} className="text-md-left" data-testid="totalWorkedTime">
                         {this.formatSecondsAsText(this.props.totalWorkedSeconds)}
-                    </div>
+                    </Col>
                 </Row>
                 <Row>
-                    <div className="col-sm font-weight-light text-md-right">
+                    <Col sm={6} className="font-weight-light text-md-right">
                         Available break time:
-            </div>
-                    <div className="col-sm text-md-left" data-testid="availableBreakTime">
+                    </Col>
+                    <Col sm={6} className="text-md-left" data-testid="availableBreakTime">
                         {this.formatSecondsAsText(this.props.availableBreakSeconds)}
-                    </div>
+                    </Col>
                 </Row>
                 <Row>
-                    <div className="col-sm font-weight-light text-md-right">
+                    <Col sm={6} className="font-weight-light text-md-right">
                         Cycles until long break ({this.props.longBreakMinutes} minutes):
-            </div>
-                    <div className="col-sm text-md-left" data-testid="longBreakInfo">
+                    </Col>
+                    <Col sm={6} className="text-md-left" data-testid="longBreakInfo">
                         {this.cyclesUntilLongBreak}
-                    </div>
+                    </Col>
                 </Row>
                 <Row>
-                    <div className="col-sm font-weight-light text-md-right">
+                    <Col sm={6} className="font-weight-light text-md-right">
                         Total time (work + break):
-            </div>
-                    <div className="col-sm text-md-left" data-testid="totalCombinedTime">
+                    </Col>
+                    <Col sm={6} className="text-md-left" data-testid="totalCombinedTime">
                         {this.formatSecondsAsText(this.props.totalCombinedTime)}
-                    </div>
+                    </Col>
                 </Row>
                 <Row>
-                    <div className="col-sm">
-                        <div className="form-check">
-                            <input className="form-check-input" type="checkbox" value="" onChange={this.onChangeContinousWork}
-                                checked={this.props.continousWork} data-testid="cont-work" id="cont-work-check" />
-                            <label className="form-check-label" htmlFor="cont-work-check">
-                                {Constants.CONTINOUS_WORK_TEXT}
-                            </label>
-                        </div>
-                    </div>
+                    <Col>
+                        <Form.Check
+                            type="checkbox"
+                            label={Constants.CONTINOUS_WORK_TEXT}
+                            checked={this.props.continousWork}
+                            id="cont-work-check"
+                            data-testid="cont-work"
+                            onChange={this.onChangeContinousWork}
+                        />
+                    </Col>
                 </Row>
                 <Row>
-                    <div className="col-sm">
-                        <div className="form-check">
-                            <input className="form-check-input" type="checkbox" value="" onChange={this.onChangeAutoStartTimers}
-                                checked={this.props.autoStartTimers} data-testid="auto-start-timers" id="auto-start-timers-check" />
-                            <label className="form-check-label" htmlFor="auto-start-timers-check">
-                                {Constants.START_TIMERS_AUTOMATICALLY_TEXT}
-                            </label>
-                        </div>
-                    </div>
+                    <Col>
+                        <Form.Check
+                            type="checkbox"
+                            label={Constants.START_TIMERS_AUTOMATICALLY_TEXT}
+                            checked={this.props.autoStartTimers}
+                            id="auto-start-timers-check"
+                            data-testid="auto-start-timers"
+                            onChange={this.onChangeAutoStartTimers}
+                        />
+                    </Col>
                 </Row>
             </>
         );

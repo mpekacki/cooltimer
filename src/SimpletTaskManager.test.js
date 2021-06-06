@@ -73,16 +73,14 @@ test('displays tasks', () => {
 });
 
 test('displays No Task option always', () => {
-  let selectedTask = undefined;
-  const taskSelectedCallback = (task) => {
-    selectedTask = task;
-  }
+  const taskSelectedCallback = (task) => { };
   const tasks = [TEST_TASK_NAME, TEST_TASK_NAME2];
   const c = render(<SimpleTaskManager onTaskSelected={taskSelectedCallback} tasks={tasks} />);
   expect(getTaskElement(c, Constants.NO_TASK_TEXT)).toBeInTheDocument();
   fireEvent.click(getTaskElement(c, TEST_TASK_NAME));
-  fireEvent.click(getTaskElement(c, Constants.NO_TASK_TEXT));
-  expect(selectedTask).toBe(null);
+  expect(getTaskElement(c, Constants.NO_TASK_TEXT)).toBeInTheDocument();
+  Simulate.change(getNewTaskInput(c), { target: { value: TEST_TASK_NAME } });
+  expect(getTaskElement(c, Constants.NO_TASK_TEXT)).toBeInTheDocument();
 });
 
 test('selects option passed in props', () => {

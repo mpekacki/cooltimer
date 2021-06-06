@@ -5,14 +5,15 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import ToggleButtonGroup from 'react-bootstrap/ToggleButtonGroup';
-import { Button } from 'react-bootstrap';
+import ToggleButton from 'react-bootstrap/ToggleButton';
+import Button from 'react-bootstrap/Button';
 
 class SimpleTaskManager extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       taskInput: '',
-      selectedTask: props.selectedTask,
+      selectedTask: props.selectedTask || '',
       visibleTasks: props.tasks,
       createButtonVisible: false
     };
@@ -21,7 +22,7 @@ class SimpleTaskManager extends React.Component {
   componentDidUpdate(prevProps) {
     if (this.props.selectedTask !== prevProps.selectedTask || !!this.props.tasks !== !!prevProps.tasks || (this.props.tasks && prevProps.tasks && this.props.tasks.length !== prevProps.tasks.length)) {
       this.setState({
-        selectedTask: this.props.selectedTask,
+        selectedTask: this.props.selectedTask || '',
         visibleTasks: this.getVisibleTasks(this.state.taskInput)
       });
     }
@@ -45,14 +46,10 @@ class SimpleTaskManager extends React.Component {
     });
   }
 
-  handleTaskSelected = (event) => {
-    let value = event.target.value;
+  handleTaskSelected = (value) => {
     if (value === "") {
       value = null;
     }
-    this.setState({
-      selectedTask: value
-    })
     this.props.onTaskSelected(value);
   }
 
@@ -69,7 +66,6 @@ class SimpleTaskManager extends React.Component {
               <Form.Group controlId="taskInput" className="mr-1">
                 <Form.Control type="text" onChange={this.handleTextInputChange} placeholder={Constants.CREATE_TASK_PLACEHOLDER_TEXT} value={this.state.taskInput}></Form.Control>
               </Form.Group>
-              {/* <input type="text" className="form-control" onChange={this.handleTextInputChange} placeholder={Constants.CREATE_TASK_PLACEHOLDER_TEXT} value={this.state.taskInput} /> */}
               {(this.state.createButtonVisible ?
                 <Button type="primary" onClick={this.handleSaveClick}>
                   {Constants.SAVE_NEW_TASK_BUTTON_TEXT} "{this.state.taskInput}"
@@ -80,16 +76,16 @@ class SimpleTaskManager extends React.Component {
         </Row>
         <Row>
           <Col>
-            <ToggleButtonGroup name="tasks" style={{ 'flex-wrap': 'wrap' }} className="float-left">
-              <label className={'btn btn-info' + (this.state.selectedTask == null ? ' active' : '')} htmlFor="no-task">{Constants.NO_TASK_TEXT}
-                <input type="radio" id="no-task" name="task" value="" autoComplete="off" onChange={this.handleTaskSelected} checked={this.state.selectedTask == null}></input>
-              </label>
+            <ToggleButtonGroup type="radio" name="tasks" style={{ 'flexWrap': 'wrap' }} className="float-left" value={this.state.selectedTask} onChange={this.handleTaskSelected}>
+              <ToggleButton id="radio-null" value="">
+                {Constants.NO_TASK_TEXT}
+              </ToggleButton>
               {this.state && this.state.visibleTasks && this.state.visibleTasks.map(
                 task => {
                   return (
-                    <label key={task} className={'btn btn-info' + (task === this.state.selectedTask ? ' active' : '')} htmlFor={task} data-testid={'button-' + task}>{task}
-                      <input type="radio" id={task} name="task" value={task} autoComplete="off" onChange={this.handleTaskSelected} checked={task === this.state.selectedTask}></input>
-                    </label>
+                    <ToggleButton id={'radio-' + task} value={task} data-testid={'button-' + task} key={task}>
+                      {task}
+                    </ToggleButton>
                   )
                 }
               )}
