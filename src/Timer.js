@@ -5,6 +5,8 @@ import Modal from 'react-bootstrap/Modal';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
+import Tooltip from 'react-bootstrap/Tooltip';
 
 class Timer extends React.Component {
     constructor(props) {
@@ -81,53 +83,6 @@ class Timer extends React.Component {
         let newState = this.calculateNewState(secondsDiff, now);
 
         this.setStateAndStorage(newState);
-    }
-
-    onTimerFinish = () => {
-        let isWork = this.tempState.isWork;
-        let stateChange = {};
-        if (isWork) {
-            let newCycle = this.tempState.cycle + 1;
-            let newAvailableBreakSeconds = this.tempState.availableBreakSeconds;
-            if (newCycle === this.props.longBreakFreq) {
-                newCycle = 0;
-                newAvailableBreakSeconds += this.props.longBreakMinutes * 60 - this.props.shortBreakMinutes * 60;
-            }
-            newAvailableBreakSeconds += this.tempState.hiddenAvailableBreakSeconds;
-            newAvailableBreakSeconds = Math.round(newAvailableBreakSeconds);
-
-            let newTimerSeconds;
-            let newIsWork;
-
-            if (this.tempState.continousWork) {
-                newTimerSeconds = this.props.workMinutes * 60;
-                newIsWork = true;
-            } else {
-                newTimerSeconds = newAvailableBreakSeconds;
-                newIsWork = false;
-            }
-
-            stateChange = {
-                timerSeconds: newTimerSeconds,
-                availableBreakSeconds: newAvailableBreakSeconds,
-                hiddenAvailableBreakSeconds: 0,
-                isWork: newIsWork,
-                cycle: newCycle
-            };
-        } else {
-            stateChange = {
-                timerSeconds: this.props.workMinutes * 60,
-                isWork: true
-            };
-        }
-
-        stateChange.timerRunning = this.props.autoStartTimers;
-
-        const lastTimerSeconds = this.tempState.timerSeconds;
-        this.tempState = Object.assign(this.tempState, stateChange);
-
-        this.props.showNotification(isWork ? 'Work finished' : 'Break finished');
-        this.notifyCycleChange(isWork, lastTimerSeconds, this.tempState.timerSeconds);
     }
 
     notifyCycleChange = (wasWork, oldTimerSeconds, newTimerSeconds) => {
@@ -209,7 +164,50 @@ class Timer extends React.Component {
             }
             this.tempState.timerLastUpdatedAt = now;
             if (this.tempState.timerSeconds === 0) {
-                this.onTimerFinish();
+                let isWork = this.tempState.isWork;
+                let stateChange = {};
+                if (isWork) {
+                    let newCycle = this.tempState.cycle + 1;
+                    let newAvailableBreakSeconds = this.tempState.availableBreakSeconds;
+                    if (newCycle === this.props.longBreakFreq) {
+                        newCycle = 0;
+                        newAvailableBreakSeconds += this.props.longBreakMinutes * 60 - this.props.shortBreakMinutes * 60;
+                    }
+                    newAvailableBreakSeconds += this.tempState.hiddenAvailableBreakSeconds;
+                    newAvailableBreakSeconds = Math.round(newAvailableBreakSeconds);
+
+                    let newTimerSeconds;
+                    let newIsWork;
+
+                    if (this.tempState.continousWork) {
+                        newTimerSeconds = this.props.workMinutes * 60;
+                        newIsWork = true;
+                    } else {
+                        newTimerSeconds = newAvailableBreakSeconds;
+                        newIsWork = false;
+                    }
+
+                    stateChange = {
+                        timerSeconds: newTimerSeconds,
+                        availableBreakSeconds: newAvailableBreakSeconds,
+                        hiddenAvailableBreakSeconds: 0,
+                        isWork: newIsWork,
+                        cycle: newCycle
+                    };
+                } else {
+                    stateChange = {
+                        timerSeconds: this.props.workMinutes * 60,
+                        isWork: true
+                    };
+                }
+
+                stateChange.timerRunning = this.props.autoStartTimers;
+
+                const lastTimerSeconds = this.tempState.timerSeconds;
+                this.tempState = Object.assign(this.tempState, stateChange);
+
+                this.props.showNotification(isWork ? 'Work finished' : 'Break finished');
+                this.notifyCycleChange(isWork, lastTimerSeconds, this.tempState.timerSeconds);
             }
         }
 
@@ -276,12 +274,17 @@ class Timer extends React.Component {
                     <Col>
                         {this.props.isWork === true ?
                             <>
-                                <Button disabled={!this.props.availableBreakSeconds} variant="success" onClick={this.onClickGoOnABreak}>{Constants.GO_ON_A_BREAT_BUTTON_TEXT}</Button>
                                 {!this.props.availableBreakSeconds ? <>
-                                    <Form.Text className='text-muted'>
-                                        {Constants.BREAK_WILL_BECOME_AVAILABLE_TEXT}
-                                    </Form.Text>
-                                </> : null}
+                                    <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{Constants.BREAK_WILL_BECOME_AVAILABLE_TEXT}</Tooltip>}>
+                                        <span className="d-inline-block">
+                                            <Button disabled variant="success" style={{ pointerEvents: 'none' }}>
+                                                {Constants.GO_ON_A_BREAT_BUTTON_TEXT}
+                                            </Button>
+                                        </span>
+                                    </OverlayTrigger>
+                                </> : <>
+                                    <Button variant="success" onClick={this.onClickGoOnABreak}>{Constants.GO_ON_A_BREAT_BUTTON_TEXT}</Button>
+                                </>}
                             </> : null
                         }
                         {this.props.isWork === false ?

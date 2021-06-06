@@ -342,23 +342,23 @@ test('"Go on a break" button is active only during work and when there is break 
   expect(c.queryByText(Constants.BREAK_WILL_BECOME_AVAILABLE_TEXT)).toBeNull();
   fireEvent.click(startWorkingButton(c));
   expect(c.queryByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT)).toBeDisabled();
+  fireEvent.mouseOver(c.queryByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT));
   expect(c.queryByText(Constants.BREAK_WILL_BECOME_AVAILABLE_TEXT)).toBeInTheDocument();
   advanceTimersByTime((25 * 60) * 1000);
   expect(c.queryByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT)).toBeNull();
-  expect(c.queryByText(Constants.BREAK_WILL_BECOME_AVAILABLE_TEXT)).toBeNull();
   advanceTimersByTime((5 * 60) * 1000);
   expect(c.queryByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT)).toBeDisabled();
+  fireEvent.mouseOver(c.queryByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT));
   expect(c.queryByText(Constants.BREAK_WILL_BECOME_AVAILABLE_TEXT)).toBeInTheDocument();
   advanceTimersByTime((25 * 60) * 1000);
   expect(c.queryByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT)).toBeNull();
-  expect(c.queryByText(Constants.BREAK_WILL_BECOME_AVAILABLE_TEXT)).toBeNull();
   advanceTimersByTime((1 * 60) * 1000);
   fireEvent.click(returnToWorkButton(c));
   expect(c.getByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT)).not.toBeDisabled();
+  fireEvent.mouseOver(c.queryByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT));
   expect(c.queryByText(Constants.BREAK_WILL_BECOME_AVAILABLE_TEXT)).toBeNull();
   fireEvent.click(goOnABreakButton(c));
   expect(c.queryByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT)).toBeNull();
-  expect(c.queryByText(Constants.BREAK_WILL_BECOME_AVAILABLE_TEXT)).toBeNull();
 });
 
 test('asks for notification permission on startup', () => {
