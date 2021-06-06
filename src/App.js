@@ -54,6 +54,12 @@ class App extends React.Component {
     });
   }
 
+  onClickToggleCalendar = () => {
+    this.setState({
+      calendarVisible: !this.state.calendarVisible
+    });
+  }
+
   setStateAndStorage = (state) => {
     this.setState(state);
     if (this.storage) {
@@ -84,6 +90,7 @@ class App extends React.Component {
       longBreakMinutes: this.defaultSettings.longBreakMinutes,
       longBreakFreq: this.defaultSettings.longBreakFreq,
       settingsVisible: false,
+      calendarVisible: false,
       events: [],
       timerStartedAt: null,
       timerStartedWithSeconds: null,
@@ -266,15 +273,26 @@ class App extends React.Component {
               <TaskTimes events={this.state.events} eventsTimestamp={this.state.eventsTimestamp} />
             </Col>
           </Row>
-          <Card>
-            <Card.Body>
-              <FullCalendar events={this.state.events} plugins={[timeGridPlugin, dayGridMonth, listPlugin]} initialView="timeGridWeek" headerToolbar={
-                { right: 'today prev,next dayGridMonth,timeGridWeek,timeGridDay listWeek' }
-              } slotDuration='00:10:00' height={650} eventDidMount={function (event) {
-                event.el.title = event.event.title;
-              }} />
-            </Card.Body>
-          </Card>
+          <Row className="mb-2">
+            <Col>
+              <Button variant="light" onClick={this.onClickToggleCalendar}>{this.state.calendarVisible ? 'Hide calendar' : 'Show calendar'}</Button>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <Collapse in={this.state.calendarVisible}>
+                <Card>
+                  <Card.Body>
+                    <FullCalendar events={this.state.events} plugins={[timeGridPlugin, dayGridMonth, listPlugin]} initialView="timeGridWeek" headerToolbar={
+                      { right: 'today prev,next dayGridMonth,timeGridWeek,timeGridDay listWeek' }
+                    } slotDuration='00:10:00' height={650} eventDidMount={function (event) {
+                      event.el.title = event.event.title;
+                    }} />
+                  </Card.Body>
+                </Card>
+              </Collapse>
+            </Col>
+          </Row>
         </Container>
       </div>
     );
