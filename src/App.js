@@ -219,7 +219,7 @@ class App extends React.Component {
         <Container>
           <Row>
             <Col sm={{ offset: 11 }}>
-              <Button variant="light" onClick={this.onClickReset} data-testid="reset-btn">{Constants.RESET_BUTTON_TEXT}</Button>
+              <Button variant="outline-dark" onClick={this.onClickReset} data-testid="reset-btn">{Constants.RESET_BUTTON_TEXT}</Button>
             </Col>
           </Row>
           <Timer timerSeconds={this.state.timerSeconds}
@@ -244,7 +244,7 @@ class App extends React.Component {
             onTimerFinish={this.handleEventCreated} />
           <Row>
             <Col>
-              <Button variant="light" className="m-2" onClick={this.onClickSettings}>Settings</Button>
+              <Button variant="outline-dark" className="m-2" onClick={this.onClickSettings}>Settings</Button>
             </Col>
           </Row>
           <Row className="mb-3">
@@ -278,7 +278,7 @@ class App extends React.Component {
           </Row>
           <Row className="mb-2">
             <Col>
-              <Button variant="light" onClick={this.onClickToggleCalendar}>{this.state.calendarVisible ? 'Hide calendar' : 'Show calendar'}</Button>
+              <Button variant="outline-dark" onClick={this.onClickToggleCalendar}>{this.state.calendarVisible ? 'Hide calendar' : 'Show calendar'}</Button>
             </Col>
           </Row>
           <Row>

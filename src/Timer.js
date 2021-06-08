@@ -258,7 +258,7 @@ class Timer extends React.Component {
                 <Row>
                     <Col>
                         {this.props.timerRunning === true &&
-                            <Button variant="warning" onClick={this.handleShow}>{Constants.HOLD_WORK_BUTTON_TEXT}</Button>
+                            <Button variant="outline-warning" onClick={this.handleShow}>{Constants.HOLD_WORK_BUTTON_TEXT}</Button>
                         }
                         {this.props.timerRunning === false &&
                             <Button variant="secondary" onClick={this.onClickResumeWork} data-testid="resume-work-btn">{Constants.RESUME_WORK_BUTTON_TEXT}</Button>
