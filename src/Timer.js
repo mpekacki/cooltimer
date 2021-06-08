@@ -22,10 +22,18 @@ class Timer extends React.Component {
         clearInterval(this.interval);
     }
 
-    formatSecondsAsTimer(seconds) {
-        let minutesPart = String(Math.floor(seconds / 60)).padStart(2, '0');
-        let secondsPart = String(seconds % 60).padStart(2, '0');
+    formatSecondsAsTimer() {
+        let minutesPart = this.getTimerMinutes();
+        let secondsPart = this.getTimerSeconds();
         return minutesPart + ':' + secondsPart;
+    }
+
+    getTimerSeconds() {
+        return String(this.props.timerSeconds % 60).padStart(2, '0');
+    }
+
+    getTimerMinutes() {
+        return String(Math.floor(this.props.timerSeconds / 60)).padStart(2, '0');
     }
 
     formatSecondsAsText(seconds) {
@@ -267,7 +275,7 @@ class Timer extends React.Component {
                 </Row>
                 <Row>
                     <Col>
-                        <h1 data-testid="timer">{this.formatSecondsAsTimer(this.props.timerSeconds)}</h1>
+                        <h1 data-testid="timer">{this.getTimerMinutes() + ':' + this.getTimerSeconds()}</h1>
                     </Col>
                 </Row>
                 <Row>
