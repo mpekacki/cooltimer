@@ -1,6 +1,6 @@
 {
   "files": {
-    "main.css": "/cooltimer/static/css/main.4871e39e.chunk.css",
+    "main.css": "/cooltimer/static/css/main.e2222d83.chunk.css",
     "main.js": "/cooltimer/static/js/main.dd69746b.chunk.js",
     "main.js.map": "/cooltimer/static/js/main.dd69746b.chunk.js.map",
     "runtime-main.js": "/cooltimer/static/js/runtime-main.469aaf17.js",
@@ -10,14 +10,14 @@
     "static/js/2.6021ecaa.chunk.js.map": "/cooltimer/static/js/2.6021ecaa.chunk.js.map",
     "index.html": "/cooltimer/index.html",
     "static/css/2.edff86ce.chunk.css.map": "/cooltimer/static/css/2.edff86ce.chunk.css.map",
-    "static/css/main.4871e39e.chunk.css.map": "/cooltimer/static/css/main.4871e39e.chunk.css.map",
+    "static/css/main.e2222d83.chunk.css.map": "/cooltimer/static/css/main.e2222d83.chunk.css.map",
     "static/js/2.6021ecaa.chunk.js.LICENSE.txt": "/cooltimer/static/js/2.6021ecaa.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.469aaf17.js",
     "static/css/2.edff86ce.chunk.css",
     "static/js/2.6021ecaa.chunk.js",
-    "static/css/main.4871e39e.chunk.css",
+    "static/css/main.e2222d83.chunk.css",
     "static/js/main.dd69746b.chunk.js"
   ]
 }
