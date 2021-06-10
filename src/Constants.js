@@ -20,15 +20,15 @@ export default class Constants {
     }
 
     static get START_WORKING_BUTTON_TEXT() {
-        return 'Start timer';
+        return 'Start';
     }
 
     static get HOLD_WORK_BUTTON_TEXT() {
-        return 'Hold timer';
+        return 'Hold';
     }
 
     static get RESUME_WORK_BUTTON_TEXT() {
-        return 'Resume timer';
+        return 'Resume';
     }
 
     static get CONTINOUS_WORK_TEXT() {
@@ -44,7 +44,7 @@ export default class Constants {
     }
 
     static get RESET_BUTTON_TEXT() {
-        return 'Reset timer';
+        return 'Reset';
     }
 
     static get CONFIRM_HOLD_TIMER_BUTTON_TEXT() {
