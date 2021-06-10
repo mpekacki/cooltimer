@@ -7,6 +7,7 @@ import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
+import ButtonGroup from 'react-bootstrap/ButtonGroup';
 
 class Timer extends React.Component {
     constructor(props) {
@@ -255,22 +256,28 @@ class Timer extends React.Component {
                         </Button>
                     </Modal.Footer>
                 </Modal>
-                <Row>
+                <Row className="mt-3">
                     <Col>
-                        {this.props.timerRunning === true &&
-                            <Button variant="outline-warning" onClick={this.handleShow}>{Constants.HOLD_WORK_BUTTON_TEXT}</Button>
-                        }
-                        {this.props.timerRunning === false &&
-                            <Button variant="secondary" onClick={this.onClickResumeWork} data-testid="resume-work-btn">{Constants.RESUME_WORK_BUTTON_TEXT}</Button>
-                        }
-                        {this.props.isWork === null &&
-                            <Button variant="success" onClick={this.onClickStartWorking} data-testid="start-working-btn">{Constants.START_WORKING_BUTTON_TEXT}</Button>
-                        }
+                        <ButtonGroup>
+
+                            {this.props.timerRunning === true &&
+                                <Button variant="outline-warning" onClick={this.handleShow}>{Constants.HOLD_WORK_BUTTON_TEXT}</Button>
+                            }
+                            {this.props.timerRunning === false &&
+                                <Button variant="secondary" onClick={this.onClickResumeWork} data-testid="resume-work-btn">{Constants.RESUME_WORK_BUTTON_TEXT}</Button>
+                            }
+                            {this.props.isWork === null &&
+                                <Button variant="success" onClick={this.onClickStartWorking} data-testid="start-working-btn">{Constants.START_WORKING_BUTTON_TEXT}</Button>
+                            }
+                            {this.props.isWork !== null &&
+                                <Button variant="outline-dark" onClick={this.props.onClickReset} data-testid="reset-btn">{Constants.RESET_BUTTON_TEXT}</Button>
+                            }
+                        </ButtonGroup>
                     </Col>
                 </Row>
                 <Row>
                     <Col>
-                        <h3 className="mt-2">{this.props.isWork === true ? Constants.WORK_LABEL_TEXT : (this.props.isWork === false ? Constants.BREAK_LABEL_TEXT : '')}</h3>
+                        <h3 className="mt-3">{this.props.isWork === true ? Constants.WORK_LABEL_TEXT : (this.props.isWork === false ? Constants.BREAK_LABEL_TEXT : '')}</h3>
                     </Col>
                 </Row>
                 <Row>

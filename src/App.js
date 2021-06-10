@@ -207,11 +207,6 @@ class App extends React.Component {
           <title>{String(Math.floor(this.state.timerSeconds / 60)).padStart(2, '0') + ':' + String(this.state.timerSeconds % 60).padStart(2, '0')} {this.state.isWork === true ? "Work" : ( this.state.isWork === false ? "Break" : "" )}</title>
         </Helmet>
         <Container>
-          <Row>
-            <Col sm={{ offset: 11 }}>
-              <Button variant="outline-dark" onClick={this.onClickReset} data-testid="reset-btn">{Constants.RESET_BUTTON_TEXT}</Button>
-            </Col>
-          </Row>
           <Timer timerSeconds={this.state.timerSeconds}
             totalWorkedSeconds={this.state.totalWorkedSeconds}
             isWork={this.state.isWork}
@@ -231,7 +226,8 @@ class App extends React.Component {
             timerStartedWithSeconds={this.state.timerStartedWithSeconds}
             setStateAndStorage={this.handleTimerStateChange}
             showNotification={this.handleShowNotification}
-            onTimerFinish={this.handleEventCreated} />
+            onTimerFinish={this.handleEventCreated}
+            onClickReset={this.onClickReset} />
           <Row>
             <Col>
               <Button variant="outline-dark" className="m-2" onClick={this.onClickSettings}>Settings</Button>

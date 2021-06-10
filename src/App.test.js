@@ -601,7 +601,9 @@ test('resets state after clicking Reset', () => {
     return true;
   };
   const c = render(<App defaultSettings={ getTestSettings() }/>);
+  expect(resetButton(c)).not.toBeInTheDocument();
   fireEvent.click(startWorkingButton(c));
+  expect(resetButton(c)).toBeInTheDocument();
   advanceTimersByTime((25 * 60) * 1000);
   verifyTimer(c, "05:00");
   verifyTotalWorkedTime(c, "0 hours 25 minutes 0 seconds");
@@ -1002,7 +1004,7 @@ function returnToWorkButton(container) {
 }
 
 function resetButton(container) {
-  return container.getByTestId("reset-btn");
+  return container.queryByTestId("reset-btn");
 }
 
 function resumeWorkButton(container) {
