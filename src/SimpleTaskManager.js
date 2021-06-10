@@ -81,7 +81,7 @@ class SimpleTaskManager extends React.Component {
           </Col>
           {this.state.selectedTask &&
             <Col xs={2}>
-              <Button variant="outline-danger" size="sm" onClick={this.handleRemoveClick}>{Constants.REMOVE_TASK_BUTTON_TEXT}</Button>
+              <Button variant="outline-danger" size="sm" onClick={this.handleRemoveClick} className="mr-1">{Constants.REMOVE_TASK_BUTTON_TEXT}</Button>
             </Col>
           }
         </Row>
