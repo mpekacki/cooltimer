@@ -192,7 +192,19 @@ class App extends React.Component {
     });
   }
 
-  setEventsTimestamp() {
+  handleTaskRemoved = (task) => {
+    let newTasks = this.state.tasks;
+    newTasks.splice(newTasks.indexOf(task), 1);
+    let newEvents = this.state.events.filter(e => e.task !== task);
+    this.setState({
+      tasks: newTasks,
+      events: newEvents,
+      eventsTimestamp: Date.now(),
+      selectedTask: this.state.selectedTask === task ? null : this.state.selectedTask
+    });
+  }
+
+  setEventsTimestamp = () => {
     this.setState({
       eventsTimestamp: Date.now()
     });
@@ -253,7 +265,14 @@ class App extends React.Component {
           </Row>
           <Row className="mb-3">
             <Col>
-              <SimpleTaskManager onTaskCreate={this.handleTaskCreated} onTaskSelected={this.handleTaskSelected} tasks={this.state.tasks} selectedTask={this.state.selectedTask} />
+              <SimpleTaskManager 
+                onTaskCreate={this.handleTaskCreated} 
+                onTaskSelected={this.handleTaskSelected} 
+                tasks={this.state.tasks} 
+                selectedTask={this.state.selectedTask} 
+                onTaskRemoved={this.handleTaskRemoved}
+                eventsTimestamp={this.state.eventsTimestamp}
+              />
             </Col>
           </Row>
           <Row className="mb-3">

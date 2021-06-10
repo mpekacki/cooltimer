@@ -872,6 +872,29 @@ test('when selected task changes, finish current event and start new one', () =>
   expect(c.queryByText('Break 0 -1500000')).not.toBeInTheDocument();
 });
 
+test('removes task together with its events', () => {
+  let confirmCalled = false;
+  global.confirm = () => {
+    confirmCalled = true;
+    return true;
+  };
+  const c = render(<App defaultSettings={ getTestSettings() }/>);
+  createTask(c, TEST_TASK_NAME);
+  createTask(c, TEST_TASK_NAME2);
+  expect(removeTaskButton(c)).not.toBeInTheDocument();
+  selectTask(c, TEST_TASK_NAME2);
+  expect(removeTaskButton(c)).toBeInTheDocument();
+  fireEvent.click(startWorkingButton(c));
+  advanceTimersByTime((25 * 60) * 1000);
+  verifyEventCreatedForWorkWithTask(c, TEST_TASK_NAME2, MOCK_START_TIME, MOCK_START_TIME + 25 * 60 * 1000);
+  advanceTimersByTime(1000);
+  fireEvent.click(removeTaskButton(c));
+  expect(confirmCalled).toBe(true);
+  expect(c.queryAllByText(TEST_TASK_NAME2, {exact: false}).length).toBe(0);
+  advanceTimersByTime((30 * 60) * 1000);
+  verifyEventCreatedForWorkWithoutTask(c, MOCK_START_TIME + 30 * 60 * 1000, MOCK_START_TIME + 55 * 60 * 1000);
+});
+
 test('does not create zero length events', () => {
   const c = render(<App defaultSettings={ getTestSettings() }/>);
   tickContinousWork(c, true);
@@ -1035,6 +1058,10 @@ function holdWorkButton(c) {
 
 function goOnABreakButton(c) {
   return c.getByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT);
+}
+
+function removeTaskButton(c) {
+  return c.queryByText(Constants.REMOVE_TASK_BUTTON_TEXT);
 }
 
 function startTimersAutomaticallyCheckbox(container) {

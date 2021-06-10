@@ -20,7 +20,7 @@ class SimpleTaskManager extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.selectedTask !== prevProps.selectedTask || !!this.props.tasks !== !!prevProps.tasks || (this.props.tasks && prevProps.tasks && this.props.tasks.length !== prevProps.tasks.length)) {
+    if (this.props.eventsTimestamp !== prevProps.eventsTimestamp || this.props.selectedTask !== prevProps.selectedTask || !!this.props.tasks !== !!prevProps.tasks || (this.props.tasks && prevProps.tasks && this.props.tasks.length !== prevProps.tasks.length)) {
       this.setState({
         selectedTask: this.props.selectedTask || '',
         visibleTasks: this.getVisibleTasks(this.state.taskInput)
@@ -57,6 +57,12 @@ class SimpleTaskManager extends React.Component {
     return this.props.tasks ? this.props.tasks.filter(x => x.toUpperCase().includes(searchText.toUpperCase())) : [];
   }
 
+  handleRemoveClick = () => {
+    if (window.confirm(Constants.REMOVE_TASK_CONFIRMATION_TEXT)) {
+      this.props.onTaskRemoved(this.state.selectedTask);
+    }
+  }
+
   render() {
     return (
       <Container>
@@ -73,6 +79,11 @@ class SimpleTaskManager extends React.Component {
                 : null)}
             </Form>
           </Col>
+          {this.state.selectedTask &&
+            <Col xs={2}>
+              <Button variant="outline-danger" size="sm" onClick={this.handleRemoveClick}>{Constants.REMOVE_TASK_BUTTON_TEXT}</Button>
+            </Col>
+          }
         </Row>
         <Row>
           <Col>

@@ -70,4 +70,12 @@ export default class Constants {
     static get BREAK_WILL_BECOME_AVAILABLE_TEXT() {
         return 'A break will be available when the current work timer finishes.';
     }
+
+    static get REMOVE_TASK_BUTTON_TEXT() {
+        return 'Remove task';
+    }
+
+    static get REMOVE_TASK_CONFIRMATION_TEXT() {
+        return 'Are sure you want to remove the selected task?';
+    }
 }
