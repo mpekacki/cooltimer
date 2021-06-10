@@ -90,19 +90,21 @@ test('renders timer based on passed settings', () => {
 
 test('starts timer after clicking the button', () => {
   const c = render(<App defaultSettings={ getTestSettings() }/>);
+  expect(document.title.includes("W")).toBeFalsy();
+  expect(document.title.includes("B")).toBeFalsy();
   fireEvent.click(startWorkingButton(c));
   advanceTimersByTime(1000);
   verifyTimer(c, '24:59');
   verifyTotalWorkedTime(c, '0 hours 0 minutes 1 second');
-  // expect(document.title).toBe("24:59");
+  expect(document.title.includes("24:59")).toBeTruthy();
   advanceTimersByTime((12 * 60 + 12) * 1000);
   verifyTimer(c, '12:47');
   verifyTotalWorkedTime(c, '0 hours 12 minutes 13 seconds');
-  // expect(document.title).toBe("12:47");
+  expect(document.title.includes("12:47")).toBeTruthy();
   advanceTimersByTime((12 * 60 + 46) * 1000);
   verifyTimer(c, '00:01');
   verifyTotalWorkedTime(c, '0 hours 24 minutes 59 seconds');
-  // expect(document.title).toBe("00:01");
+  expect(document.title.includes("00:01")).toBeTruthy();
 });
 
 test('switches to break after work time elapses', () => {
@@ -112,11 +114,15 @@ test('switches to break after work time elapses', () => {
   expect(c.getByText(Constants.WORK_LABEL_TEXT)).toBeInTheDocument();
   advanceTimersByTime((25 * 60) * 1000);
   verifyTimer(c, '05:00');
+  expect(document.title.includes("05:00")).toBeTruthy();
+  expect(document.title.includes("B")).toBeTruthy();
   expect(c.getByText(Constants.BREAK_LABEL_TEXT)).toBeInTheDocument();
   verifyTotalWorkedTime(c, '0 hours 25 minutes 0 seconds');
   verifyAvailableBreakTime(c, '0 hours 5 minutes 0 seconds');
   advanceTimersByTime(1000);
   verifyTimer(c, '04:59');
+  expect(document.title.includes("04:59")).toBeTruthy();
+  expect(document.title.includes("B")).toBeTruthy();
   verifyTotalWorkedTime(c, '0 hours 25 minutes 0 seconds');
   verifyAvailableBreakTime(c, '0 hours 4 minutes 59 seconds');
   advanceTimersByTime(15 * 1000);
@@ -125,6 +131,8 @@ test('switches to break after work time elapses', () => {
   verifyAvailableBreakTime(c, '0 hours 4 minutes 44 seconds');
   advanceTimersByTime((4 * 60 + 44) * 1000);
   verifyTimer(c, '25:00');
+  expect(document.title.includes("25:00")).toBeTruthy();
+  expect(document.title.includes("W")).toBeTruthy();
   expect(c.getByText(Constants.WORK_LABEL_TEXT)).toBeInTheDocument();
   verifyTotalWorkedTime(c, '0 hours 25 minutes 0 seconds');
   verifyAvailableBreakTime(c, '0 hours 0 minutes 0 seconds');

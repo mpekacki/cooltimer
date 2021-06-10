@@ -203,8 +203,8 @@ class App extends React.Component {
   render() {
     return (
       <div className="App">
-        <Helmet>
-          <title>Timer</title>
+        <Helmet defer={false}>
+          <title>{String(Math.floor(this.state.timerSeconds / 60)).padStart(2, '0') + ':' + String(this.state.timerSeconds % 60).padStart(2, '0')} {this.state.isWork === true ? "Work" : ( this.state.isWork === false ? "Break" : "" )}</title>
         </Helmet>
         <Container>
           <Row>
