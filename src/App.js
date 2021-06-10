@@ -114,9 +114,6 @@ class App extends React.Component {
   }
 
   handleTimerStateChange = (timerState) => {
-    // if (timerState.timerStartedAt < this.state.timerStartedAt) {
-    //   timerState.timerStartedAt = this.state.timerStartedAt;
-    // }
     this.setStateAndStorage(timerState);
   }
 
@@ -137,7 +134,7 @@ class App extends React.Component {
 
   handleEventCreated = (event) => {
     let eventTitle = event.wasWork ? 'Work' : 'Break';
-    if (this.state.selectedTask) {
+    if (this.state.selectedTask && event.wasWork) {
       eventTitle += ' (' + this.state.selectedTask + ')';
     }
     const newEvent = {
@@ -205,7 +202,7 @@ class App extends React.Component {
     return (
       <div className="App">
         <Helmet defer={false}>
-          <title>{String(Math.floor(this.state.timerSeconds / 60)).padStart(2, '0') + ':' + String(this.state.timerSeconds % 60).padStart(2, '0')} {this.state.isWork === true ? "Work" : ( this.state.isWork === false ? "Break" : "" )}</title>
+          <title>{String(Math.floor(this.state.timerSeconds / 60)).padStart(2, '0') + ':' + String(this.state.timerSeconds % 60).padStart(2, '0')} {this.state.isWork === true ? "Work" : ( this.state.isWork === false ? "Break" : "" )}{this.state.isWork && this.state.selectedTask ? ' (' + this.state.selectedTask + ')' : ''}</title>
         </Helmet>
         <Container>
           <Timer timerSeconds={this.state.timerSeconds}

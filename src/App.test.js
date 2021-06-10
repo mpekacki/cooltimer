@@ -842,12 +842,17 @@ test('when task is selected, saves calendar work events with task name', () => {
   createTask(c, TEST_TASK_NAME);
   selectTask(c, TEST_TASK_NAME);
   fireEvent.click(startWorkingButton(c));
+  expect(document.title.includes(TEST_TASK_NAME)).toBeTruthy();
   advanceTimersByTime((25 * 60) * 1000);
   verifyEventCreatedForWorkWithTask(c, TEST_TASK_NAME, MOCK_START_TIME, MOCK_START_TIME + 25 * 60 * 1000);
+  expect(document.title.includes(TEST_TASK_NAME)).toBeFalsy();
   advanceTimersByTime((5 * 60) * 1000);
   selectTask(c, Constants.NO_TASK_TEXT);
   advanceTimersByTime((25 * 60) * 1000);
   verifyEventCreatedForWorkWithoutTask(c, MOCK_START_TIME + 30 * 60 * 1000, MOCK_START_TIME + 55 * 60 * 1000);
+  selectTask(c, TEST_TASK_NAME);
+  advanceTimersByTime((5 * 60) * 1000);
+  verifyEventCreatedForBreakWithoutTask(c, MOCK_START_TIME + 55 * 60 * 1000, MOCK_START_TIME + 60 * 60 * 1000)
 });
 
 const TEST_TASK_NAME2 = 'eating cake';
@@ -1058,6 +1063,10 @@ function verifyEventCreatedForWorkWithTask(c, taskName, start, end) {
 
 function verifyEventCreatedForWorkWithoutTask(c, start, end) {
   expect(c.getAllByText(`Work ${start} ${end}`).length).toBe(1);
+}
+
+function verifyEventCreatedForBreakWithoutTask(c, start, end) {
+  expect(c.getAllByText(`Break ${start} ${end}`).length).toBe(1);
 }
 
 function verifyTotalTimeWorkedTodayForTask(c, taskName, expectedSeconds) {
