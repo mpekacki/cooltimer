@@ -60,7 +60,7 @@ class Timer extends React.Component {
 
     onClickReturnToWork = () => {
         const lastTimerSeconds = this.props.timerSeconds;
-        const newTimerSeconds = this.props.workMinutes * 60;
+        const newTimerSeconds = this.props.lastWorkTimerSeconds || this.props.workMinutes * 60;
         this.setStateAndStorage({
             isWork: true,
             timerSeconds: newTimerSeconds
@@ -148,6 +148,7 @@ class Timer extends React.Component {
         this.tempState = {
             isWork: this.props.isWork,
             totalWorkedSeconds: this.props.totalWorkedSeconds,
+            lastWorkTimerSeconds: this.props.lastWorkTimerSeconds,
             availableBreakSeconds: this.props.availableBreakSeconds,
             hiddenAvailableBreakSeconds: this.props.hiddenAvailableBreakSeconds,
             timerLastUpdatedAt: this.props.timerLastUpdatedAt,
@@ -162,6 +163,7 @@ class Timer extends React.Component {
             this.tempState.totalCombinedTime++;
             if (this.tempState.isWork) {
                 this.tempState.totalWorkedSeconds++;
+                this.tempState.lastWorkTimerSeconds = this.tempState.timerSeconds;
                 let availableBreakSecondsIncrement = this.props.shortBreakMinutes * 1.0 / this.props.workMinutes;
                 if (this.tempState.availableBreakSeconds >= this.props.shortBreakMinutes * 60) {
                     this.tempState.availableBreakSeconds += availableBreakSecondsIncrement;
@@ -205,7 +207,7 @@ class Timer extends React.Component {
                     };
                 } else {
                     stateChange = {
-                        timerSeconds: this.props.workMinutes * 60,
+                        timerSeconds: this.props.lastWorkTimerSeconds || this.props.workMinutes * 60,
                         isWork: true
                     };
                 }

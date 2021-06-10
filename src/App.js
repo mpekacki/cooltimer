@@ -74,6 +74,7 @@ class App extends React.Component {
   getDefaultState = () => {
     return {
       timerSeconds: this.defaultSettings.workMinutes * 60,
+      lastWorkTimerSeconds: this.defaultSettings.workMinutes * 60,
       totalWorkedSeconds: 0,
       isWork: null,
       availableBreakSeconds: 0,
@@ -208,6 +209,7 @@ class App extends React.Component {
         </Helmet>
         <Container>
           <Timer timerSeconds={this.state.timerSeconds}
+            lastWorkTimerSeconds={this.state.lastWorkTimerSeconds}
             totalWorkedSeconds={this.state.totalWorkedSeconds}
             isWork={this.state.isWork}
             availableBreakSeconds={this.state.availableBreakSeconds}

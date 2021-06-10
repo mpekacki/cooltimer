@@ -203,10 +203,22 @@ test('after clicking on "Return to work" during break, resumes work', () => {
   verifyTimer(c, '09:50');
   verifyTotalWorkedTime(c, '0 hours 50 minutes 0 seconds');
   verifyAvailableBreakTime(c, '0 hours 9 minutes 50 seconds');
-  advanceTimersByTime((9 * 60 + 50) * 1000);
-  verifyTimer(c, '25:00');
+  advanceTimersByTime((5 * 60 + 50) * 1000);
+  verifyTimer(c, '04:00');
   verifyTotalWorkedTime(c, '0 hours 50 minutes 0 seconds');
-  verifyAvailableBreakTime(c, '0 hours 0 minutes 0 seconds');
+  verifyAvailableBreakTime(c, '0 hours 4 minutes 0 seconds');
+  fireEvent.click(returnToWorkButton(c));
+  verifyTimer(c, '25:00');
+  advanceTimersByTime((5 * 60) * 1000);
+  verifyTimer(c, '20:00');
+  fireEvent.click(goOnABreakButton(c));
+  verifyTimer(c, '04:00');
+  fireEvent.click(returnToWorkButton(c));
+  verifyTimer(c, '20:00');
+  fireEvent.click(goOnABreakButton(c));
+  verifyTimer(c, '04:00');
+  advanceTimersByTime((4 * 60) * 1000);
+  verifyTimer(c, '20:00');
 });
 
 test('if during work there is break time available, clicking on "Go on a break" starts break', () => {
@@ -236,11 +248,11 @@ test('if during work there is break time available, clicking on "Go on a break" 
   verifyTotalWorkedTime(c, '0 hours 35 minutes 0 seconds');
   verifyAvailableBreakTime(c, '0 hours 4 minutes 0 seconds');
   fireEvent.click(returnToWorkButton(c));
-  verifyTimer(c, '25:00');
+  verifyTimer(c, '15:00');
   verifyTotalWorkedTime(c, '0 hours 35 minutes 0 seconds');
   verifyAvailableBreakTime(c, '0 hours 4 minutes 0 seconds');
   advanceTimersByTime((5 * 60) * 1000);
-  verifyTimer(c, '20:00');
+  verifyTimer(c, '10:00');
   verifyTotalWorkedTime(c, '0 hours 40 minutes 0 seconds');
   verifyAvailableBreakTime(c, '0 hours 4 minutes 0 seconds');
   fireEvent.click(goOnABreakButton(c));
@@ -248,7 +260,7 @@ test('if during work there is break time available, clicking on "Go on a break" 
   verifyTotalWorkedTime(c, '0 hours 40 minutes 0 seconds');
   verifyAvailableBreakTime(c, '0 hours 4 minutes 0 seconds');
   advanceTimersByTime((4 * 60) * 1000);
-  verifyTimer(c, '25:00');
+  verifyTimer(c, '10:00');
   verifyTotalWorkedTime(c, '0 hours 40 minutes 0 seconds');
   verifyAvailableBreakTime(c, '0 hours 0 minutes 0 seconds');
 });
@@ -460,7 +472,7 @@ test('if work is continued even though there is full break available, then add i
   fireEvent.click(goOnABreakButton(c));
   verifyTimer(c, '11:00');
   advanceTimersByTime((11 * 60) * 1000);
-  verifyTimer(c, '25:00');
+  verifyTimer(c, '20:00');
   verifyTotalWorkedTime(c, '0 hours 55 minutes 0 seconds');
   verifyAvailableBreakTime(c, '0 hours 0 minutes 0 seconds');
 });
@@ -722,6 +734,7 @@ test('resets using updated settings', () => {
   Simulate.change(c.getByDisplayValue("13"), { target: { value: 19 } });
   expect(c.getByDisplayValue("19")).toBeInTheDocument();
   verifyTimer(c, "13:00");
+  fireEvent.click(startWorkingButton(c));
   fireEvent.click(resetButton(c));
   verifyTimer(c, "19:00");
 });
