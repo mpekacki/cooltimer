@@ -47,8 +47,11 @@ class Timer extends React.Component {
         seconds = seconds % 60;
         let secondsPart = (seconds % 60) + '';
         let secondsLabel = secondsPart === '1' ? 'second' : 'seconds';
-        return hoursPart + ' ' + hoursLabel + ' ' + minutesPart + ' ' + minutesLabel + ' ' + secondsPart + ' ' + secondsLabel;
-    }
+        const formattedTime = ((hoursPart !== '0' ? hoursPart + ' ' + hoursLabel + ' ' : '') +
+          (minutesPart !== '0' ? minutesPart + ' ' + minutesLabel + ' ' : '') +
+          (secondsPart !== '0' ? secondsPart + ' ' + secondsLabel : '')).trim();
+        return formattedTime || '0 minutes';
+      }
 
     onClickStartWorking = () => {
         this.setStateAndStorage({
