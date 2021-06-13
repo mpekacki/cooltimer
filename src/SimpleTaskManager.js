@@ -67,7 +67,7 @@ class SimpleTaskManager extends React.Component {
     return (
       <Container>
         <Row>
-          <Col>
+          <Col xs={9}>
             <Form inline className="mb-2">
               <Form.Group controlId="taskInput" className="mr-1">
                 <Form.Control type="text" onChange={this.handleTextInputChange} placeholder={Constants.CREATE_TASK_PLACEHOLDER_TEXT} value={this.state.taskInput}></Form.Control>
