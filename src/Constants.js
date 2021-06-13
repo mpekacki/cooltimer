@@ -75,7 +75,7 @@ export default class Constants {
         return 'Remove task';
     }
 
-    static get REMOVE_TASK_CONFIRMATION_TEXT() {
-        return 'Are sure you want to remove the selected task?';
+    static getRemoveTaskConfirmationText(taskName) {
+        return `Are sure you want to remove the task "${taskName}"?`;
     }
 }

@@ -58,7 +58,7 @@ class SimpleTaskManager extends React.Component {
   }
 
   handleRemoveClick = () => {
-    if (window.confirm(Constants.REMOVE_TASK_CONFIRMATION_TEXT)) {
+    if (window.confirm(Constants.getRemoveTaskConfirmationText(this.state.selectedTask))) {
       this.props.onTaskRemoved(this.state.selectedTask);
     }
   }

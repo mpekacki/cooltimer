@@ -112,11 +112,13 @@ test('switches to break after work time elapses', () => {
   expect(c.queryByText(Constants.BREAK_LABEL_TEXT)).not.toBeInTheDocument();
   fireEvent.click(startWorkingButton(c));
   expect(c.getByText(Constants.WORK_LABEL_TEXT)).toBeInTheDocument();
+  verifyFutureAdditionBreakTime(c, 5 * 60);
   advanceTimersByTime((25 * 60) * 1000);
   verifyTimer(c, '05:00');
   expect(document.title.includes("05:00")).toBeTruthy();
   expect(document.title.includes("B")).toBeTruthy();
   expect(c.getByText(Constants.BREAK_LABEL_TEXT)).toBeInTheDocument();
+  verifyFutureAdditionBreakTimeNotVisible(c);
   verifyTotalWorkedTime(c, '0 hours 25 minutes 0 seconds');
   verifyAvailableBreakTime(c, '0 hours 5 minutes 0 seconds');
   advanceTimersByTime(1000);
@@ -171,7 +173,11 @@ test('renders total combined time correctly', () => {
 test('after n periods, uses long break instead of short break', () => {
   const c = render(<App defaultSettings={ getTestSettings() }/>);
   fireEvent.click(startWorkingButton(c));
-  advanceTimersByTime(((25 + 5 + 25 + 5 + 25 + 5 + 25) * 60) * 1000);
+  advanceTimersByTime(((25 + 5 + 25 + 5 + 25 + 5 + 24) * 60) * 1000);
+  verifyTimer(c, '01:00');
+  verifyAvailableBreakTime(c, '0 hours 0 minutes 0 seconds');
+  verifyFutureAdditionBreakTime(c, 10 * 60);
+  advanceTimersByTime(60 * 1000);
   verifyTimer(c, '10:00');
   verifyTotalWorkedTime(c, '1 hour 40 minutes 0 seconds');
   verifyAvailableBreakTime(c, '0 hours 10 minutes 0 seconds');
@@ -444,37 +450,46 @@ test('if work is continued even though there is full break available, then add i
   verifyTimer(c, '25:00');
   verifyTotalWorkedTime(c, '0 hours 25 minutes 0 seconds');
   verifyAvailableBreakTime(c, '0 hours 5 minutes 0 seconds');
+  verifyFutureAdditionBreakTimeNotVisible(c);
   advanceTimersByTime((5 * 60) * 1000);
   verifyTimer(c, '20:00');
   verifyTotalWorkedTime(c, '0 hours 30 minutes 0 seconds');
   verifyAvailableBreakTime(c, '0 hours 6 minutes 0 seconds');
+  verifyFutureAdditionBreakTimeNotVisible(c);
   advanceTimersByTime((5 * 60) * 1000);
   verifyTimer(c, '15:00');
   verifyTotalWorkedTime(c, '0 hours 35 minutes 0 seconds');
   verifyAvailableBreakTime(c, '0 hours 7 minutes 0 seconds');
+  verifyFutureAdditionBreakTimeNotVisible(c);
   advanceTimersByTime((5 * 60) * 1000);
   verifyTimer(c, '10:00');
   verifyTotalWorkedTime(c, '0 hours 40 minutes 0 seconds');
   verifyAvailableBreakTime(c, '0 hours 8 minutes 0 seconds');
+  verifyFutureAdditionBreakTimeNotVisible(c);
   advanceTimersByTime((5 * 60) * 1000);
   verifyTimer(c, '05:00');
   verifyTotalWorkedTime(c, '0 hours 45 minutes 0 seconds');
   verifyAvailableBreakTime(c, '0 hours 9 minutes 0 seconds');
+  verifyFutureAdditionBreakTimeNotVisible(c);
   advanceTimersByTime((5 * 60) * 1000);
   verifyTimer(c, '25:00');
   verifyTotalWorkedTime(c, '0 hours 50 minutes 0 seconds');
   verifyAvailableBreakTime(c, '0 hours 10 minutes 0 seconds');
+  verifyFutureAdditionBreakTimeNotVisible(c);
   advanceTimersByTime((5 * 60) * 1000);
   verifyTimer(c, '20:00');
   verifyTotalWorkedTime(c, '0 hours 55 minutes 0 seconds');
   verifyAvailableBreakTime(c, '0 hours 11 minutes 0 seconds');
+  verifyFutureAdditionBreakTimeNotVisible(c);
   expect(c.getByText(Constants.GO_ON_A_BREAT_BUTTON_TEXT)).toBeInTheDocument();
   fireEvent.click(goOnABreakButton(c));
   verifyTimer(c, '11:00');
+  verifyFutureAdditionBreakTimeNotVisible(c);
   advanceTimersByTime((11 * 60) * 1000);
   verifyTimer(c, '20:00');
   verifyTotalWorkedTime(c, '0 hours 55 minutes 0 seconds');
   verifyAvailableBreakTime(c, '0 hours 0 minutes 0 seconds');
+  verifyFutureAdditionBreakTime(c, 4 * 60);
 });
 
 test('if there is less than short break time during work and break is started, then the awarded break is not lost and is added to next break time', () => {
@@ -1084,6 +1099,18 @@ function verifyAvailableBreakTime(container, expected) {
   return expect(container.getByTestId("availableBreakTime").textContent).toBe(expected);
 }
 
+function verifyFutureAdditionBreakTime(container, expectedSeconds) {
+  return expect(getFutureAdditionBreakTime(container).textContent).toBe(formatSecondsAsText(expectedSeconds));
+}
+
+function getFutureAdditionBreakTime(container) {
+  return container.queryByTestId("futureAdditionBreakTime");
+}
+
+function verifyFutureAdditionBreakTimeNotVisible(container) {
+  expect(getFutureAdditionBreakTime(container)).not.toBeInTheDocument();
+}
+
 function verifyEventCreatedForWorkWithTask(c, taskName, start, end) {
   expect(c.getAllByText(`Work (${taskName}) ${start} ${end}`).length).toBe(1);
 }
@@ -1140,11 +1167,32 @@ function getTimeWorkedThisWeek(c, taskName) {
   return c.queryByTestId('week-' + taskName.charAt(0) + taskName.length);
 }
 
+// 1h5m
 function formatSeconds(seconds) {
-  let hours = Math.floor(seconds / 3600);
-  let minutes = Math.floor((seconds % 3600) / 60);
-  let secs = seconds % 60;
-  return `${hours}h${minutes}m`;
+  let time = getHoursMinutesSeconds(seconds);
+  return `${time.hours}h${time.minutes}m`;
+}
+
+// 1 hour 5 minutes 3 seconds
+function formatSecondsAsText(seconds) {
+  seconds = Math.round(seconds);
+  let hoursPart = Math.floor(seconds / 3600) + '';
+  let hoursLabel = hoursPart === '1' ? 'hour' : 'hours';
+  seconds = seconds % 3600;
+  let minutesPart = Math.floor(seconds / 60) + '';
+  let minutesLabel = minutesPart === '1' ? 'minute' : 'minutes';
+  seconds = seconds % 60;
+  let secondsPart = (seconds % 60) + '';
+  let secondsLabel = secondsPart === '1' ? 'second' : 'seconds';
+  return hoursPart + ' ' + hoursLabel + ' ' + minutesPart + ' ' + minutesLabel + ' ' + secondsPart + ' ' + secondsLabel;
+}
+
+function getHoursMinutesSeconds(seconds) {
+  return {
+    hours: Math.floor(seconds / 3600),
+    minutes: Math.floor((seconds % 3600) / 60),
+    seconds: seconds % 60
+  };
 }
 
 function createTask(c, taskName) {

@@ -327,6 +327,13 @@ class Timer extends React.Component {
                         {this.formatSecondsAsText(this.props.availableBreakSeconds)}
                     </Col>
                 </Row>
+                {this.props.isWork && this.props.availableBreakSeconds < this.props.shortBreakMinutes * 60 &&
+                    <Row>
+                        <Col xs={12} sm={{ span: 6, offset: 6 }} className="text-md-left text-muted font-weight-light small">
+                            + <span data-testid="futureAdditionBreakTime">{this.getFutureAdditionBreakTime()}</span> after work timer finishes
+                        </Col>
+                    </Row>
+                }
                 <Row>
                     <Col sm={6} className="font-weight-light text-md-right">
                         Cycles until long break ({this.props.longBreakMinutes} minutes):
@@ -369,6 +376,14 @@ class Timer extends React.Component {
                 </Row>
             </>
         );
+    }
+
+    getFutureAdditionBreakTime() {
+        let additionalBreakTime = Math.round(this.props.hiddenAvailableBreakSeconds + this.props.timerSeconds * 1.0 / (this.props.workMinutes * 60.0) * this.props.shortBreakMinutes * 60);
+        if (this.props.cycle === this.props.longBreakFreq - 1) {
+            additionalBreakTime += (this.props.longBreakMinutes - this.props.shortBreakMinutes) * 60;
+        }
+        return this.formatSecondsAsText(additionalBreakTime);
     }
 }
 
