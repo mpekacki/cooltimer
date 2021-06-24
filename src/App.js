@@ -86,6 +86,7 @@ class App extends React.Component {
       continousWork: this.defaultSettings.continousWork,
       timerLastUpdatedAt: Date.now(),
       autoStartTimers: true,
+      alwaysStartFullWork: false,
       workMinutes: this.defaultSettings.workMinutes,
       shortBreakMinutes: this.defaultSettings.shortBreakMinutes,
       longBreakMinutes: this.defaultSettings.longBreakMinutes,
@@ -229,6 +230,7 @@ class App extends React.Component {
             continousWork={this.state.continousWork}
             timerLastUpdatedAt={this.state.timerLastUpdatedAt}
             autoStartTimers={this.state.autoStartTimers}
+            alwaysStartFullWork={this.state.alwaysStartFullWork}
             workMinutes={this.state.workMinutes}
             shortBreakMinutes={this.state.shortBreakMinutes}
             longBreakMinutes={this.state.longBreakMinutes}

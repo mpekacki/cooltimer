@@ -78,4 +78,8 @@ export default class Constants {
     static getRemoveTaskConfirmationText(taskName) {
         return `Are sure you want to remove the task "${taskName}"?`;
     }
+
+    static get ALWAYS_START_FULL_WORK_TEXT() {
+        return 'Always start full work timer';
+    }
 }

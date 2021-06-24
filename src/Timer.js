@@ -63,7 +63,7 @@ class Timer extends React.Component {
 
     onClickReturnToWork = () => {
         const lastTimerSeconds = this.props.timerSeconds;
-        const newTimerSeconds = this.props.lastWorkTimerSeconds || this.props.workMinutes * 60;
+        const newTimerSeconds = (!this.props.alwaysStartFullWork && this.props.lastWorkTimerSeconds) || this.props.workMinutes * 60;
         this.setStateAndStorage({
             isWork: true,
             timerSeconds: newTimerSeconds
@@ -143,6 +143,12 @@ class Timer extends React.Component {
         });
     }
 
+    onChangeAlwaysStartFullWork = (event) => {
+        this.setStateAndStorage({
+            alwaysStartFullWork: event.target.checked
+        });
+    }
+
     setStateAndStorage = (newState) => {
         this.props.setStateAndStorage(newState);
     }
@@ -210,7 +216,7 @@ class Timer extends React.Component {
                     };
                 } else {
                     stateChange = {
-                        timerSeconds: this.props.lastWorkTimerSeconds || this.props.workMinutes * 60,
+                        timerSeconds: (!this.props.alwaysStartFullWork && this.props.lastWorkTimerSeconds) || this.props.workMinutes * 60,
                         isWork: true
                     };
                 }
@@ -374,6 +380,18 @@ class Timer extends React.Component {
                             id="auto-start-timers-check"
                             data-testid="auto-start-timers"
                             onChange={this.onChangeAutoStartTimers}
+                        />
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <Form.Check
+                            type="checkbox"
+                            label={Constants.ALWAYS_START_FULL_WORK_TEXT}
+                            checked={this.props.alwaysStartFullWork}
+                            id="full-work-check"
+                            data-testid="full-work"
+                            onChange={this.onChangeAlwaysStartFullWork}
                         />
                     </Col>
                 </Row>

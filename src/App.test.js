@@ -1043,6 +1043,37 @@ test('updates total time worked per task even if no new event is created', () =>
   verifyTotalTimeWorkedTodayForTask(c, TEST_TASK_NAME, 15 * 60);
 });
 
+test('sets new work timer based on "Always start full work timer"', () => {
+  const c = render(<App defaultSettings={getTestSettings()} />);
+  fireEvent.click(startWorkingButton(c));
+  tickAlwaysStartFullWork(c, true);
+  advanceTimersByTime((25 * 60) * 1000);
+  fireEvent.click(returnToWorkButton(c));
+  verifyTimer(c, '25:00');
+  advanceTimersByTime(10 * 1000);
+  verifyTimer(c, '24:50');
+  fireEvent.click(goOnABreakButton(c));
+  verifyTimer(c, '05:02');
+  advanceTimersByTime((5 * 60 + 2) * 1000);
+  verifyTimer(c, '25:00');
+  advanceTimersByTime((25 * 60) * 1000);
+  fireEvent.click(returnToWorkButton(c));
+  advanceTimersByTime(10 * 1000);
+  verifyTimer(c, '24:50');
+  fireEvent.click(goOnABreakButton(c));
+  fireEvent.click(returnToWorkButton(c));
+  verifyTimer(c, '25:00');
+  tickAlwaysStartFullWork(c, false);
+  advanceTimersByTime(10 * 1000);
+  fireEvent.click(goOnABreakButton(c));
+  fireEvent.click(returnToWorkButton(c));
+  verifyTimer(c, '24:50');
+  fireEvent.click(goOnABreakButton(c));
+  verifyTimer(c, '05:04');
+  advanceTimersByTime((5 * 60 + 4) * 1000);
+  verifyTimer(c, '24:50');
+});
+
 function confirmHoldTimerButton(c) {
   return c.queryByText(Constants.CONFIRM_HOLD_TIMER_BUTTON_TEXT);
 }
@@ -1264,4 +1295,8 @@ class MockStorage {
 
 function tickContinousWork(container, checked) {
   Simulate.change(container.getByTestId("cont-work"), { target: { checked: checked } });
+}
+
+function tickAlwaysStartFullWork(container, checked) {
+  Simulate.change(container.getByTestId("full-work"), { target: { checked: checked } });
 }
