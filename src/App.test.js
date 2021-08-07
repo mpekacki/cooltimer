@@ -526,6 +526,7 @@ test('saves app state to provided storage', () => {
   expect(mockStorage.state).toBeTruthy();
   expect(mockStorage.state).toMatchObject({
     autoStartTimers: true,
+    alwaysStartFullWork: true,
     timerSeconds: 24 * 60 + 59,
     totalWorkedSeconds: 1,
     isWork: true,
@@ -547,6 +548,7 @@ test('restores app state from provided storage', () => {
   let mockStorage = new MockStorage();
   let savedState = {
     autoStartTimers: true,
+    alwaysStartFullWork: true,
     timerSeconds: 21 * 60 + 37,
     totalWorkedSeconds: 8,
     isWork: true,

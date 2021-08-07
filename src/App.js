@@ -86,7 +86,7 @@ class App extends React.Component {
       continousWork: this.defaultSettings.continousWork,
       timerLastUpdatedAt: Date.now(),
       autoStartTimers: true,
-      alwaysStartFullWork: false,
+      alwaysStartFullWork: true,
       workMinutes: this.defaultSettings.workMinutes,
       shortBreakMinutes: this.defaultSettings.shortBreakMinutes,
       longBreakMinutes: this.defaultSettings.longBreakMinutes,
