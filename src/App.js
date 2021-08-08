@@ -72,32 +72,7 @@ class App extends React.Component {
   }
 
   getDefaultState = () => {
-    return {
-      timerSeconds: this.defaultSettings.workMinutes * 60,
-      lastWorkTimerSeconds: this.defaultSettings.workMinutes * 60,
-      totalWorkedSeconds: 0,
-      isWork: null,
-      availableBreakSeconds: 0,
-      hiddenAvailableBreakSeconds: 0,
-      totalCombinedTime: 0,
-      cycle: 0,
-      notificationsGranted: false,
-      timerRunning: null,
-      continousWork: this.defaultSettings.continousWork,
-      timerLastUpdatedAt: Date.now(),
-      autoStartTimers: true,
-      alwaysStartFullWork: true,
-      workMinutes: this.defaultSettings.workMinutes,
-      shortBreakMinutes: this.defaultSettings.shortBreakMinutes,
-      longBreakMinutes: this.defaultSettings.longBreakMinutes,
-      longBreakFreq: this.defaultSettings.longBreakFreq,
-      settingsVisible: false,
-      calendarVisible: false,
-      events: [],
-      timerStartedAt: null,
-      timerStartedWithSeconds: null,
-      tasks: []
-    };
+    return this.defaultSettings.defaultState;
   }
 
   getStateForReset = () => {

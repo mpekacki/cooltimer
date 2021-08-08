@@ -1,10 +1,11 @@
 class Settings {
-    constructor(workMinutes, shortBreakMinutes, longBreakMinutes, longBreakFreq, continousWork) {
+    constructor(workMinutes, shortBreakMinutes, longBreakMinutes, longBreakFreq, continousWork, defaultState) {
         this._workMinutes = workMinutes;
         this._shortBreakMinutes = shortBreakMinutes;
         this._longBreakMinutes = longBreakMinutes;
         this._longBreakFreq = longBreakFreq;
         this._continousWork = continousWork;
+        this._defaultState = defaultState;
     }
 
     get workMinutes() {
@@ -25,6 +26,10 @@ class Settings {
 
     get continousWork() {
         return this._continousWork;
+    }
+
+    get defaultState() {
+        return this._defaultState;
     }
 }
 
