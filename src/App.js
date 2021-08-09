@@ -72,7 +72,7 @@ class App extends React.Component {
   }
 
   getDefaultState = () => {
-    return this.defaultSettings.defaultState;
+    return Object.assign({}, this.defaultSettings.defaultState);
   }
 
   getStateForReset = () => {
