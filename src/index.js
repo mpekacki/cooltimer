@@ -1,6 +1,7 @@
+import './custom.scss';
+import '@fontsource/signika';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import DefaultSettings from './DefaultSettings';

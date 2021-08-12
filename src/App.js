@@ -17,6 +17,7 @@ import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
 import Collapse from 'react-bootstrap/Collapse';
 import CloseButton from 'react-bootstrap/CloseButton';
+import isEqual from 'lodash/isEqual';
 
 class App extends React.Component {
   constructor(props) {
@@ -62,7 +63,7 @@ class App extends React.Component {
 
   setStateAndStorage = (state) => {
     this.setState(state);
-    if (this.storage) {
+    if (this.storage && !isEqual(this.storage.state, state)) {
       this.storage.state = Object.assign(this.state, state);
     }
   }
@@ -216,9 +217,9 @@ class App extends React.Component {
             showNotification={this.handleShowNotification}
             onTimerFinish={this.handleEventCreated}
             onClickReset={this.onClickReset} />
-          <Row>
+          <Row className="mt-2 mb-2">
             <Col>
-              <Button variant="outline-dark" className="m-2" onClick={this.onClickSettings}>Settings</Button>
+              <Button variant="outline-dark" onClick={this.onClickSettings}>Settings</Button>
             </Col>
           </Row>
           <Row className="mb-3">
