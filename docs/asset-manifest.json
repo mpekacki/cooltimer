@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/cooltimer/static/css/main.ec4ad4ec.chunk.css",
-    "main.js": "/cooltimer/static/js/main.926e6b33.chunk.js",
-    "main.js.map": "/cooltimer/static/js/main.926e6b33.chunk.js.map",
+    "main.js": "/cooltimer/static/js/main.e96936fe.chunk.js",
+    "main.js.map": "/cooltimer/static/js/main.e96936fe.chunk.js.map",
     "runtime-main.js": "/cooltimer/static/js/runtime-main.985ac3b9.js",
     "runtime-main.js.map": "/cooltimer/static/js/runtime-main.985ac3b9.js.map",
     "static/css/2.9f2b37d9.chunk.css": "/cooltimer/static/css/2.9f2b37d9.chunk.css",
@@ -23,6 +23,6 @@
     "static/css/2.9f2b37d9.chunk.css",
     "static/js/2.f5349868.chunk.js",
     "static/css/main.ec4ad4ec.chunk.css",
-    "static/js/main.926e6b33.chunk.js"
+    "static/js/main.e96936fe.chunk.js"
   ]
 }

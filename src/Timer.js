@@ -12,7 +12,14 @@ import ButtonGroup from "react-bootstrap/ButtonGroup";
 class Timer extends React.Component {
   constructor(props) {
     super(props);
-    this.interval = setInterval(this.tick, 1000);
+    if (window.Worker) {
+      this.worker = new Worker("/cooltimer/worker.js");
+      this.worker.onmessage = () => {
+        this.tick();
+      };
+    } else {
+      this.interval = setInterval(this.tick, 1000);
+    }
     this.tick();
     this.state = {
       showHoldModal: false,
@@ -20,7 +27,11 @@ class Timer extends React.Component {
   }
 
   componentWillUnmount() {
-    clearInterval(this.interval);
+    if (window.Worker) {
+      this.worker.terminate();
+    } else {
+      clearInterval(this.interval);
+    }
   }
 
   formatSecondsAsTimer() {
