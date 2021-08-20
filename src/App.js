@@ -278,7 +278,7 @@ class App extends React.Component {
                 selectedTask={this.state.selectedTask}
                 onTaskRemoved={this.handleTaskRemoved}
                 eventsTimestamp={this.state.eventsTimestamp}
-                totalMaxVisibleCharacters={300}
+                totalMaxVisibleCharacters={256}
               />
             </Col>
           </Row>
