@@ -79,6 +79,7 @@ test("displays tasks", () => {
   const c = render(<SimpleTaskManager tasks={tasks} />);
   expect(getTaskElement(c, TEST_TASK_NAME)).toBeInTheDocument();
   expect(getTaskElement(c, TEST_TASK_NAME2)).toBeInTheDocument();
+  expect(getMoreLessButton(c)).not.toBeInTheDocument();
 });
 
 test("displays No Task option always", () => {
@@ -104,7 +105,7 @@ test("selects option passed in props", () => {
     <SimpleTaskManager tasks={tasks} selectedTask={TEST_TASK_NAME2} />
   );
   expect(getTaskElementChecked(c, TEST_TASK_NAME2)).toBeTruthy();
-  c.rerender(<SimpleTaskManager tasks={tasks} selectedTask={null} />);
+  c.rerender(<SimpleTaskManager tasks={tasks} selectedTask={""} />);
   expect(getTaskElementChecked(c, Constants.NO_TASK_TEXT)).toBeTruthy();
 });
 
@@ -141,6 +142,30 @@ test("searches for tasks", () => {
   expect(getTaskElement(c, TEST_TASK_NAME2)).not.toBeInTheDocument();
 });
 
+test("hides excessive amount of tasks", () => {
+  const task1 = 'abcd';
+  const task2 = 'efgh';
+  const task3 = 'ijkl';
+  const tasks = [task1, task2, task3];
+  const c = render(<SimpleTaskManager tasks={tasks} totalMaxVisibleCharacters={ 6 } />);
+  expect(getTaskElement(c, task1)).toBeInTheDocument();
+  expect(getTaskElement(c, task2)).toBeInTheDocument();
+  expect(getTaskElement(c, task3)).not.toBeInTheDocument();
+  expect(getMoreLessButton(c)).toBeInTheDocument();
+  expect(getMoreLessButton(c).textContent).toBe('show 1 more');
+  fireEvent.click(getMoreLessButton(c));
+  expect(getTaskElement(c, task1)).toBeInTheDocument();
+  expect(getTaskElement(c, task2)).toBeInTheDocument();
+  expect(getTaskElement(c, task3)).toBeInTheDocument();
+  expect(getMoreLessButton(c).textContent).toBe('show less');
+  fireEvent.click(getMoreLessButton(c));
+  expect(getTaskElement(c, task1)).toBeInTheDocument();
+  expect(getTaskElement(c, task2)).toBeInTheDocument();
+  expect(getTaskElement(c, task3)).not.toBeInTheDocument();
+  expect(getMoreLessButton(c)).toBeInTheDocument();
+  expect(getMoreLessButton(c).textContent).toBe('show 1 more');
+});
+
 function getNewTaskInput(c) {
   return c.getByPlaceholderText(Constants.CREATE_TASK_PLACEHOLDER_TEXT);
 }
@@ -159,4 +184,8 @@ function getTaskElement(c, taskName) {
 
 function getTaskElementChecked(c, taskName) {
   return getTaskElement(c, taskName).checked;
+}
+
+function getMoreLessButton(c) {
+  return c.queryByTestId('more-tasks-btn');
 }

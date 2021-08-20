@@ -27,7 +27,7 @@ class Timer extends React.Component {
   }
 
   componentWillUnmount() {
-    if (window.Worker) {
+    if (this.worker) {
       this.worker.terminate();
     } else {
       clearInterval(this.interval);

@@ -13,40 +13,14 @@ class SimpleTaskManager extends React.Component {
     super(props);
     this.state = {
       taskInput: "",
-      selectedTask: props.selectedTask || "",
-      visibleTasks: props.tasks,
-      createButtonVisible: false,
+      showMore: false,
     };
-  }
-
-  componentDidUpdate(prevProps) {
-    if (
-      this.props.eventsTimestamp !== prevProps.eventsTimestamp ||
-      this.props.selectedTask !== prevProps.selectedTask ||
-      !!this.props.tasks !== !!prevProps.tasks ||
-      (this.props.tasks &&
-        prevProps.tasks &&
-        this.props.tasks.length !== prevProps.tasks.length)
-    ) {
-      this.setState({
-        selectedTask: this.props.selectedTask || "",
-        visibleTasks: this.getVisibleTasks(this.state.taskInput),
-      });
-    }
   }
 
   handleTextInputChange = (event) => {
     const value = event.target.value;
     this.setState({
       taskInput: value,
-      createButtonVisible:
-        value &&
-        value.trim() !== "" &&
-        (!this.props.tasks ||
-          !this.props.tasks.some(
-            (task) => task.toUpperCase() === value.toUpperCase()
-          )),
-      visibleTasks: this.getVisibleTasks(value),
     });
   };
 
@@ -54,37 +28,83 @@ class SimpleTaskManager extends React.Component {
     this.props.onTaskCreate(this.state.taskInput.trim());
     this.setState({
       taskInput: "",
-      visibleTasks: this.getVisibleTasks(""),
-      createButtonVisible: false,
     });
   };
 
   handleTaskSelected = (value) => {
-    if (value === "") {
-      value = null;
-    }
     this.props.onTaskSelected(value);
   };
 
-  getVisibleTasks(searchText) {
-    return this.props.tasks
+  getVisibleTasks() {
+    let visibleTasks = this.props.tasks
       ? this.props.tasks.filter((x) =>
-          x.toUpperCase().includes(searchText.toUpperCase())
+          x.toUpperCase().includes(this.state.taskInput.toUpperCase())
         )
       : [];
+    if (this.props.totalMaxVisibleCharacters) {
+      let trimmed = [];
+      visibleTasks.reduce((totalCharacters, task) => {
+        if (totalCharacters < this.props.totalMaxVisibleCharacters) {
+          trimmed.push(task);
+        }
+        return totalCharacters + task.length;
+      }, 0);
+      return trimmed;
+    } else {
+      return visibleTasks;
+    }
   }
+
+  createButtonVisible = () => {
+    return (
+      this.state.taskInput &&
+      this.state.taskInput.trim() !== "" &&
+      (!this.props.tasks ||
+        !this.props.tasks.some(
+          (task) => task.toUpperCase() === this.state.taskInput.toUpperCase()
+        ))
+    );
+  };
 
   handleRemoveClick = () => {
     if (
       window.confirm(
-        Constants.getRemoveTaskConfirmationText(this.state.selectedTask)
+        Constants.getRemoveTaskConfirmationText(this.props.selectedTask)
       )
     ) {
-      this.props.onTaskRemoved(this.state.selectedTask);
+      this.props.onTaskRemoved(this.props.selectedTask);
     }
   };
 
+  handleMoreTasksToggleClick = () => {
+    this.setState({
+      showMore: !this.state.showMore,
+    });
+  };
+
   render() {
+    let numberOfTrimmedTasks = 0;
+    let visibleTasks = this.props.tasks
+      ? this.props.tasks.filter((x) =>
+          x.toUpperCase().includes(this.state.taskInput.toUpperCase())
+        )
+      : [];
+    if (this.props.totalMaxVisibleCharacters) {
+      let trimmed = [];
+      visibleTasks.reduce((totalCharacters, task) => {
+        if (totalCharacters < this.props.totalMaxVisibleCharacters) {
+          trimmed.push(task);
+        }
+        return totalCharacters + task.length;
+      }, 0);
+      numberOfTrimmedTasks = visibleTasks.length - trimmed.length;
+      if (!this.state.showMore) {
+        visibleTasks = trimmed;
+      }
+    }
+    let moreTasksLabel = this.state.showMore
+      ? "show less"
+      : "show " + numberOfTrimmedTasks + " more";
     return (
       <Container>
         <Row>
@@ -98,14 +118,14 @@ class SimpleTaskManager extends React.Component {
                   value={this.state.taskInput}
                 ></Form.Control>
               </Form.Group>
-              {this.state.createButtonVisible ? (
+              {this.createButtonVisible() ? (
                 <Button type="primary" onClick={this.handleSaveClick}>
                   {Constants.SAVE_NEW_TASK_BUTTON_TEXT} "{this.state.taskInput}"
                 </Button>
               ) : null}
             </Form>
           </Col>
-          {this.state.selectedTask && (
+          {this.props.selectedTask && (
             <Col xs={2}>
               <Button
                 variant="outline-danger"
@@ -125,27 +145,35 @@ class SimpleTaskManager extends React.Component {
               name="tasks"
               style={{ flexWrap: "wrap" }}
               className="float-left"
-              value={this.state.selectedTask}
+              value={this.props.selectedTask}
               onChange={this.handleTaskSelected}
             >
               <ToggleButton id="radio-null" value="">
                 {Constants.NO_TASK_TEXT}
               </ToggleButton>
-              {this.state &&
-                this.state.visibleTasks &&
-                this.state.visibleTasks.map((task) => {
-                  return (
-                    <ToggleButton
-                      id={"radio-" + task}
-                      value={task}
-                      data-testid={"button-" + task}
-                      key={task}
-                    >
-                      {task}
-                    </ToggleButton>
-                  );
-                })}
+              {visibleTasks.map((task) => {
+                return (
+                  <ToggleButton
+                    id={"radio-" + task}
+                    value={task}
+                    data-testid={"button-" + task}
+                    key={task}
+                  >
+                    {task}
+                  </ToggleButton>
+                );
+              })}
             </ToggleButtonGroup>
+            {numberOfTrimmedTasks > 0 && (
+              <Button
+                variant="light"
+                className="float-left"
+                data-testid="more-tasks-btn"
+                onClick={this.handleMoreTasksToggleClick}
+              >
+                {moreTasksLabel}
+              </Button>
+            )}
           </Col>
         </Row>
       </Container>

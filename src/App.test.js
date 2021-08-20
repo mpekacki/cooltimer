@@ -1365,6 +1365,7 @@ function getDefaultState(
     timerStartedAt: null,
     timerStartedWithSeconds: null,
     tasks: [],
+    selectedTask: ""
   };
 }
 
