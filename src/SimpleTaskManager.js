@@ -107,9 +107,9 @@ class SimpleTaskManager extends React.Component {
       : "show " + numberOfTrimmedTasks + " more";
     return (
       <Container>
-        <Row>
+        <Row  className="mb-2">
           <Col xs={9}>
-            <Form inline className="mb-2">
+            <Form inline>
               <Form.Group controlId="taskInput" className="mr-1">
                 <Form.Control
                   type="text"
@@ -126,12 +126,12 @@ class SimpleTaskManager extends React.Component {
             </Form>
           </Col>
           {this.props.selectedTask && (
-            <Col xs={2}>
+            <Col xs={3}>
               <Button
                 variant="outline-danger"
                 size="sm"
                 onClick={this.handleRemoveClick}
-                className="mr-1"
+                className="float-right"
               >
                 {Constants.REMOVE_TASK_BUTTON_TEXT}
               </Button>
