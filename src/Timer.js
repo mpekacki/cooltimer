@@ -13,7 +13,7 @@ class Timer extends React.Component {
   constructor(props) {
     super(props);
     if (window.Worker) {
-      this.worker = new Worker("/cooltimer/worker.js");
+      this.worker = new Worker("./worker.js");
       this.worker.onmessage = () => {
         this.tick();
       };
