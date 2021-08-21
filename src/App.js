@@ -305,20 +305,22 @@ class App extends React.Component {
               <Collapse in={this.state.calendarVisible}>
                 <Card>
                   <Card.Body>
-                    <FullCalendar
-                      events={this.state.events}
-                      plugins={[timeGridPlugin, dayGridMonth, listPlugin]}
-                      initialView="timeGridWeek"
-                      headerToolbar={{
-                        right:
-                          "today prev,next dayGridMonth,timeGridWeek,timeGridDay listWeek",
-                      }}
-                      slotDuration="00:10:00"
-                      height={650}
-                      eventDidMount={function (event) {
-                        event.el.title = event.event.title;
-                      }}
-                    />
+                    {this.state.calendarVisible && (
+                      <FullCalendar
+                        events={this.state.events}
+                        plugins={[timeGridPlugin, dayGridMonth, listPlugin]}
+                        initialView="timeGridWeek"
+                        headerToolbar={{
+                          right:
+                            "today prev,next dayGridMonth,timeGridWeek,timeGridDay listWeek",
+                        }}
+                        slotDuration="00:10:00"
+                        height={650}
+                        eventDidMount={function (event) {
+                          event.el.title = event.event.title;
+                        }}
+                      />
+                    )}
                   </Card.Body>
                 </Card>
               </Collapse>
