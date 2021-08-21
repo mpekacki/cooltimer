@@ -108,8 +108,8 @@ class SimpleTaskManager extends React.Component {
     return (
       <Container>
         <Row  className="mb-2">
-          <Col xs={9}>
-            <Form inline>
+          <Col xs={9} className="d-flex justify-content-center">
+            <Form>
               <Form.Group controlId="taskInput" className="mr-1">
                 <Form.Control
                   type="text"
@@ -126,7 +126,7 @@ class SimpleTaskManager extends React.Component {
             </Form>
           </Col>
           {this.props.selectedTask && (
-            <Col xs={3}>
+            <Col xs={3} className="d-flex justify-content-center">
               <Button
                 variant="outline-danger"
                 size="sm"
@@ -139,7 +139,7 @@ class SimpleTaskManager extends React.Component {
           )}
         </Row>
         <Row>
-          <Col>
+          <Col className="d-flex justify-content-center">
             <ToggleButtonGroup
               type="radio"
               name="tasks"

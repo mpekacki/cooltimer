@@ -241,14 +241,14 @@ class App extends React.Component {
             onClickReset={this.onClickReset}
           />
           <Row className="mt-2 mb-2">
-            <Col>
+            <Col className="d-flex justify-content-center">
               <Button variant="outline-dark" onClick={this.onClickSettings}>
                 Settings
               </Button>
             </Col>
           </Row>
           <Row className="mb-3">
-            <Col>
+            <Col className="d-flex justify-content-center">
               <Collapse in={this.state.settingsVisible}>
                 <div>
                   <Card>
@@ -270,7 +270,7 @@ class App extends React.Component {
             </Col>
           </Row>
           <Row className="mb-3">
-            <Col>
+            <Col className="d-flex justify-content-center">
               <SimpleTaskManager
                 onTaskCreate={this.handleTaskCreated}
                 onTaskSelected={this.handleTaskSelected}
@@ -283,7 +283,7 @@ class App extends React.Component {
             </Col>
           </Row>
           <Row className="mb-3">
-            <Col>
+            <Col className="d-flex justify-content-center">
               <TaskTimes
                 events={this.state.events}
                 eventsTimestamp={this.state.eventsTimestamp}
@@ -291,7 +291,7 @@ class App extends React.Component {
             </Col>
           </Row>
           <Row className="mb-2">
-            <Col>
+            <Col className="d-flex justify-content-center">
               <Button
                 variant="outline-dark"
                 onClick={this.onClickToggleCalendar}
@@ -301,7 +301,7 @@ class App extends React.Component {
             </Col>
           </Row>
           <Row>
-            <Col>
+            <Col className="d-flex justify-content-center">
               <Collapse in={this.state.calendarVisible}>
                 <Card>
                   <Card.Body>

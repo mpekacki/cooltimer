@@ -308,8 +308,8 @@ class Timer extends React.Component {
             </Button>
           </Modal.Footer>
         </Modal>
-        <Row className="mt-3">
-          <Col>
+        <Row>
+          <Col className="d-flex justify-content-center">
             <ButtonGroup>
               {this.props.timerRunning === true && (
                 <Button variant="outline-warning" onClick={this.handleShow}>
@@ -347,7 +347,7 @@ class Timer extends React.Component {
           </Col>
         </Row>
         <Row>
-          <Col>
+          <Col className="d-flex justify-content-center">
             <h3 className="mt-3">
               {this.props.isWork === true
                 ? Constants.WORK_LABEL_TEXT
@@ -358,14 +358,14 @@ class Timer extends React.Component {
           </Col>
         </Row>
         <Row>
-          <Col>
+          <Col className="d-flex justify-content-center">
             <h1 data-testid="timer">
               {this.getTimerMinutes() + ":" + this.getTimerSeconds()}
             </h1>
           </Col>
         </Row>
         <Row>
-          <Col>
+          <Col className="d-flex justify-content-center">
             {this.props.isWork === true ? (
               <>
                 {!this.props.availableBreakSeconds ? (
@@ -407,18 +407,18 @@ class Timer extends React.Component {
           </Col>
         </Row>
         <Row>
-          <Col sm={6} className="font-weight-light text-md-right">
+          <Col sm={6} className="font-weight-light text-md-end">
             Total time worked:
           </Col>
-          <Col sm={6} className="text-md-left" data-testid="totalWorkedTime">
+          <Col sm={6} className="text-md-start" data-testid="totalWorkedTime">
             {this.formatSecondsAsText(this.props.totalWorkedSeconds)}
           </Col>
         </Row>
         <Row>
-          <Col sm={6} className="font-weight-light text-md-right">
+          <Col sm={6} className="font-weight-light text-md-end">
             Available break time:
           </Col>
-          <Col sm={6} className="text-md-left" data-testid="availableBreakTime">
+          <Col sm={6} className="text-md-start" data-testid="availableBreakTime">
             {this.formatSecondsAsText(this.props.availableBreakSeconds)}
           </Col>
         </Row>
@@ -429,7 +429,7 @@ class Timer extends React.Component {
               <Col
                 xs={12}
                 sm={{ span: 6, offset: 6 }}
-                className="text-md-left text-muted font-weight-light small"
+                className="text-md-start text-muted font-weight-light small"
               >
                 +{" "}
                 <span data-testid="futureAdditionBreakTime">
@@ -440,23 +440,23 @@ class Timer extends React.Component {
             </Row>
           )}
         <Row>
-          <Col sm={6} className="font-weight-light text-md-right">
+          <Col sm={6} className="font-weight-light text-md-end">
             Cycles until long break ({this.props.longBreakMinutes} minutes):
           </Col>
-          <Col sm={6} className="text-md-left" data-testid="longBreakInfo">
+          <Col sm={6} className="text-md-start" data-testid="longBreakInfo">
             {this.cyclesUntilLongBreak}
           </Col>
         </Row>
         <Row>
-          <Col sm={6} className="font-weight-light text-md-right">
+          <Col sm={6} className="font-weight-light text-md-end">
             Total time (work + break):
           </Col>
-          <Col sm={6} className="text-md-left" data-testid="totalCombinedTime">
+          <Col sm={6} className="text-md-start" data-testid="totalCombinedTime">
             {this.formatSecondsAsText(this.props.totalCombinedTime)}
           </Col>
         </Row>
         <Row>
-          <Col>
+          <Col className="d-flex justify-content-center">
             <Form.Check
               type="checkbox"
               label={Constants.CONTINOUS_WORK_TEXT}
@@ -468,7 +468,7 @@ class Timer extends React.Component {
           </Col>
         </Row>
         <Row>
-          <Col>
+          <Col className="d-flex justify-content-center">
             <Form.Check
               type="checkbox"
               label={Constants.START_TIMERS_AUTOMATICALLY_TEXT}
@@ -480,7 +480,7 @@ class Timer extends React.Component {
           </Col>
         </Row>
         <Row>
-          <Col>
+          <Col className="d-flex justify-content-center">
             <Form.Check
               type="checkbox"
               label={Constants.ALWAYS_START_FULL_WORK_TEXT}
