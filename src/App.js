@@ -18,6 +18,7 @@ import Card from "react-bootstrap/Card";
 import Collapse from "react-bootstrap/Collapse";
 import CloseButton from "react-bootstrap/CloseButton";
 import isEqual from "lodash/isEqual";
+import Modal from "react-bootstrap/Modal";
 
 class App extends React.Component {
   constructor(props) {
@@ -196,6 +197,18 @@ class App extends React.Component {
     });
   };
 
+  handleAboutShow = () => {
+    this.setState({
+      showAboutModal: true,
+    });
+  };
+
+  handleAboutClose = () => {
+    this.setState({
+      showAboutModal: false,
+    });
+  };
+
   render() {
     return (
       <div className="App">
@@ -215,6 +228,38 @@ class App extends React.Component {
           </title>
         </Helmet>
         <Container>
+          <Modal
+            size="lg"
+            show={this.state.showAboutModal}
+            onHide={this.handleAboutClose}
+          >
+            <Modal.Header closeButton>
+              <Modal.Title>About</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+              enim ad minim veniam, quis nostrud exercitation ullamco laboris
+              nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+              reprehenderit in voluptate velit esse cillum dolore eu fugiat
+              nulla pariatur. Excepteur sint occaecat cupidatat non proident,
+              sunt in culpa qui officia deserunt mollit anim id est laborum.
+            </Modal.Body>
+            <Modal.Footer>
+              <Button onClick={this.handleAboutClose}>Close</Button>
+            </Modal.Footer>
+          </Modal>
+          <Row>
+            <Col>
+              <Button
+                variant="light"
+                onClick={this.handleAboutShow}
+                className="float-right"
+              >
+                About
+              </Button>
+            </Col>
+          </Row>
           <Timer
             timerSeconds={this.state.timerSeconds}
             lastWorkTimerSeconds={this.state.lastWorkTimerSeconds}
@@ -294,6 +339,7 @@ class App extends React.Component {
             <Col>
               <Button
                 variant="outline-dark"
+                data-testid="toggle-calendar-btn"
                 onClick={this.onClickToggleCalendar}
               >
                 {this.state.calendarVisible ? "Hide calendar" : "Show calendar"}

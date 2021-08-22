@@ -833,6 +833,7 @@ test("resets without events or tasks", () => {
   fireEvent.click(startWorkingButton(c));
   advanceTimersByTime(25 * 60 * 1000);
   fireEvent.click(resetButton(c));
+  fireEvent.click(getToggleCalendarButton(c));
   expect(
     c.getAllByText(
       `Work ${MOCK_START_TIME} ${MOCK_START_TIME + 25 * 60 * 1000}`
@@ -843,6 +844,7 @@ test("resets without events or tasks", () => {
 
 test("displays event in calendar", () => {
   const c = render(<App defaultSettings={getTestSettings()} />);
+  fireEvent.click(getToggleCalendarButton(c));
   fireEvent.click(startWorkingButton(c));
   advanceTimersByTime(25 * 60 * 1000);
   expect(
@@ -862,6 +864,7 @@ test("displays event in calendar", () => {
 
 test("displays events in calendar correctly when manually switching timer", () => {
   const c = render(<App defaultSettings={getTestSettings()} />);
+  fireEvent.click(getToggleCalendarButton(c));
   fireEvent.click(startWorkingButton(c));
   advanceTimersByTime(25 * 60 * 1000);
   expect(
@@ -915,6 +918,7 @@ test("saves and restores event state in storage", () => {
   let c = render(
     <App defaultSettings={getTestSettings()} storage={mockStorage} />
   );
+  fireEvent.click(getToggleCalendarButton(c));
   fireEvent.click(startWorkingButton(c));
   advanceTimersByTime(25 * 60 * 1000);
   expect(
@@ -959,6 +963,7 @@ test("correctly creates events when restoring app after delay", () => {
   let c = render(
     <App defaultSettings={getTestSettings()} storage={mockStorage} />
   );
+  fireEvent.click(getToggleCalendarButton(c));
   fireEvent.click(startWorkingButton(c));
   advanceTimersByTime(25 * 60 * 1000);
   expect(
@@ -981,6 +986,7 @@ test("correctly creates events when restoring app after delay", () => {
 
 test("squashes neighbouring events of the same type", () => {
   const c = render(<App defaultSettings={getTestSettings()} />);
+  fireEvent.click(getToggleCalendarButton(c));
   tickContinousWork(c, true);
   fireEvent.click(startWorkingButton(c));
   advanceTimersByTime(25 * 60 * 1000);
@@ -1019,6 +1025,7 @@ test("squashes neighbouring events of the same type", () => {
 const TEST_TASK_NAME = "petting the dog";
 test("when task is selected, saves calendar work events with task name", () => {
   const c = render(<App defaultSettings={getTestSettings()} />);
+  fireEvent.click(getToggleCalendarButton(c));
   createTask(c, TEST_TASK_NAME);
   selectTask(c, TEST_TASK_NAME);
   fireEvent.click(startWorkingButton(c));
@@ -1051,6 +1058,7 @@ test("when task is selected, saves calendar work events with task name", () => {
 const TEST_TASK_NAME2 = "eating cake";
 test("when selected task changes, finish current event and start new one", () => {
   const c = render(<App defaultSettings={getTestSettings()} />);
+  fireEvent.click(getToggleCalendarButton(c));
   createTask(c, TEST_TASK_NAME);
   createTask(c, TEST_TASK_NAME2);
   fireEvent.click(startWorkingButton(c));
@@ -1086,6 +1094,7 @@ test("removes task together with its events", () => {
     return true;
   };
   const c = render(<App defaultSettings={getTestSettings()} />);
+  fireEvent.click(getToggleCalendarButton(c));
   createTask(c, TEST_TASK_NAME);
   createTask(c, TEST_TASK_NAME2);
   expect(removeTaskButton(c)).not.toBeInTheDocument();
@@ -1113,6 +1122,7 @@ test("removes task together with its events", () => {
 
 test("does not create zero length events", () => {
   const c = render(<App defaultSettings={getTestSettings()} />);
+  fireEvent.click(getToggleCalendarButton(c));
   tickContinousWork(c, true);
   fireEvent.click(startWorkingButton(c));
   advanceTimersByTime(25 * 60 * 1000);
@@ -1145,6 +1155,7 @@ test("stores task info in storage and restores it", () => {
   let c = render(
     <App defaultSettings={getTestSettings()} storage={mockStorage} />
   );
+  fireEvent.click(getToggleCalendarButton(c));
   createTask(c, TEST_TASK_NAME);
   createTask(c, TEST_TASK_NAME2);
   selectTask(c, TEST_TASK_NAME);
@@ -1555,6 +1566,10 @@ function getSaveNewTaskButton(c) {
       element.tagName.toLowerCase() === "button" &&
       content.startsWith(Constants.SAVE_NEW_TASK_BUTTON_TEXT)
   );
+}
+
+function getToggleCalendarButton(c) {
+  return c.getByTestId('toggle-calendar-btn');
 }
 
 function getTaskElement(c, taskName) {
