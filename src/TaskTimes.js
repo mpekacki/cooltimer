@@ -178,7 +178,7 @@ class TaskTimes extends React.Component {
                 </td>
               </tr>
             ))}
-          <tr>
+          <tr class="font-italic">
             <td>Total</td>
             <td data-testid={"today-total"}>
               {this.formatSeconds(this.state.timesMap[TOTALS_KEY].today)}
