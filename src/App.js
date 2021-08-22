@@ -237,13 +237,46 @@ class App extends React.Component {
               <Modal.Title>About</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-              enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
-              reprehenderit in voluptate velit esse cillum dolore eu fugiat
-              nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-              sunt in culpa qui officia deserunt mollit anim id est laborum.
+              <p>
+                Productivity timer that enables you to work in "25 minutes
+                work - 5 minutes break" model, but designed to be tolerant of
+                situations when you cannot go on a break when you should or when
+                you are forced to cut your break short and go back to work right
+                now. The goal of the app is to always calculate the amount of
+                break time you are entitled to.
+              </p>
+              <p>
+                Features:
+                <ul>
+                  <li>
+                    work in sessions that are at least 25 minutes long, but
+                    extend them at will as much as you want - the app will
+                    calculate the correct amount of break time available to you
+                    at all times
+                  </li>
+                  <li>
+                    get back to work before finishing your break and be able to
+                    reclaim the remaining break time later
+                  </li>
+                  <li>
+                    track how much time you spent on a given task, with
+                    precision down to minutes
+                  </li>
+                  <li>configure work and break times per your needs</li>
+                  <li>
+                    you may safely close the app when the timer is running -
+                    when you open the app again, the correct app state will be
+                    calculated, taking into account how much time has passed
+                    (this also applies to forceful shutdowns like system crashes
+                    or power outages)
+                  </li>
+                  <li>
+                    100% private - all the data is kept locally on your device,
+                    nothing is sent to the server - in fact, there is no server
+                    backend at all
+                  </li>
+                </ul>
+              </p>
             </Modal.Body>
             <Modal.Footer>
               <Button onClick={this.handleAboutClose}>Close</Button>
