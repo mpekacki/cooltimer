@@ -252,7 +252,7 @@ class App extends React.Component {
           <Row>
             <Col>
               <Button
-                variant="light"
+                variant="link"
                 onClick={this.handleAboutShow}
                 className="float-right"
               >
