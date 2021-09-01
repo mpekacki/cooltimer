@@ -45,14 +45,9 @@ test("calls callback after changing value 1", () => {
       onchange={callback}
     />
   );
-  Simulate.change(getByDisplayValue("13"), { target: { value: 19 } });
+  Simulate.change(getByDisplayValue("13"), { target: { value: '19' } });
   expect(callbackCalled).toBeTruthy();
-  expect(callbackParam).toStrictEqual({
-    workMinutes: 19,
-    shortBreakMinutes: 3,
-    longBreakMinutes: 7,
-    longBreakFreq: 2,
-  });
+  expect(callbackParam.workMinutes).toStrictEqual(19);
 });
 
 test("calls callback after changing value 2", () => {
@@ -71,14 +66,9 @@ test("calls callback after changing value 2", () => {
       onchange={callback}
     />
   );
-  Simulate.change(getByDisplayValue("3"), { target: { value: 19 } });
+  Simulate.change(getByDisplayValue("3"), { target: { value: '19' } });
   expect(callbackCalled).toBeTruthy();
-  expect(callbackParam).toStrictEqual({
-    workMinutes: 13,
-    shortBreakMinutes: 19,
-    longBreakMinutes: 7,
-    longBreakFreq: 2,
-  });
+  expect(callbackParam.shortBreakMinutes).toStrictEqual(19);
 });
 
 test("calls callback after changing value 3", () => {
@@ -97,14 +87,9 @@ test("calls callback after changing value 3", () => {
       onchange={callback}
     />
   );
-  Simulate.change(getByDisplayValue("7"), { target: { value: 19 } });
+  Simulate.change(getByDisplayValue("7"), { target: { value: '19' } });
   expect(callbackCalled).toBeTruthy();
-  expect(callbackParam).toStrictEqual({
-    workMinutes: 13,
-    shortBreakMinutes: 3,
-    longBreakMinutes: 19,
-    longBreakFreq: 2,
-  });
+  expect(callbackParam.longBreakMinutes).toStrictEqual(19);
 });
 
 test("calls callback after changing value 4", () => {
@@ -123,12 +108,7 @@ test("calls callback after changing value 4", () => {
       onchange={callback}
     />
   );
-  Simulate.change(getByDisplayValue("2"), { target: { value: 19 } });
+  Simulate.change(getByDisplayValue("2"), { target: { value: '19' } });
   expect(callbackCalled).toBeTruthy();
-  expect(callbackParam).toStrictEqual({
-    workMinutes: 13,
-    shortBreakMinutes: 3,
-    longBreakMinutes: 7,
-    longBreakFreq: 19,
-  });
+  expect(callbackParam.longBreakFreq).toStrictEqual(19);
 });

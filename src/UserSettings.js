@@ -6,25 +6,25 @@ import Col from "react-bootstrap/Col";
 class UserSettings extends React.Component {
   onChangeWorkMinutes = (event) => {
     this.props.onchange({
-      workMinutes: event.target.value,
+      workMinutes: +event.target.value,
     });
   };
 
   onChangeShortBreakMinutes = (event) => {
     this.props.onchange({
-      shortBreakMinutes: event.target.value,
+      shortBreakMinutes: +event.target.value,
     });
   };
 
   onChangeLongBreakMinutes = (event) => {
     this.props.onchange({
-      longBreakMinutes: event.target.value,
+      longBreakMinutes: +event.target.value,
     });
   };
 
   onChangeLongBreakFreq = (event) => {
     this.props.onchange({
-      longBreakFreq: event.target.value,
+      longBreakFreq: +event.target.value,
     });
   };
 
