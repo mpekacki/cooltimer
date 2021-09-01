@@ -7,6 +7,7 @@ import Form from "react-bootstrap/Form";
 import ToggleButtonGroup from "react-bootstrap/ToggleButtonGroup";
 import ToggleButton from "react-bootstrap/ToggleButton";
 import Button from "react-bootstrap/Button";
+import { InputGroup } from "react-bootstrap";
 
 class SimpleTaskManager extends React.Component {
   constructor(props) {
@@ -82,6 +83,12 @@ class SimpleTaskManager extends React.Component {
     });
   };
 
+  handleClearInputButtonClick = () => {
+    this.setState({
+      taskInput: "",
+    });
+  };
+
   render() {
     let numberOfTrimmedTasks = 0;
     let visibleTasks = this.props.tasks
@@ -107,16 +114,29 @@ class SimpleTaskManager extends React.Component {
       : "show " + numberOfTrimmedTasks + " more";
     return (
       <Container>
-        <Row  className="mb-2">
+        <Row className="mb-2">
           <Col xs={9}>
             <Form inline>
               <Form.Group controlId="taskInput" className="mr-1">
-                <Form.Control
-                  type="text"
-                  onChange={this.handleTextInputChange}
-                  placeholder={Constants.CREATE_TASK_PLACEHOLDER_TEXT}
-                  value={this.state.taskInput}
-                ></Form.Control>
+                <InputGroup>
+                  <Form.Control
+                    type="text"
+                    onChange={this.handleTextInputChange}
+                    placeholder={Constants.CREATE_TASK_PLACEHOLDER_TEXT}
+                    value={this.state.taskInput}
+                  ></Form.Control>
+                  {this.state.taskInput !== "" && (
+                    <InputGroup.Append>
+                      <Button
+                        onClick={this.handleClearInputButtonClick}
+                        variant="outline-light"
+                        data-testid="clear-input-btn"
+                      >
+                        ✖
+                      </Button>
+                    </InputGroup.Append>
+                  )}
+                </InputGroup>
               </Form.Group>
               {this.createButtonVisible() ? (
                 <Button type="primary" onClick={this.handleSaveClick}>

@@ -166,6 +166,17 @@ test("hides excessive amount of tasks", () => {
   expect(getMoreLessButton(c).textContent).toBe('show 1 more');
 });
 
+test("shows button to clear input", () => {
+  const tasks = [TEST_TASK_NAME, TEST_TASK_NAME2];
+  const c = render(<SimpleTaskManager tasks={tasks} />);
+  expect(getClearInputButton(c)).not.toBeInTheDocument();
+  Simulate.change(getNewTaskInput(c), { target: { value: "cake" } });
+  expect(getClearInputButton(c)).toBeInTheDocument();
+  fireEvent.click(getClearInputButton(c));
+  expect(getNewTaskInput(c).value).toBe("");
+  expect(getClearInputButton(c)).not.toBeInTheDocument();
+});
+
 function getNewTaskInput(c) {
   return c.getByPlaceholderText(Constants.CREATE_TASK_PLACEHOLDER_TEXT);
 }
@@ -188,4 +199,8 @@ function getTaskElementChecked(c, taskName) {
 
 function getMoreLessButton(c) {
   return c.queryByTestId('more-tasks-btn');
+}
+
+function getClearInputButton(c) {
+  return c.queryByTestId('clear-input-btn');
 }
