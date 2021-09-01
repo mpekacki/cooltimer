@@ -147,7 +147,7 @@ class App extends React.Component {
 
   handleTaskCreated = (task) => {
     let newTasks = this.state.tasks;
-    newTasks.push(task);
+    newTasks.unshift(task);
     this.setStateAndStorage({
       tasks: newTasks,
     });
