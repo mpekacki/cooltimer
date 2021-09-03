@@ -238,8 +238,8 @@ class App extends React.Component {
             </Modal.Header>
             <Modal.Body>
               <p>
-                Productivity timer that enables you to work in "25 minutes
-                work - 5 minutes break" model, but designed to be tolerant of
+                Productivity timer that enables you to work in "25 minutes work
+                - 5 minutes break" model, but designed to be tolerant of
                 situations when you cannot go on a break when you should or when
                 you are forced to cut your break short and go back to work right
                 now. The goal of the app is to always calculate the amount of

@@ -91,13 +91,6 @@ class UserSettings extends React.Component {
             </Form.Group>
           </Col>
         </Row>
-        <Row>
-          <Col>
-            <Form.Text className="text-muted">
-              Changes are effective after timer reset.
-            </Form.Text>
-          </Col>
-        </Row>
       </Form>
     );
   }
