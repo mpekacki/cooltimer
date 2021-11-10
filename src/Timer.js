@@ -188,6 +188,9 @@ class Timer extends React.Component {
       totalCombinedTime: this.props.totalCombinedTime,
     };
 
+    let cycleChanges = [];
+    let notificationToShow = null;
+
     for (let secondsPassed = secondsDiff; secondsPassed > 0; secondsPassed--) {
       this.tempState.timerSeconds--;
       this.tempState.totalCombinedTime++;
@@ -259,15 +262,26 @@ class Timer extends React.Component {
         const lastTimerSeconds = this.tempState.timerSeconds;
         this.tempState = Object.assign(this.tempState, stateChange);
 
-        this.props.showNotification(
-          isWork ? "Work finished" : "Break finished"
-        );
-        this.notifyCycleChange(
-          isWork,
-          lastTimerSeconds,
-          this.tempState.timerSeconds
-        );
+        notificationToShow = isWork ? "Work finished" : "Break finished";
+
+        cycleChanges.push({
+          isWork: isWork,
+          lastTimerSeconds: lastTimerSeconds,
+          newTimerSeconds: this.tempState.timerSeconds
+        });
       }
+    }
+
+    cycleChanges.forEach((cycleChange) => {
+      this.notifyCycleChange(
+        cycleChange.isWork,
+        cycleChange.lastTimerSeconds,
+        cycleChange.newTimerSeconds
+      );
+    });
+
+    if (notificationToShow) {
+      this.props.showNotification(notificationToShow);
     }
 
     return this.tempState;
