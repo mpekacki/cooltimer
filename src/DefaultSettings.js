@@ -39,7 +39,8 @@ class DefaultSettings extends Settings {
         timerStartedAt: null,
         timerStartedWithSeconds: null,
         tasks: [],
-        selectedTask: ""
+        selectedTask: "",
+        showHoldModal: false
       }
     );
   }

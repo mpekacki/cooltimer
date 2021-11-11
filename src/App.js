@@ -2,7 +2,6 @@ import React from "react";
 import { Helmet } from "react-helmet";
 import "./App.css";
 import UserSettings from "./UserSettings";
-import Timer from "./Timer";
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import dayGridMonth from "@fullcalendar/daygrid";
@@ -19,6 +18,10 @@ import Collapse from "react-bootstrap/Collapse";
 import CloseButton from "react-bootstrap/CloseButton";
 import isEqual from "lodash/isEqual";
 import Modal from "react-bootstrap/Modal";
+import Form from "react-bootstrap/Form";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import Tooltip from "react-bootstrap/Tooltip";
+import ButtonGroup from "react-bootstrap/ButtonGroup";
 
 class App extends React.Component {
   constructor(props) {
@@ -42,6 +45,24 @@ class App extends React.Component {
       });
     }
     this.plugins = [timeGridPlugin];
+
+    if (window.Worker) {
+      this.worker = new Worker("./worker.js");
+      this.worker.onmessage = () => {
+        this.tick();
+      };
+    } else {
+      this.interval = setInterval(this.tick, 1000);
+    }
+    this.tick();
+  }
+
+  componentWillUnmount() {
+    if (this.worker) {
+      this.worker.terminate();
+    } else {
+      clearInterval(this.interval);
+    }
   }
 
   onClickReset = () => {
@@ -209,6 +230,285 @@ class App extends React.Component {
     });
   };
 
+  formatSecondsAsTimer() {
+    let minutesPart = this.getTimerMinutes();
+    let secondsPart = this.getTimerSeconds();
+    return minutesPart + ":" + secondsPart;
+  }
+
+  getTimerSeconds() {
+    return String(this.state.timerSeconds % 60).padStart(2, "0");
+  }
+
+  getTimerMinutes() {
+    return String(Math.floor(this.state.timerSeconds / 60)).padStart(2, "0");
+  }
+
+  formatSecondsAsText(seconds) {
+    seconds = Math.round(seconds);
+    let hoursPart = Math.floor(seconds / 3600) + "";
+    let hoursLabel = hoursPart === "1" ? "hour" : "hours";
+    seconds = seconds % 3600;
+    let minutesPart = Math.floor(seconds / 60) + "";
+    let minutesLabel = minutesPart === "1" ? "minute" : "minutes";
+    seconds = seconds % 60;
+    let secondsPart = (seconds % 60) + "";
+    let secondsLabel = secondsPart === "1" ? "second" : "seconds";
+    const formattedTime = (
+      (hoursPart !== "0" ? hoursPart + " " + hoursLabel + " " : "") +
+      (minutesPart !== "0" ? minutesPart + " " + minutesLabel + " " : "") +
+      (secondsPart !== "0" ? secondsPart + " " + secondsLabel : "")
+    ).trim();
+    return formattedTime || "0 minutes";
+  }
+
+  onClickStartWorking = () => {
+    this.setStateAndStorage({
+      isWork: true,
+      timerRunning: true,
+    });
+    this.markTimerStart(this.state.timerSeconds, Date.now());
+  };
+
+  onClickReturnToWork = () => {
+    const lastTimerSeconds = this.state.timerSeconds;
+    const newTimerSeconds =
+      (!this.state.alwaysStartFullWork && this.state.lastWorkTimerSeconds) ||
+      this.state.workMinutes * 60;
+    this.setStateAndStorage({
+      isWork: true,
+      timerSeconds: newTimerSeconds,
+    });
+    this.notifyCycleChange(false, lastTimerSeconds, newTimerSeconds);
+  };
+
+  onClickGoOnABreak = () => {
+    let availableBreakSeconds = Math.round(this.state.availableBreakSeconds);
+    const lastTimerSeconds = this.state.timerSeconds;
+    this.setStateAndStorage({
+      isWork: false,
+      timerSeconds: availableBreakSeconds,
+      availableBreakSeconds: availableBreakSeconds,
+    });
+    this.notifyCycleChange(true, lastTimerSeconds, availableBreakSeconds);
+  };
+
+  tick = () => {
+    if (!this.state.timerRunning) {
+      this.setStateAndStorage({
+        timerLastUpdatedAt: Date.now(),
+      });
+      return;
+    }
+
+    let now = Date.now();
+    let secondsDiff = Math.round((now - this.state.timerLastUpdatedAt) / 1000);
+    let newState = this.calculateNewState(secondsDiff, now);
+
+    this.setStateAndStorage(newState);
+  };
+
+  notifyCycleChange = (wasWork, oldTimerSeconds, newTimerSeconds) => {
+    const timerEndAt =
+      this.state.timerStartedAt +
+      (this.state.timerStartedWithSeconds - oldTimerSeconds) * 1000;
+    const event = {
+      wasWork: wasWork,
+      start: this.state.timerStartedAt,
+      end: timerEndAt,
+    };
+    this.handleEventCreated(event);
+    this.markTimerStart(newTimerSeconds, timerEndAt);
+  };
+
+  markTimerStart = (timerSeconds, timerStartedAt) => {
+    const newState = {
+      timerStartedAt: timerStartedAt,
+      timerStartedWithSeconds: timerSeconds,
+    };
+    this.setStateAndStorage(newState);
+  };
+
+  onClickHoldWork = () => {
+    this.setStateAndStorage({
+      timerRunning: false,
+    });
+    this.notifyCycleChange(
+      this.state.isWork,
+      this.state.timerSeconds,
+      this.state.timerSeconds
+    );
+    this.handleClose();
+  };
+
+  onClickResumeWork = () => {
+    this.setStateAndStorage({
+      timerRunning: true,
+    });
+    this.markTimerStart(this.state.timerSeconds, Date.now());
+  };
+
+  onChangeContinousWork = (event) => {
+    this.setStateAndStorage({
+      continousWork: event.target.checked,
+    });
+  };
+
+  onChangeAutoStartTimers = (event) => {
+    this.setStateAndStorage({
+      autoStartTimers: event.target.checked,
+    });
+  };
+
+  onChangeAlwaysStartFullWork = (event) => {
+    this.setStateAndStorage({
+      alwaysStartFullWork: event.target.checked,
+    });
+  };
+
+  calculateNewState(secondsDiff, now) {
+    this.tempState = {
+      isWork: this.state.isWork,
+      totalWorkedSeconds: this.state.totalWorkedSeconds,
+      lastWorkTimerSeconds: this.state.lastWorkTimerSeconds,
+      availableBreakSeconds: this.state.availableBreakSeconds,
+      hiddenAvailableBreakSeconds: this.state.hiddenAvailableBreakSeconds,
+      timerLastUpdatedAt: this.state.timerLastUpdatedAt,
+      cycle: this.state.cycle,
+      continousWork: this.state.continousWork,
+      timerSeconds: this.state.timerSeconds,
+      totalCombinedTime: this.state.totalCombinedTime,
+    };
+
+    let cycleChanges = [];
+    let notificationToShow = null;
+
+    for (let secondsPassed = secondsDiff; secondsPassed > 0; secondsPassed--) {
+      this.tempState.timerSeconds--;
+      this.tempState.totalCombinedTime++;
+      if (this.tempState.isWork) {
+        this.tempState.totalWorkedSeconds++;
+        this.tempState.lastWorkTimerSeconds = this.tempState.timerSeconds;
+        let availableBreakSecondsIncrement =
+          (this.state.shortBreakMinutes * 1.0) / this.state.workMinutes;
+        if (
+          this.tempState.availableBreakSeconds >=
+          this.state.shortBreakMinutes * 60
+        ) {
+          this.tempState.availableBreakSeconds +=
+            availableBreakSecondsIncrement;
+        } else {
+          this.tempState.hiddenAvailableBreakSeconds +=
+            availableBreakSecondsIncrement;
+        }
+      } else {
+        this.tempState.availableBreakSeconds--;
+      }
+      this.tempState.timerLastUpdatedAt = now;
+      if (this.tempState.timerSeconds === 0) {
+        let isWork = this.tempState.isWork;
+        let stateChange = {};
+        if (isWork) {
+          let newCycle = this.tempState.cycle + 1;
+          let newAvailableBreakSeconds = this.tempState.availableBreakSeconds;
+          if (newCycle === this.state.longBreakFreq) {
+            newCycle = 0;
+            newAvailableBreakSeconds +=
+              this.state.longBreakMinutes * 60 -
+              this.state.shortBreakMinutes * 60;
+          }
+          newAvailableBreakSeconds +=
+            this.tempState.hiddenAvailableBreakSeconds;
+          newAvailableBreakSeconds = Math.round(newAvailableBreakSeconds);
+
+          let newTimerSeconds;
+          let newIsWork;
+
+          if (this.tempState.continousWork) {
+            newTimerSeconds = this.state.workMinutes * 60;
+            newIsWork = true;
+          } else {
+            newTimerSeconds = newAvailableBreakSeconds;
+            newIsWork = false;
+          }
+
+          stateChange = {
+            timerSeconds: newTimerSeconds,
+            availableBreakSeconds: newAvailableBreakSeconds,
+            hiddenAvailableBreakSeconds: 0,
+            isWork: newIsWork,
+            cycle: newCycle,
+          };
+        } else {
+          stateChange = {
+            timerSeconds:
+              (!this.state.alwaysStartFullWork &&
+                this.state.lastWorkTimerSeconds) ||
+              this.state.workMinutes * 60,
+            isWork: true,
+          };
+        }
+
+        stateChange.timerRunning = this.state.autoStartTimers;
+
+        const lastTimerSeconds = this.tempState.timerSeconds;
+        this.tempState = Object.assign(this.tempState, stateChange);
+
+        notificationToShow = isWork ? "Work finished" : "Break finished";
+
+        cycleChanges.push({
+          isWork: isWork,
+          lastTimerSeconds: lastTimerSeconds,
+          newTimerSeconds: this.tempState.timerSeconds,
+        });
+      }
+    }
+
+    cycleChanges.forEach((cycleChange) => {
+      this.notifyCycleChange(
+        cycleChange.isWork,
+        cycleChange.lastTimerSeconds,
+        cycleChange.newTimerSeconds
+      );
+    });
+
+    if (notificationToShow) {
+      this.handleShowNotification(notificationToShow);
+    }
+
+    return this.tempState;
+  }
+
+  get cyclesUntilLongBreak() {
+    return this.state.longBreakFreq - this.state.cycle;
+  }
+
+  handleShow = () => {
+    this.setState({
+      showHoldModal: true,
+    });
+  };
+
+  handleClose = () => {
+    this.setState({
+      showHoldModal: false,
+    });
+  };
+
+  getFutureAdditionBreakTime() {
+    let additionalBreakTime = Math.round(
+      this.state.hiddenAvailableBreakSeconds +
+        ((this.state.timerSeconds * 1.0) / (this.state.workMinutes * 60.0)) *
+          this.state.shortBreakMinutes *
+          60
+    );
+    if (this.state.cycle === this.state.longBreakFreq - 1) {
+      additionalBreakTime +=
+        (this.state.longBreakMinutes - this.state.shortBreakMinutes) * 60;
+    }
+    return this.formatSecondsAsText(additionalBreakTime);
+  }
+
   render() {
     return (
       <div className="App">
@@ -293,31 +593,219 @@ class App extends React.Component {
               </Button>
             </Col>
           </Row>
-          <Timer
-            timerSeconds={this.state.timerSeconds}
-            lastWorkTimerSeconds={this.state.lastWorkTimerSeconds}
-            totalWorkedSeconds={this.state.totalWorkedSeconds}
-            isWork={this.state.isWork}
-            availableBreakSeconds={this.state.availableBreakSeconds}
-            hiddenAvailableBreakSeconds={this.state.hiddenAvailableBreakSeconds}
-            totalCombinedTime={this.state.totalCombinedTime}
-            cycle={this.state.cycle}
-            timerRunning={this.state.timerRunning}
-            continousWork={this.state.continousWork}
-            timerLastUpdatedAt={this.state.timerLastUpdatedAt}
-            autoStartTimers={this.state.autoStartTimers}
-            alwaysStartFullWork={this.state.alwaysStartFullWork}
-            workMinutes={this.state.workMinutes}
-            shortBreakMinutes={this.state.shortBreakMinutes}
-            longBreakMinutes={this.state.longBreakMinutes}
-            longBreakFreq={this.state.longBreakFreq}
-            timerStartedAt={this.state.timerStartedAt}
-            timerStartedWithSeconds={this.state.timerStartedWithSeconds}
-            setStateAndStorage={this.handleTimerStateChange}
-            showNotification={this.handleShowNotification}
-            onTimerFinish={this.handleEventCreated}
-            onClickReset={this.onClickReset}
-          />
+          <Modal show={this.state.showHoldModal} onHide={this.handleClose}>
+            <Modal.Header closeButton>
+              <Modal.Title>
+                {Constants.CONFIRM_HOLD_TIMER_MODAL_HEADER}
+              </Modal.Title>
+            </Modal.Header>
+            <Modal.Body>{Constants.CONFIRM_HOLD_TIMER_MODAL_TEXT}</Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={this.handleClose}>
+                No
+              </Button>
+              <Button variant="primary" onClick={this.onClickHoldWork}>
+                {Constants.CONFIRM_HOLD_TIMER_BUTTON_TEXT}
+              </Button>
+            </Modal.Footer>
+          </Modal>
+          <Row className="mt-3">
+            <Col>
+              <ButtonGroup>
+                {this.state.timerRunning === true && (
+                  <Button variant="outline-warning" onClick={this.handleShow}>
+                    {Constants.HOLD_WORK_BUTTON_TEXT}
+                  </Button>
+                )}
+                {this.state.timerRunning === false && (
+                  <Button
+                    variant="secondary"
+                    onClick={this.onClickResumeWork}
+                    data-testid="resume-work-btn"
+                  >
+                    {Constants.RESUME_WORK_BUTTON_TEXT}
+                  </Button>
+                )}
+                {this.state.isWork === null && (
+                  <Button
+                    variant="success"
+                    onClick={this.onClickStartWorking}
+                    data-testid="start-working-btn"
+                  >
+                    {Constants.START_WORKING_BUTTON_TEXT}
+                  </Button>
+                )}
+                {this.state.isWork !== null && (
+                  <Button
+                    variant="outline-dark"
+                    onClick={this.onClickReset}
+                    data-testid="reset-btn"
+                  >
+                    {Constants.RESET_BUTTON_TEXT}
+                  </Button>
+                )}
+              </ButtonGroup>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <h3 className="mt-3">
+                {this.state.isWork === true
+                  ? Constants.WORK_LABEL_TEXT
+                  : this.state.isWork === false
+                  ? Constants.BREAK_LABEL_TEXT
+                  : ""}
+              </h3>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <h1 data-testid="timer">
+                {this.getTimerMinutes() + ":" + this.getTimerSeconds()}
+              </h1>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              {this.state.isWork === true ? (
+                <>
+                  {!this.state.availableBreakSeconds ? (
+                    <>
+                      <OverlayTrigger
+                        overlay={
+                          <Tooltip id="tooltip-disabled">
+                            {Constants.BREAK_WILL_BECOME_AVAILABLE_TEXT}
+                          </Tooltip>
+                        }
+                      >
+                        <span className="d-inline-block">
+                          <Button
+                            disabled
+                            variant="success"
+                            style={{ pointerEvents: "none" }}
+                          >
+                            {Constants.GO_ON_A_BREAT_BUTTON_TEXT}
+                          </Button>
+                        </span>
+                      </OverlayTrigger>
+                    </>
+                  ) : (
+                    <>
+                      <Button
+                        variant="success"
+                        onClick={this.onClickGoOnABreak}
+                      >
+                        {Constants.GO_ON_A_BREAT_BUTTON_TEXT}
+                      </Button>
+                    </>
+                  )}
+                </>
+              ) : null}
+              {this.state.isWork === false ? (
+                <>
+                  <Button
+                    variant="secondary"
+                    onClick={this.onClickReturnToWork}
+                  >
+                    {Constants.RETURN_TO_WORK_BUTTON_TEXT}
+                  </Button>
+                </>
+              ) : null}
+            </Col>
+          </Row>
+          <Row>
+            <Col sm={6} className="font-weight-light text-md-right">
+              Total time worked:
+            </Col>
+            <Col sm={6} className="text-md-left" data-testid="totalWorkedTime">
+              {this.formatSecondsAsText(this.state.totalWorkedSeconds)}
+            </Col>
+          </Row>
+          <Row>
+            <Col sm={6} className="font-weight-light text-md-right">
+              Available break time:
+            </Col>
+            <Col
+              sm={6}
+              className="text-md-left"
+              data-testid="availableBreakTime"
+            >
+              {this.formatSecondsAsText(this.state.availableBreakSeconds)}
+            </Col>
+          </Row>
+          {this.state.isWork &&
+            this.state.availableBreakSeconds <
+              this.state.shortBreakMinutes * 60 && (
+              <Row>
+                <Col
+                  xs={12}
+                  sm={{ span: 6, offset: 6 }}
+                  className="text-md-left text-muted font-weight-light small"
+                >
+                  +{" "}
+                  <span data-testid="futureAdditionBreakTime">
+                    {this.getFutureAdditionBreakTime()}
+                  </span>{" "}
+                  after work timer finishes
+                </Col>
+              </Row>
+            )}
+          <Row>
+            <Col sm={6} className="font-weight-light text-md-right">
+              Cycles until long break ({this.state.longBreakMinutes} minutes):
+            </Col>
+            <Col sm={6} className="text-md-left" data-testid="longBreakInfo">
+              {this.cyclesUntilLongBreak}
+            </Col>
+          </Row>
+          <Row>
+            <Col sm={6} className="font-weight-light text-md-right">
+              Total time (work + break):
+            </Col>
+            <Col
+              sm={6}
+              className="text-md-left"
+              data-testid="totalCombinedTime"
+            >
+              {this.formatSecondsAsText(this.state.totalCombinedTime)}
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <Form.Check
+                type="checkbox"
+                label={Constants.CONTINOUS_WORK_TEXT}
+                checked={this.state.continousWork}
+                id="cont-work-check"
+                data-testid="cont-work"
+                onChange={this.onChangeContinousWork}
+              />
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <Form.Check
+                type="checkbox"
+                label={Constants.START_TIMERS_AUTOMATICALLY_TEXT}
+                checked={this.state.autoStartTimers}
+                id="auto-start-timers-check"
+                data-testid="auto-start-timers"
+                onChange={this.onChangeAutoStartTimers}
+              />
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <Form.Check
+                type="checkbox"
+                label={Constants.ALWAYS_START_FULL_WORK_TEXT}
+                checked={this.state.alwaysStartFullWork}
+                id="full-work-check"
+                data-testid="full-work"
+                onChange={this.onChangeAlwaysStartFullWork}
+              />
+            </Col>
+          </Row>
           <Row className="mt-2 mb-2">
             <Col>
               <Button variant="outline-dark" onClick={this.onClickSettings}>
