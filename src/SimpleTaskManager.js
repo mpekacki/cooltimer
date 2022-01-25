@@ -110,8 +110,8 @@ class SimpleTaskManager extends React.Component {
       }
     }
     let moreTasksLabel = this.state.showMore
-      ? "show less"
-      : "show " + numberOfTrimmedTasks + " more";
+      ? "show less tasks"
+      : "show " + numberOfTrimmedTasks + " more tasks";
     return (
       <Container>
         <Row className="mb-2">
@@ -146,6 +146,16 @@ class SimpleTaskManager extends React.Component {
                     </InputGroup.Append>
                   )}
                 </InputGroup>
+                {numberOfTrimmedTasks > 0 && this.state.showMore && (
+                  <Button
+                    variant="light"
+                    className="float-left ml-3"
+                    data-testid="more-tasks-btn"
+                    onClick={this.handleMoreTasksToggleClick}
+                  >
+                    {moreTasksLabel}
+                  </Button>
+                )}
               </Form.Group>
             </Form>
           </Col>
