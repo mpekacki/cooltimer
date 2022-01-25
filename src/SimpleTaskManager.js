@@ -150,7 +150,6 @@ class SimpleTaskManager extends React.Component {
                   <Button
                     variant="light"
                     className="float-left ml-3"
-                    data-testid="more-tasks-btn"
                     onClick={this.handleMoreTasksToggleClick}
                   >
                     {moreTasksLabel}
