@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "./static/css/main.a4eb50d0.chunk.css",
-    "main.js": "./static/js/main.c190f45e.chunk.js",
-    "main.js.map": "./static/js/main.c190f45e.chunk.js.map",
+    "main.js": "./static/js/main.c451aa34.chunk.js",
+    "main.js.map": "./static/js/main.c451aa34.chunk.js.map",
     "runtime-main.js": "./static/js/runtime-main.4b755398.js",
     "runtime-main.js.map": "./static/js/runtime-main.4b755398.js.map",
     "static/css/2.b187af99.chunk.css": "./static/css/2.b187af99.chunk.css",
-    "static/js/2.9f1a4807.chunk.js": "./static/js/2.9f1a4807.chunk.js",
-    "static/js/2.9f1a4807.chunk.js.map": "./static/js/2.9f1a4807.chunk.js.map",
+    "static/js/2.476f27ee.chunk.js": "./static/js/2.476f27ee.chunk.js",
+    "static/js/2.476f27ee.chunk.js.map": "./static/js/2.476f27ee.chunk.js.map",
     "static/js/3.bda1dd52.chunk.js": "./static/js/3.bda1dd52.chunk.js",
     "static/js/3.bda1dd52.chunk.js.map": "./static/js/3.bda1dd52.chunk.js.map",
     "index.html": "./index.html",
@@ -15,14 +15,14 @@
     "service-worker.js.map": "./service-worker.js.map",
     "static/css/2.b187af99.chunk.css.map": "./static/css/2.b187af99.chunk.css.map",
     "static/css/main.a4eb50d0.chunk.css.map": "./static/css/main.a4eb50d0.chunk.css.map",
-    "static/js/2.9f1a4807.chunk.js.LICENSE.txt": "./static/js/2.9f1a4807.chunk.js.LICENSE.txt",
+    "static/js/2.476f27ee.chunk.js.LICENSE.txt": "./static/js/2.476f27ee.chunk.js.LICENSE.txt",
     "static/media/index.css": "./static/media/signika-vietnamese-400-normal.008fd00c.woff2"
   },
   "entrypoints": [
     "static/js/runtime-main.4b755398.js",
     "static/css/2.b187af99.chunk.css",
-    "static/js/2.9f1a4807.chunk.js",
+    "static/js/2.476f27ee.chunk.js",
     "static/css/main.a4eb50d0.chunk.css",
-    "static/js/main.c190f45e.chunk.js"
+    "static/js/main.c451aa34.chunk.js"
   ]
 }
