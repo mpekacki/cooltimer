@@ -152,18 +152,18 @@ test("hides excessive amount of tasks", () => {
   expect(getTaskElement(c, task2)).toBeInTheDocument();
   expect(getTaskElement(c, task3)).not.toBeInTheDocument();
   expect(getMoreLessButton(c)).toBeInTheDocument();
-  expect(getMoreLessButton(c).textContent).toBe('show 1 more');
+  expect(getMoreLessButton(c).textContent).toBe('show 1 more tasks');
   fireEvent.click(getMoreLessButton(c));
   expect(getTaskElement(c, task1)).toBeInTheDocument();
   expect(getTaskElement(c, task2)).toBeInTheDocument();
   expect(getTaskElement(c, task3)).toBeInTheDocument();
-  expect(getMoreLessButton(c).textContent).toBe('show less');
+  expect(getMoreLessButton(c).textContent).toBe('show less tasks');
   fireEvent.click(getMoreLessButton(c));
   expect(getTaskElement(c, task1)).toBeInTheDocument();
   expect(getTaskElement(c, task2)).toBeInTheDocument();
   expect(getTaskElement(c, task3)).not.toBeInTheDocument();
   expect(getMoreLessButton(c)).toBeInTheDocument();
-  expect(getMoreLessButton(c).textContent).toBe('show 1 more');
+  expect(getMoreLessButton(c).textContent).toBe('show 1 more tasks');
 });
 
 test("shows button to clear input", () => {
