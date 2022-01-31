@@ -10,6 +10,7 @@ class TaskTimes extends React.Component {
     super(props);
     this.state = {
       timesMap: this.calculateTimes(),
+      sortBy: "name"
     };
   }
 
@@ -110,25 +111,70 @@ class TaskTimes extends React.Component {
     return !isNaN(percent) ? percent + "%" : "-";
   }
 
+  sortBy = (period) => {
+    this.setState({
+      sortBy: period
+    });
+  }
+
+  sortByName = () => {
+    this.sortBy("name");
+  }
+
+  sortByToday = () => {
+    this.sortBy("today");
+  }
+
+  sortByYesterday = () => {
+    this.sortBy("yesterday");
+  }
+
+  sortByWeek = () => {
+    this.sortBy("week");
+  }
+
+  sortByMonth = () => {
+    this.sortBy("month");
+  }
+
   render() {
     return (
       <Table size="sm" responsive>
         <thead>
           <tr>
-            <th>Task</th>
-            <th>Today</th>
+            <th><button type="button" class="btn btn-light" onClick={this.sortByName}>Task {this.state.sortBy === "name" ? "↑" : ""}</button></th>
+            <th><button type="button" class="btn btn-light" onClick={this.sortByToday}>Today {this.state.sortBy === "today" ? "↓" : ""}</button></th>
             <th>%</th>
-            <th>Yesterday</th>
+            <th><button type="button" class="btn btn-light" onClick={this.sortByYesterday}>Yesterday {this.state.sortBy === "yesterday" ? "↓" : ""}</button></th>
             <th>%</th>
-            <th>Week</th>
+            <th><button type="button" class="btn btn-light" onClick={this.sortByWeek}>Week {this.state.sortBy === "week" ? "↓" : ""}</button></th>
             <th>%</th>
-            <th>Month</th>
+            <th><button type="button" class="btn btn-light" onClick={this.sortByMonth}>Month {this.state.sortBy === "month" ? "↓" : ""}</button></th>
             <th>%</th>
           </tr>
         </thead>
         <tbody>
-          {Object.entries(this.state.timesMap)
-            .filter((entry) => entry[0] !== TOTALS_KEY)
+          {Object.entries(this.state.timesMap).filter((entry) => entry[0] !== TOTALS_KEY).sort((a, b) => {
+            if (a[0] === b[0]) {
+              return 0;
+            }
+            if (this.state.sortBy === 'name') {
+              return a[0] > b[0] ? 1 : -1;
+            }
+            if (this.state.sortBy === 'today') {
+              return a[1].today > b[1].today ? -1 : 1;
+            }
+            if (this.state.sortBy === 'yesterday') {
+              return a[1].yesterday > b[1].yesterday ? -1 : 1;
+            }
+            if (this.state.sortBy === 'week') {
+              return a[1].week > b[1].week ? -1 : 1;
+            }
+            if (this.state.sortBy === 'month') {
+              return a[1].month > b[1].month ? -1 : 1;
+            }
+            return 0;
+          })
             .map((entry) => (
               <tr key={entry[0]}>
                 <td>{entry[0]}</td>
