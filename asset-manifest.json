@@ -1,0 +1,28 @@
+{
+  "files": {
+    "main.css": "/cooltimer/static/css/main.96ebeccf.chunk.css",
+    "main.js": "/cooltimer/static/js/main.eb101d6f.chunk.js",
+    "main.js.map": "/cooltimer/static/js/main.eb101d6f.chunk.js.map",
+    "runtime-main.js": "/cooltimer/static/js/runtime-main.ced582e3.js",
+    "runtime-main.js.map": "/cooltimer/static/js/runtime-main.ced582e3.js.map",
+    "static/css/2.faef0f0f.chunk.css": "/cooltimer/static/css/2.faef0f0f.chunk.css",
+    "static/js/2.476f27ee.chunk.js": "/cooltimer/static/js/2.476f27ee.chunk.js",
+    "static/js/2.476f27ee.chunk.js.map": "/cooltimer/static/js/2.476f27ee.chunk.js.map",
+    "static/js/3.bda1dd52.chunk.js": "/cooltimer/static/js/3.bda1dd52.chunk.js",
+    "static/js/3.bda1dd52.chunk.js.map": "/cooltimer/static/js/3.bda1dd52.chunk.js.map",
+    "index.html": "/cooltimer/index.html",
+    "service-worker.js": "/cooltimer/service-worker.js",
+    "service-worker.js.map": "/cooltimer/service-worker.js.map",
+    "static/css/2.faef0f0f.chunk.css.map": "/cooltimer/static/css/2.faef0f0f.chunk.css.map",
+    "static/css/main.96ebeccf.chunk.css.map": "/cooltimer/static/css/main.96ebeccf.chunk.css.map",
+    "static/js/2.476f27ee.chunk.js.LICENSE.txt": "/cooltimer/static/js/2.476f27ee.chunk.js.LICENSE.txt",
+    "static/media/index.css": "/cooltimer/static/media/signika-vietnamese-400-normal.008fd00c.woff2"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.ced582e3.js",
+    "static/css/2.faef0f0f.chunk.css",
+    "static/js/2.476f27ee.chunk.js",
+    "static/css/main.96ebeccf.chunk.css",
+    "static/js/main.eb101d6f.chunk.js"
+  ]
+}
